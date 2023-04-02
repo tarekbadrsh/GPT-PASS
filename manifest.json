@@ -11,7 +11,10 @@
         "contextMenus",
         "clipboardWrite",
         "storage",
-        "notifications"
+        "notifications",
+        "tabs",
+        "activeTab",
+        "<all_urls>"
     ],
     "background": {
         "scripts": [
@@ -30,8 +33,7 @@
                 "<all_urls>"
             ],
             "js": [
-                "js/content.js",
-                "js/options.js"
+                "js/content.js"
             ]
         }
     ],

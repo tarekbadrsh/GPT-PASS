@@ -52,6 +52,17 @@ function getCharset(options) {
     return charset;
 }
 
+function sendMessageToTabs(tabs) {
+    for (const tab of tabs) {
+        browser.tabs
+            .sendMessage(tab.id, { greeting: "Hi from background script" })
+            .then((response) => {
+                console.log("Message from the content script:");
+                console.log(response.response);
+            });
+    }
+}
+
 
 // Function to generate a new password
 function generatePassword() {
@@ -80,6 +91,13 @@ function generatePassword() {
     }, function (error) {
         console.error("Error getting options:", error);
     });
+
+    browser.tabs
+        .query({
+            currentWindow: true,
+            active: true,
+        })
+        .then(sendMessageToTabs);
     console.log("Generate Password context menu item clicked END.");
 }
 
@@ -138,4 +156,3 @@ browser.contextMenus.onClicked.addListener(function (info, tab) {
         }
     }
 });
-
