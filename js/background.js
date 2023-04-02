@@ -3,24 +3,24 @@
  * This file contains the logic for the GPT-PASS extension.
  */
 
-// Function to save a password
-function savePassword(password) {
-    // Get the list of saved passwords
-    browser.storage.local.get("passwords").then(function (result) {
-        const passwords = result.passwords || [];
-        // Add the new password to the list
-        passwords.push(password);
+// Function to save a password and email
+function savePassword(userData) {
+    // Get the list of saved users
+    browser.storage.local.get("users").then(function (result) {
+        const users = result.users || [];
+        // Add the new password and email to the list
+        users.push(userData);
 
         // Copy the password to the clipboard using the Clipboard API
-        navigator.clipboard.writeText(password).then(function () {
-            console.log("Password copied to clipboard");
+        navigator.clipboard.writeText(userData.password).then(function () {
+            console.log("Password copied to clipboard" + userData.password);
         }, function (err) {
             console.error("Failed to copy password: ", err);
         });
 
         // Save the updated list of passwords
-        browser.storage.local.set({ passwords }).then(function () {
-            console.log("Password saved:", password);
+        browser.storage.local.set({ users }).then(function () {
+            console.log("Password saved:", userData.password, "with email:", userData.email);
         }, function (error) {
             console.error("Error saving password:", error);
         });
@@ -69,32 +69,18 @@ function generatePassword() {
         // Use options to generate password
         const length = options.passwordLength;
         const charset = getCharset(options);
-        let password = "";
+        let new_password = "";
         let values = new Uint32Array(length);
         window.crypto.getRandomValues(values);
         for (let i = 0; i < length; i++) {
-            password += charset[values[i] % charset.length];
+            new_password += charset[values[i] % charset.length];
         }
         // Save the password to storage
-        savePassword(password);
+        savePassword({ password: new_password, email: new_password + "@example.com" });
     }, function (error) {
         console.error("Error getting options:", error);
     });
     console.log("Generate Password context menu item clicked END.");
-}
-
-// Function to view all passwords
-function viewPasswords() {
-    console.log("View Passwords context menu item clicked START.");
-    // Get the list of saved passwords
-    browser.storage.local.get("passwords").then(function (result) {
-        const passwords = result.passwords || [];
-        // Log the list of passwords to the console
-        console.log("Saved passwords:", passwords);
-    }, function (error) {
-        console.error("Error getting passwords:", error);
-    });
-    console.log("View Passwords context menu item clicked END.");
 }
 
 // Function to configure the extension
@@ -118,15 +104,6 @@ var contextMenus = [
         method: generatePassword,
         onclick: function (info, tab) {
             generatePassword();
-        }
-    },
-    {
-        id: "view-passwords",
-        title: "View All Passwords with GPT-PASS",
-        contexts: ["all"],
-        method: viewPasswords,
-        onclick: function (info, tab) {
-            viewPasswords();
         }
     },
     {
