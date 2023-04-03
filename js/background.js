@@ -4,23 +4,24 @@
  */
 
 // Function to save a password and email
-function savePassword(userData) {
+function savePassword(user) {
+    console.log("Password saved:", user.password, "with email:", user.email);
     // Get the list of saved users
     browser.storage.local.get("users").then(function (result) {
         const users = result.users || [];
         // Add the new password and email to the list
-        users.push(userData);
+        users.push(user);
 
         // Copy the password to the clipboard using the Clipboard API
-        navigator.clipboard.writeText(userData.password).then(function () {
-            console.log("Password copied to clipboard" + userData.password);
+        navigator.clipboard.writeText(user.password).then(function () {
+            console.log("Password copied to clipboard" + user.password);
         }, function (err) {
             console.error("Failed to copy password: ", err);
         });
 
         // Save the updated list of passwords
         browser.storage.local.set({ users }).then(function () {
-            console.log("Password saved:", userData.password, "with email:", userData.email);
+            console.log("Password saved:", user.password, "with email:", user.email);
         }, function (error) {
             console.error("Error saving password:", error);
         });
@@ -63,6 +64,38 @@ function sendMessageToTabs(tabs) {
     }
 }
 
+function generateHash(str) {
+    console.log("generateHash(input) " + str);
+    const encoder = new TextEncoder();
+    const data = encoder.encode(str);
+    return crypto.subtle.digest('SHA-256', data)
+        .then(digest => {
+            const hashArray = Array.from(new Uint8Array(digest));
+            const hashHex = hashArray.map(b => ('00' + b.toString(16)).slice(-2)).join('');
+            const result = hashHex.slice(0, 16);
+            console.log("result " + result);
+            return result;
+        });
+}
+
+
+function validateEmail(email) {
+    const regex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
+    return regex.test(email);
+}
+
+function extractEmail(input) {
+    console.log("input: " + input);
+    let emailRegex = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g;
+    let emails = input.match(emailRegex);
+    if (emails && emails.length > 0 && validateEmail(emails[0])) {
+        console.log("extracted emails: " + emails);
+        return emails[0];
+    }
+    console.error("Can't find email in the input");
+    return "";
+}
+
 
 // Function to generate a new password
 function generatePassword() {
@@ -77,6 +110,19 @@ function generatePassword() {
         excludeSimilar: true,
         excludeAmbiguous: true,
     }).then(function (options) {
+        let user = { password: "", email: "" };
+        // Access the clipboard and get the last copied text
+        navigator.clipboard.readText().then((text) => {
+            user.email = extractEmail(text);
+            generateHash(user.email).then(myHash => {
+                user.password = myHash;
+            });
+            console.log("user: " + user);
+            savePassword(user);
+        });
+        if (user.email) {
+            return;
+        }
         // Use options to generate password
         const length = options.passwordLength;
         const charset = getCharset(options);

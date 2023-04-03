@@ -9,6 +9,7 @@
     },
     "permissions": [
         "contextMenus",
+        "clipboardRead",
         "clipboardWrite",
         "storage",
         "notifications",
