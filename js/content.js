@@ -30,3 +30,12 @@ browser.runtime.onMessage.addListener((request) => {
     show_notification(request)
     return Promise.resolve({ response: "Hi from content script" });
 });
+
+
+// content script
+browser.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+    if (request.action == "getSelectedText") {
+        var selectedText = window.getSelection().toString();
+        sendResponse({ selectedText: selectedText });
+    }
+});

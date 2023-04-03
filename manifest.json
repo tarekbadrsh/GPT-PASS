@@ -17,6 +17,7 @@
         "activeTab",
         "<all_urls>"
     ],
+    "incognito": "spanning",
     "background": {
         "scripts": [
             "js/background.js"
