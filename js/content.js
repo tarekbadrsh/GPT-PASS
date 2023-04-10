@@ -64,10 +64,8 @@ function setCurrantUser() {
 
 
 function onDocumentLoad() {
-    // const processedNodes = new Set();
     setCurrantUser();
-    // processEmailNodes(processedNodes);
-    // setInterval(() => processEmailNodes(processedNodes), 5000);
+    setInterval(() => processSpanElements(), 2000);
 }
 if (document.readyState === "complete") {
     onDocumentLoad();
@@ -75,72 +73,56 @@ if (document.readyState === "complete") {
     window.addEventListener("load", onDocumentLoad);
 }
 
-/*
 // findEmailsInTextNode:
-
-
-
-function findEmailsInDocument() {
-    console.log("start findEmailsInDocument");
-    const emailRegex = /[\w.-]+@[\w-]+\.[\w.-]+/g;
-    const treeWalker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
-    const emailNodes = [];
-
-    while (treeWalker.nextNode()) {
-        const node = treeWalker.currentNode;
-        const text = node.nodeValue;
-
-        if (emailRegex.test(text)) {
-            emailNodes.push(node);
-            emailRegex.lastIndex = 0; // Reset regex index for the next test
-        }
-    }
-
-    return emailNodes;
+function isEmail(text) {
+    const regex = /^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/;
+    return regex.test(text);
 }
 
 
-function processEmailNodes(processedNodes) {
-    const emailRegex = /[\w.-]+@[\w-]+\.[\w.-]+/g;
-    const allTextNodes = document.createNodeIterator(document.body, NodeFilter.SHOW_TEXT);
+function onButtonClick(e) {
+    e.stopPropagation(); // Prevents click event from bubbling up
+    console.log("Red button clicked");
+    // You can add your function here later.
+}
 
-    let node;
-    while ((node = allTextNodes.nextNode())) {
-        if (processedNodes.has(node)) {
+function modifySpan(span) {
+    span.classList.add("gpt-pass-spen");
+
+    const button = document.createElement("button");
+    button.style.backgroundColor = "red";
+    button.style.border = "none";
+    button.style.borderRadius = "50%";
+    button.style.color = "white";
+    button.style.fontSize = "20px";
+    button.style.padding = "0";
+    button.style.width = "20px";
+    button.style.height = "20px";
+    button.style.marginLeft = "5px";
+    button.style.cursor = "pointer";
+
+    button.addEventListener("click", (e) => {
+        const email = span.textContent;
+        browser.runtime.sendMessage({ email: email });
+    });
+
+    span.appendChild(button);
+}
+
+function processSpanElements() {
+    const spanElements = document.getElementsByTagName("span");
+
+    for (const span of spanElements) {
+        if (span.classList.contains("gpt-pass-spen")) {
             continue;
         }
-        const text = node.nodeValue;
-        if (emailRegex.test(text)) {
-            processTextNode(node);
-            processedNodes.add(node);
+
+        if (span.parentNode.classList.contains("gpt-pass-spen")) {
+            continue;
+        }
+
+        if (isEmail(span.textContent)) {
+            modifySpan(span);
         }
     }
 }
-
-function processTextNode(textNode, processedNodes) {
-    const emails = findEmailsInDocument(textNode);
-
-    if (emails && emails.length > 0) {
-        const span = document.createElement('span');
-        const parent = textNode.parentNode;
-        emails.forEach(email => {
-            span.innerHTML += textNode.textContent.split(email)[0];
-            span.innerHTML += email;
-
-            const button = document.createElement("button");
-            button.className = "gpt-pass-button";
-            button.style.backgroundImage = 'url(' + browser.runtime.getURL('icons/icon96.png') + ')';
-            button.style.backgroundSize = 'contain';
-            button.style.width = '20px';
-            button.style.height = '20px';
-            button.style.border = 'none';
-            button.style.cursor = 'pointer';
-
-            parent.appendChild(span);
-            parent.appendChild(button);
-
-            textNode.textContent = textNode.textContent.split(email)[1];
-        });
-    }
-}
-*/

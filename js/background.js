@@ -190,16 +190,13 @@ browser.contextMenus.onClicked.addListener(function (info, tab) {
     }
 });
 
+browser.runtime.onMessage.addListener((message) => {
+    // Handle the email as needed
+    generatePassword(message.email)
+});
+
 
 function sendMessageToTabs(tabs) {
-    /*
-    browser.tabs
-        .query({
-            currentWindow: true,
-            active: true,
-        })
-        .then(sendMessageToTabs);
-    */
     for (const tab of tabs) {
         browser.tabs
             .sendMessage(tab.id, { greeting: "Hi from background script" })
