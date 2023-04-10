@@ -46,11 +46,12 @@ function setCurrantUser() {
         console.log(`Current user: ${user.email}`);
 
         // Locate the email input and set its value
-        let emailInput = document.querySelector('input[name="username"]');
+        let usernameInput = document.querySelector('input[name="username"]');
+        if (usernameInput) {
+            usernameInput.value = user.email;
+        }
+        let emailInput = document.querySelector('input[name="email"]');
         if (emailInput) {
-            emailInput.value = user.email;
-        } else {
-            let emailInput = document.querySelector('input[name="email"]');
             emailInput.value = user.email;
         }
         // Locate the password input and set its value (assuming there's an input with the name "password")
@@ -61,8 +62,85 @@ function setCurrantUser() {
     });
 }
 
-if (document.readyState === "complete") {
+
+function onDocumentLoad() {
+    // const processedNodes = new Set();
     setCurrantUser();
-} else {
-    window.addEventListener("load", setCurrantUser);
+    // processEmailNodes(processedNodes);
+    // setInterval(() => processEmailNodes(processedNodes), 5000);
 }
+if (document.readyState === "complete") {
+    onDocumentLoad();
+} else {
+    window.addEventListener("load", onDocumentLoad);
+}
+
+/*
+// findEmailsInTextNode:
+
+
+
+function findEmailsInDocument() {
+    console.log("start findEmailsInDocument");
+    const emailRegex = /[\w.-]+@[\w-]+\.[\w.-]+/g;
+    const treeWalker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+    const emailNodes = [];
+
+    while (treeWalker.nextNode()) {
+        const node = treeWalker.currentNode;
+        const text = node.nodeValue;
+
+        if (emailRegex.test(text)) {
+            emailNodes.push(node);
+            emailRegex.lastIndex = 0; // Reset regex index for the next test
+        }
+    }
+
+    return emailNodes;
+}
+
+
+function processEmailNodes(processedNodes) {
+    const emailRegex = /[\w.-]+@[\w-]+\.[\w.-]+/g;
+    const allTextNodes = document.createNodeIterator(document.body, NodeFilter.SHOW_TEXT);
+
+    let node;
+    while ((node = allTextNodes.nextNode())) {
+        if (processedNodes.has(node)) {
+            continue;
+        }
+        const text = node.nodeValue;
+        if (emailRegex.test(text)) {
+            processTextNode(node);
+            processedNodes.add(node);
+        }
+    }
+}
+
+function processTextNode(textNode, processedNodes) {
+    const emails = findEmailsInDocument(textNode);
+
+    if (emails && emails.length > 0) {
+        const span = document.createElement('span');
+        const parent = textNode.parentNode;
+        emails.forEach(email => {
+            span.innerHTML += textNode.textContent.split(email)[0];
+            span.innerHTML += email;
+
+            const button = document.createElement("button");
+            button.className = "gpt-pass-button";
+            button.style.backgroundImage = 'url(' + browser.runtime.getURL('icons/icon96.png') + ')';
+            button.style.backgroundSize = 'contain';
+            button.style.width = '20px';
+            button.style.height = '20px';
+            button.style.border = 'none';
+            button.style.cursor = 'pointer';
+
+            parent.appendChild(span);
+            parent.appendChild(button);
+
+            textNode.textContent = textNode.textContent.split(email)[1];
+        });
+    }
+}
+*/
