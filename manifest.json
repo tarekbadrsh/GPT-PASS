@@ -51,11 +51,5 @@
         "edge": {
             "browser_action_next_to_addressbar": true
         }
-    },
-    "applications": {
-        "gecko": {
-            "id": "gpt-pass@example.com",
-            "strict_min_version": "60.0"
-        }
     }
 }
