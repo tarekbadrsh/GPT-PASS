@@ -160,8 +160,8 @@ var contextMenus = [
         parentId: null,
         method: generatePassword,
         icons: {
-            "16": "icons/icon2.png",
-            "32": "icons/icon2.png"
+            "16": "icons/icon48.png",
+            "32": "icons/icon48.png"
         }
     },
 
