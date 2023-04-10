@@ -39,3 +39,30 @@ browser.runtime.onMessage.addListener(function (request, sender, sendResponse) {
         sendResponse({ selectedText: selectedText });
     }
 });
+
+function setCurrantUser() {
+    browser.storage.local.get('currentUser').then(result => {
+        let user = result.currentUser || { password: "", email: "" };
+        console.log(`Current user: ${user.email}`);
+
+        // Locate the email input and set its value
+        let emailInput = document.querySelector('input[name="username"]');
+        if (emailInput) {
+            emailInput.value = user.email;
+        } else {
+            let emailInput = document.querySelector('input[name="email"]');
+            emailInput.value = user.email;
+        }
+        // Locate the password input and set its value (assuming there's an input with the name "password")
+        let passwordInput = document.querySelector('input[name="password"]');
+        if (passwordInput) {
+            passwordInput.value = user.password;
+        }
+    });
+}
+
+if (document.readyState === "complete") {
+    setCurrantUser();
+} else {
+    window.addEventListener("load", setCurrantUser);
+}

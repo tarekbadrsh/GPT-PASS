@@ -4,20 +4,24 @@
  */
 
 // Function to save a password and email
-function savePassword(user) {
+function saveUser(user) {
     // Get the list of saved users
     browser.storage.local.get("users").then(function (result) {
         const users = result.users || [];
+        // Add an ID to the user object
+        user.id = users.length + 1;
         // Add the new password and email to the list
         users.push(user);
         // Save the updated list of passwords
-        browser.storage.local.set({ users }).then(function () {
-            console.log("Password saved:", user.password, "with email:", user.email);
-        }, function (err) {
+        browser.storage.local.set({ users }).catch(function (err) {
             console.error(`Error saving password: ${err}`);
         });
-    }, function (err) {
+        navigator.clipboard.writeText(user.password);
+    }).catch(function (err) {
         console.error(`Error getting passwords: ${err}`);
+    });
+    browser.storage.local.set({ currentUser: user }).catch(function (err) {
+        console.error(`Error SET Current user: ${err}`);
     });
 }
 
@@ -79,16 +83,7 @@ function extractEmail(input) {
  * Extracts the text from the clipboard
  * @returns {string} The text from the clipboard
  */
-function extractClipboardText() {
-    return navigator.clipboard.readText() // Call readText() directly
-        .catch((err) => { // Catch any errors
-            console.error(`Failed to read clipboard: ${err}`);
-            return null;
-        });
-}
-
 function getclipboardText(callback) {
-    // Copy the password to the clipboard using the Clipboard API
     navigator.clipboard.readText().then((text) => {
         if (text) {
             callback(text);
@@ -108,7 +103,7 @@ function getSelectedText(callback) {
 }
 
 function generatePassword(selectedText) {
-    let user = { password: "", email: "" };
+    let user = { email: "", password: "" };
     if (selectedText) {
         user.email = extractEmail(selectedText);
         generateHash(user.email).then(myHash => {
@@ -135,14 +130,13 @@ function generatePassword(selectedText) {
                 user.password += charset[values[i] % charset.length];
             }
             user.email = "tmp@tmp.com"
-            // Save the password to storage
-            savePassword(user);
         }).catch((err) => { // Catch any errors
             console.error(`Failed to read clipboard: ${err}`);
             return null;
         });
     }
-    savePassword(user);
+    // Save the user to storage
+    saveUser(user);
 }
 
 // Function to configure the extension
@@ -161,8 +155,9 @@ function configureExtension() {
 var contextMenus = [
     {
         id: "generate-password",
-        title: "Generate New Password with GPT-PASS",
+        title: "GPT-PASS",
         contexts: ["all"],
+        parentId: null,
         method: generatePassword,
         icons: {
             "16": "icons/icon2.png",
@@ -179,26 +174,12 @@ browser.runtime.onInstalled.addListener(function () {
         browser.contextMenus.create({
             id: menu.id,
             title: menu.title,
-            contexts: menu.contexts
+            contexts: menu.contexts,
+            parentId: menu.parentId,
+            icons: menu.icons
         });
         console.log("Context menu item added: " + menu.title);
     }
-});
-
-
-// Add the context menu items to the browser
-browser.runtime.onInstalled.addListener(function () {
-    console.log("GPT-PASS START");
-    browser.contextMenus.create({
-        id: "generate-password",
-        title: "GPT-PASS",
-        contexts: ["all"],
-        parentId: null,
-        icons: {
-            "16": "icons/icon2.png",
-            "32": "icons/icon2.png"
-        }
-    });
 });
 
 // Handle click event on the context menu item

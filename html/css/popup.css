@@ -1,60 +1,73 @@
 body {
-    font-family: Arial, sans-serif;
-    font-size: 16px;
-    padding: 20px;
-    background-color: #15202b;
-    color: #d9d9d9;
-  }
-  
-  h1 {
-    text-align: center;
-    margin-top: 0;
-  }
-  
-  ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-  }
-  
-  li {
-    margin-bottom: 10px;
-    display: flex;
-    align-items: center;
-  }
-  
-  li span {
-    flex-grow: 1;
-  }
-  
-  li .password {
-    margin-right: 10px;
-  }
-  
-  li input[type="email"] {
-    margin-right: 10px;
-    padding: 5px;
-    font-size: 14px;
-    border-radius: 5px;
-    border: none;
-  }
-  
-  li button {
-    padding: 5px 10px;
-    font-size: 14px;
-    background-color: #1da1f2;
-    border: none;
-    color: #fff;
-    border-radius: 5px;
-    cursor: pointer;
-  }
-  
-  li button.remove {
-    margin-left: 10px;
-    background-color: #f44336;
-  }
-  
-  button:hover {
-    background-color: #0c7fb0;
-  }
-  
+  font-family: Arial, sans-serif;
+  font-size: 16px;
+  padding: 20px;
+  background-color: #15202b;
+  color: #d9d9d9;
+}
+
+h1 {
+  text-align: center;
+  margin-top: 0;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+li {
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+}
+
+.email-container, .password-container {
+  flex: 1;
+  padding: 0 5px;
+  position: relative;
+}
+
+.email-container button::after, .password-container button::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  left: 50%;
+  bottom: 100%;
+  transform: translateX(-50%);
+  margin-bottom: 8px;
+  background-color: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  padding: 2px 5px;
+  font-size: 12px;
+  white-space: nowrap;
+  border-radius: 3px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease-in-out;
+  z-index: 1000;
+}
+
+.email-container button:hover::after, .password-container button:hover::after {
+  opacity: 1;
+}
+
+li button {
+  width: 100%;
+  padding: 5px 10px;
+  font-size: 14px;
+  background-color: #1da1f2;
+  border: none;
+  color: #fff;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+li button.remove {
+  margin-left: 10px;
+  background-color: #f44336;
+}
+
+button:hover {
+  background-color: #0c7fb0;
+}

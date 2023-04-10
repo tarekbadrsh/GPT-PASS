@@ -1,23 +1,40 @@
+function truncate(text, maxLength) {
+    if (text.length > maxLength) {
+        return text.substr(0, maxLength) + '...';
+    }
+    return text;
+}
+
 browser.storage.local.get("users").then((result) => {
     var users = result.users || [];
     var usersList = document.getElementById("users-list");
+
+    // Reverse the users array to display the users from last to first
+    users.reverse();
 
     users.forEach(function (userData) {
         var li = document.createElement("li");
         var buttonCopyEmail = document.createElement("button");
         var buttonCopyPassword = document.createElement("button");
         var buttonRemove = document.createElement("button");
+        var emailContainer = document.createElement("div");
+        var passwordContainer = document.createElement("div");
 
-        buttonCopyEmail.textContent = userData.email;
+        emailContainer.classList.add("email-container");
+        passwordContainer.classList.add("password-container");
+
+        buttonCopyEmail.textContent = truncate(userData.email, 20);
+        buttonCopyEmail.setAttribute('data-tooltip', userData.email);
+
         buttonCopyEmail.addEventListener("click", function () {
             copyToClipboard(userData.email);
-            console.log("Copied email to clipboard:", userData.email);
         });
-        buttonCopyPassword.textContent = userData.password;
+        buttonCopyPassword.textContent = truncate(userData.password, 16);
+        buttonCopyPassword.setAttribute('data-tooltip', userData.password);
         buttonCopyPassword.addEventListener("click", function () {
             copyToClipboard(userData.password);
-            console.log("Copied password to clipboard:", userData.password);
         });
+
         buttonRemove.textContent = "X";
         buttonRemove.classList.add("remove");
         buttonRemove.addEventListener("click", function () {
@@ -25,13 +42,13 @@ browser.storage.local.get("users").then((result) => {
             console.log("Removed user:", userData);
         });
 
-        li.appendChild(buttonCopyEmail);
-        li.appendChild(buttonCopyPassword);
+        emailContainer.appendChild(buttonCopyEmail);
+        passwordContainer.appendChild(buttonCopyPassword);
+        li.appendChild(emailContainer);
+        li.appendChild(passwordContainer);
         li.appendChild(buttonRemove);
         usersList.appendChild(li);
     });
-
-    console.log("Loaded users:", users);
 }).catch((error) => {
     console.error("Error loading users:", error);
 });
