@@ -78,3 +78,23 @@ function removeUserFromList(li, userData) {
         console.error("Error removing user:", error);
     });
 }
+
+function clearAllUsers() {
+    browser.storage.local.set({ users: [] }).catch((error) => {
+        console.error("Error removing all users:", error);
+    });
+}
+
+function clearCurrentUser() {
+    browser.storage.local.set({ currentUser: {} }).catch((error) => {
+        console.error("Error removing current user:", error);
+    });
+}
+
+document.getElementById("clear-all-button").addEventListener("click", function () {
+    clearAllUsers();
+});
+
+document.getElementById("clear-current-button").addEventListener("click", function () {
+    clearCurrentUser();
+});

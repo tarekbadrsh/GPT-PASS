@@ -71,3 +71,13 @@ li button.remove {
 button:hover {
   background-color: #0c7fb0;
 }
+
+.button-clear-all {
+  background-color: #f44336;
+  color: #fff;
+}
+
+.button-clear-current {
+  background-color: #ffc107;
+  color: #fff;
+}
