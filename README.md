@@ -86,6 +86,9 @@ This project was made possible thanks to the following resources:
 - [Mozilla Community Discord](https://discord.gg/6HD5u5Y)
 - [Mozilla Add-ons Community](https://discourse.mozilla.org/c/add-ons)
 
+## To execlude .DS_Store and __MACOSX from zip file use:
+> zip -r archive.zip . -x '**/.*' -x '**/__MACOSX'
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
