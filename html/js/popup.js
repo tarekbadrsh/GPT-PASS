@@ -39,7 +39,6 @@ browser.storage.local.get("users").then((result) => {
         buttonRemove.classList.add("remove");
         buttonRemove.addEventListener("click", function () {
             removeUserFromList(li, userData);
-            console.log("Removed user:", userData);
         });
 
         emailContainer.appendChild(buttonCopyEmail);
@@ -49,15 +48,25 @@ browser.storage.local.get("users").then((result) => {
         li.appendChild(buttonRemove);
         usersList.appendChild(li);
     });
-}).catch((error) => {
-    console.error("Error loading users:", error);
+}).catch(function (err) {
+    console.error(`Error loading users: ${err}`);
 });
+
+browser.storage.local.get("autoFillCheckbox").then(result => {
+    let autoFillCheckbox = result.autoFillCheckbox || false;
+    document.getElementById("auto-fill-checkbox").checked = autoFillCheckbox;
+}).catch(function (err) {
+    console.error(`Error get autoFillCheckbox: ${err}`);
+});
+
+
 
 function copyToClipboard(input) {
     var textarea = document.createElement("textarea");
     document.body.appendChild(textarea);
     textarea.value = input;
     textarea.select();
+    // navigator.clipboard.writeText(
     document.execCommand("copy");
     document.body.removeChild(textarea);
 }
@@ -79,22 +88,16 @@ function removeUserFromList(li, userData) {
     });
 }
 
-function clearAllUsers() {
+document.getElementById("clear-all-button").addEventListener("click", function () {
     browser.storage.local.set({ users: [] }).catch((error) => {
         console.error("Error removing all users:", error);
     });
-}
-
-function clearCurrentUser() {
-    browser.storage.local.set({ currentUser: {} }).catch((error) => {
-        console.error("Error removing current user:", error);
-    });
-}
-
-document.getElementById("clear-all-button").addEventListener("click", function () {
-    clearAllUsers();
+    var usersHTML = document.getElementById("users-list").childNodes;
+    usersHTML.innerHTML = '';
 });
 
-document.getElementById("clear-current-button").addEventListener("click", function () {
-    clearCurrentUser();
+document.getElementById("auto-fill-checkbox").addEventListener("change", function () {
+    browser.storage.local.set({ "autoFillCheckbox": this.checked }).catch(function (err) {
+        console.error(`Error auto-fill-checkbox: ${err}`);
+    });
 });

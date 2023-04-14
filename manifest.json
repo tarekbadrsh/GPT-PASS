@@ -1,7 +1,7 @@
 {
     "manifest_version": 2,
     "name": "GPT-PASS",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "description": "Generate strong and secure passwords with the GPT-PASS extension.",
     "icons": {
         "48": "icons/icon48.png",
