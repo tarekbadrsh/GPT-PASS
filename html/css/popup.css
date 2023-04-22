@@ -27,13 +27,13 @@ li {
   width: 100%;
 }
 
-.email-container, .password-container {
+.button-container {
   flex: 1;
   padding: 0 5px;
   position: relative;
 }
 
-.email-container button::after, .password-container button::after {
+.button-container button::after {
   content: attr(data-tooltip);
   position: absolute;
   left: 50%;
@@ -52,7 +52,7 @@ li {
   z-index: 1000;
 }
 
-.email-container button:hover::after, .password-container button:hover::after {
+.button-container button:hover::after{
   opacity: 1;
 }
 

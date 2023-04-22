@@ -5,6 +5,20 @@ function truncate(text, maxLength) {
     return text;
 }
 
+function createButtonContainer(text) {
+    var button = document.createElement("button");
+    button.textContent = truncate(text, 20);
+    button.setAttribute('data-tooltip', text);
+    button.addEventListener("click", function () {
+        navigator.clipboard.writeText(text);
+    });
+    var container = document.createElement("div");
+    container.classList.add("button-container");
+    container.appendChild(button);
+
+    return container;
+}
+
 browser.storage.local.get("users").then((result) => {
     var users = result.users || [];
     var usersList = document.getElementById("users-list");
@@ -14,37 +28,17 @@ browser.storage.local.get("users").then((result) => {
 
     users.forEach(function (userData) {
         var li = document.createElement("li");
-        var buttonCopyEmail = document.createElement("button");
-        var buttonCopyPassword = document.createElement("button");
+        li.appendChild(createButtonContainer(userData.email));
+        li.appendChild(createButtonContainer(userData.password));
+        li.appendChild(createButtonContainer(userData.first_name));
+        li.appendChild(createButtonContainer(userData.last_name));
+        li.appendChild(createButtonContainer(userData.birth_date));
         var buttonRemove = document.createElement("button");
-        var emailContainer = document.createElement("div");
-        var passwordContainer = document.createElement("div");
-
-        emailContainer.classList.add("email-container");
-        passwordContainer.classList.add("password-container");
-
-        buttonCopyEmail.textContent = truncate(userData.email, 20);
-        buttonCopyEmail.setAttribute('data-tooltip', userData.email);
-
-        buttonCopyEmail.addEventListener("click", function () {
-            copyToClipboard(userData.email);
-        });
-        buttonCopyPassword.textContent = truncate(userData.password, 16);
-        buttonCopyPassword.setAttribute('data-tooltip', userData.password);
-        buttonCopyPassword.addEventListener("click", function () {
-            copyToClipboard(userData.password);
-        });
-
         buttonRemove.textContent = "X";
         buttonRemove.classList.add("remove");
         buttonRemove.addEventListener("click", function () {
             removeUserFromList(li, userData);
         });
-
-        emailContainer.appendChild(buttonCopyEmail);
-        passwordContainer.appendChild(buttonCopyPassword);
-        li.appendChild(emailContainer);
-        li.appendChild(passwordContainer);
         li.appendChild(buttonRemove);
         usersList.appendChild(li);
     });
@@ -52,31 +46,11 @@ browser.storage.local.get("users").then((result) => {
     console.error(`Error loading users: ${err}`);
 });
 
-browser.storage.local.get("autoFillCheckbox").then(result => {
-    let autoFillCheckbox = result.autoFillCheckbox || false;
-    document.getElementById("auto-fill-checkbox").checked = autoFillCheckbox;
-}).catch(function (err) {
-    console.error(`Error get autoFillCheckbox: ${err}`);
-});
 
-
-
-function copyToClipboard(input) {
-    var textarea = document.createElement("textarea");
-    document.body.appendChild(textarea);
-    textarea.value = input;
-    textarea.select();
-    // navigator.clipboard.writeText(
-    document.execCommand("copy");
-    document.body.removeChild(textarea);
-}
-
-function removeUserFromList(li, userData) {
+function removeUserFromList(li, user) {
     browser.storage.local.get("users").then((result) => {
         var users = result.users || [];
-        var index = users.findIndex(function (item) {
-            return item.password === userData.password && item.email === userData.email;
-        });
+        const index = users.findIndex(u => u.email === user.email);
         if (index !== -1) {
             users.splice(index, 1);
             browser.storage.local.set({ users }, function () {
@@ -92,8 +66,8 @@ document.getElementById("clear-all-button").addEventListener("click", function (
     browser.storage.local.set({ users: [] }).catch((error) => {
         console.error("Error removing all users:", error);
     });
-    var usersHTML = document.getElementById("users-list").childNodes;
-    usersHTML.innerHTML = '';
+    var usersList = document.getElementById("users-list");
+    usersList.innerHTML = "";
 });
 
 document.getElementById("auto-fill-checkbox").addEventListener("change", function () {
