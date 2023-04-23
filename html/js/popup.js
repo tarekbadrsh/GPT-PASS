@@ -26,6 +26,10 @@ browser.storage.local.get("users").then((result) => {
     // Reverse the users array to display the users from last to first
     users.reverse();
 
+    var clearAllButton = document.getElementById("clear-all-button");
+    clearAllButton.textContent = `Clear All (${users.length})`;
+
+
     users.forEach(function (userData) {
         var li = document.createElement("li");
         li.appendChild(createButtonContainer(userData.email));
@@ -57,14 +61,14 @@ function removeUserFromList(li, user) {
                 li.parentNode.removeChild(li);
             });
         }
-    }).catch((error) => {
-        console.error("Error removing user:", error);
+    }).catch((err) => {
+        console.error(`Error removing user: ${err}`);
     });
 }
 
 document.getElementById("clear-all-button").addEventListener("click", function () {
-    browser.storage.local.set({ users: [] }).catch((error) => {
-        console.error("Error removing all users:", error);
+    browser.storage.local.set({ users: [] }).catch((err) => {
+        console.error(`Error removing all users: ${err}`);
     });
     var usersList = document.getElementById("users-list");
     usersList.innerHTML = "";
