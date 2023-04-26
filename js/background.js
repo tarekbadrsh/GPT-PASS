@@ -3,123 +3,94 @@
  * This file contains the logic for the GPT-PASS extension.
  */
 
-// Function to save a password and email
-function saveUserToList(user) {
-    if (!user || !user.email) {
-        return;
-    }
-    // Get the list of saved users
-    browser.storage.local.get("users").then(function (result) {
-        const users = result.users || [];
+async function saveUserToList(user) {
+    if (!user || !user.email) return;
+
+    try {
+        const { users = [] } = await browser.storage.local.get("users");
         const isLastIndex = users.length > 0 && users[users.length - 1].email === user.email;
-        if (isLastIndex) {
-            return
-        }
-        // Check if the email already exists in the list of users
-        const emailExists = users.some(u => u.email === user.email);
-        if (emailExists) {
-            // Move the existing user object to the bottom of the list
-            const index = users.findIndex(u => u.email === user.email);
-            users.splice(index, 1);
+
+        if (!isLastIndex) {
+            const existingUserIndex = users.findIndex(u => u.email === user.email);
+
+            if (existingUserIndex !== -1) {
+                users.splice(existingUserIndex, 1);
+            } else {
+                user.id = users.length + 1;
+            }
+
             users.push(user);
-        } else {
-            // Add an ID to the user object
-            user.id = users.length + 1;
-            // Add the new password and email to the list
-            users.push(user);
+            await navigator.clipboard.writeText(user.password);
+            await browser.storage.local.set({ users });
         }
-        navigator.clipboard.writeText(user.password);
-        // Save the updated list of passwords
-        browser.storage.local.set({ users }).catch(function (err) {
-            console.error(`Error saving users: ${err}`);
-        });
-    }).catch(function (err) {
-        console.error(`Error getting users: ${err}`);
-    });
+    } catch (err) {
+        console.error(`Error handling users: ${err}`);
+    }
 }
 
-function updateCurrentUser(user) {
-    // Save the updated user data
-    browser.storage.local.set({ currentUser: user }).catch((err) => {
-        console.error(`Error SET Current user: ${err}`);
-    });
-    saveUserToList(user);
-    console.log("user :", user);
+async function updateCurrentUser(user) {
+    try {
+        await browser.storage.local.set({ currentUser: user });
+        saveUserToList(user);
+    } catch (err) {
+        console.error(`Error setting current user: ${err}`);
+    }
 }
 
-function generateHash(str) {
-    const encoder = new TextEncoder();
-    const data = encoder.encode(str);
-    return crypto.subtle.digest('SHA-256', data)
-        .then(digest => {
-            const hashArray = Array.from(new Uint8Array(digest));
-            const hashHex = hashArray.map(b => ('00' + b.toString(16)).slice(-2)).join('');
-            const result = hashHex.slice(0, 16);
-            return result;
-        }).catch((err) => { // Catch any errors
-            console.error(`Failed to read clipboard: ${err}`);
-            return null;
-        });
+async function generateHash(str) {
+    try {
+        const encoder = new TextEncoder();
+        const data = encoder.encode(str);
+        const digest = await crypto.subtle.digest('SHA-256', data);
+        const hashArray = Array.from(new Uint8Array(digest));
+        const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        return hashHex.slice(0, 16);
+    } catch (err) {
+        console.error(`Failed to generate hash: ${err}`);
+        return null;
+    }
 }
 
-/**
- * Extracts the text from the clipboard
- * @returns {string} The text from the clipboard
- */
-function getclipboardText(callback) {
-    navigator.clipboard.readText().then((text) => {
-        if (text) {
-            callback(text);
-        }
-    });
+async function getClipboardText(callback) {
+    try {
+        const text = await navigator.clipboard.readText();
+        if (text) callback(text);
+    } catch (err) {
+        console.error(`Failed to read clipboard: ${err}`);
+    }
 }
 
 function getSelectedText(callback) {
-    browser.tabs.executeScript({ code: "window.getSelection().toString();" }, function (results) {
-        let text = results[0];
+    browser.tabs.executeScript({ code: "window.getSelection().toString();" }, (results) => {
+        const text = results[0];
+
         if (text) {
             callback(text);
         } else {
-            getclipboardText(callback);
+            getClipboardText(callback);
         }
     });
 }
 
-// Function to configure the extension
 function configureExtension() {
-    console.log("Configure Extension context menu item clicked START.");
-    // Open the options page for the extension
-    browser.runtime.openOptionsPage().then(function () {
-        console.log("Opened options page");
-    }, function (error) {
-        console.error("Error opening options page:", error);
-    });
-    console.log("Configure Extension context menu item clicked END.");
+    browser.runtime.openOptionsPage()
+        .then(() => console.log("Opened options page"))
+        .catch((error) => console.error("Error opening options page:", error));
 }
 
 function generateRandomBirthDate() {
-    // Generate a random year within the specified range
     const randomYear = Math.floor(Math.random() * (1995 - 1970 + 1)) + 1970;
+    const randomMonth = (Math.floor(Math.random() * 12) + 1).toString().padStart(2, '0');
+    const randomDay = (Math.floor(Math.random() * 25) + 1).toString().padStart(2, '0');
 
-    // Generate a random month (1 to 12)
-    const randomMonth = Math.floor(Math.random() * 12) + 1;
-
-    // Generate a random day, considering the number of days in each month
-    const randomDay = Math.floor(Math.random() * 25) + 1;;
-
-    // Return the random birth date as a string in the format 'MM/DD/YYYY'
-    return `${randomMonth.toString().padStart(2, '0')}/${randomDay.toString().padStart(2, '0')}/${randomYear}`;
+    return `${randomMonth}/${randomDay}/${randomYear}`;
 }
 
-browser.runtime.onMessage.addListener((message) => {
-    // Handle user
+browser.runtime.onMessage.addListener(async (message) => {
     if (message.type === "user") {
-        let user = message.user
-        user.birth_date = generateRandomBirthDate()
-        generateHash(user.email).then(hash => {
-            user.password = hash;
-            updateCurrentUser(user);
-        });
+        const user = { ...message.user, birth_date: generateRandomBirthDate() };
+        const hash = await generateHash(user.email);
+        user.password = hash;
+        updateCurrentUser(user);
     }
 });
-
