@@ -1,3 +1,7 @@
+/*
+ * Content.js for a Firefox extension
+ */
+
 const createStyleElement = () => {
     const style = document.createElement("style");
     style.textContent = `
@@ -25,13 +29,6 @@ const createStyleElement = () => {
     document.head.appendChild(style);
 };
 
-const getSelectedText = (request, sender, sendResponse) => {
-    if (request.action === "getSelectedText") {
-        const selectedText = window.getSelection().toString();
-        sendResponse({ selectedText });
-    }
-};
-
 const isEmailValid = (email) => {
     const regex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
     return regex.test(email);
@@ -43,7 +40,7 @@ const extractEmail = (text) => {
     if (emails && emails.length > 0 && isEmailValid(emails[0])) {
         return emails[0];
     }
-    console.error(`Can't find email in the input: ${text}`);
+    console.error(`Cannot find email in the input: ${text}`);
     return null;
 };
 
@@ -53,9 +50,7 @@ const emailInText = (text) => {
 };
 
 function processUserName(username) {
-    // Trim the username
     username = username.trim();
-    // Split the username into first and last names
     let first_name, last_name;
     const spaceIndex = username.indexOf(" ");
     if (spaceIndex !== -1) {
@@ -65,13 +60,13 @@ function processUserName(username) {
         first_name = username;
         last_name = "AI";
     }
-    return { "first_name": first_name, "last_name": last_name };
+    return { first_name, last_name };
 }
 
 const findParentDiv = (element) => {
     while (element.parentElement) {
         element = element.parentElement;
-        if (element.tagName.toLowerCase() === 'div') {
+        if (element.tagName.toLowerCase() === "div") {
             return element;
         }
     }
@@ -90,7 +85,7 @@ const extractUserNameFromAnchor = () => {
             }
         }
     }
-    console.error(`Can't find user_name in the input: ${input}`);
+    console.error("Cannot find username in the input");
     return null;
 };
 
@@ -122,7 +117,7 @@ const addGptPassButton = (span) => {
         });
         span.appendChild(button);
     } catch (err) {
-        console.error(`Error send user: ${err}`);
+        console.error(`Error sending user: ${err}`);
     }
 };
 
@@ -132,22 +127,21 @@ const isSixDigitNumber = (value) => {
 };
 
 async function handleSmsActivate() {
-
-    const phoneElement = document.querySelector('.activate-grid-item__numberq');
+    const phoneElement = document.querySelector(".activate-grid-item__numberq");
     if (!phoneElement) {
-        return
+        return;
     }
-    const phone_number = phoneElement.innerText.replace(/\D/g, '');
+    const phone_number = phoneElement.innerText.replace(/\D/g, "");
     let { storage_phone = { phone_number: "", count_of_use: 0 } } = await browser.storage.local.get("storage_phone");
-    if (storage_phone.phone_number != phone_number) {
-        browser.storage.local.set({ "smscode": "" })
-        storage_phone = { phone_number: phone_number, count_of_use: 0 }
-        browser.storage.local.set({ storage_phone });
+    if (storage_phone.phone_number !== phone_number) {
+        await browser.storage.local.set({ smscode: undefined });
+        storage_phone = { phone_number: phone_number, count_of_use: 0 };
+        await browser.storage.local.set({ storage_phone });
     }
-    const smscodeElement = document.querySelector('.underline-orange.cursor-pointer');
+    const smscodeElement = document.querySelector(".underline-orange.cursor-pointer");
     if (smscodeElement) {
         if (isSixDigitNumber(smscodeElement.textContent)) {
-            browser.storage.local.set({ "smscode": smscodeElement.textContent });
+            await browser.storage.local.set({ smscode: smscodeElement.textContent });
         }
     }
 };
@@ -163,69 +157,44 @@ const handleFacebook = () => {
             continue;
         }
         if (emailInText(span.textContent)) {
-            addGptPassButton(span);
+
+            (span);
         }
     }
 };
 
+function fillInputIfEmpty(selector, value) {
+    const inputElement = document.querySelector(selector);
+    if (inputElement && inputElement.value.length < 1) {
+        inputElement.value = value;
+        inputElement.setAttribute("value", value);
+    }
+}
+
 async function handleOpenAI() {
-    let { autoFillCheckbox = true } = await browser.storage.local.get("autoFillCheckbox");
-    if (!autoFillCheckbox) { return }
-    let { currentUser = { email: "", password: "", first_name: "", last_name: "", birth_date: "" } } = await browser.storage.local.get('currentUser');
-    if (currentUser) {
-        // Locate the email input and set its value
-        let usernameInput = document.querySelector('input[name="username"]');
-        if (usernameInput && usernameInput.value.length < 1) {
-            usernameInput.value = currentUser.email;
-        }
-        let emailInput = document.querySelector('input[name="email"]');
-        if (emailInput && emailInput.value.length < 1) {
-            emailInput.value = currentUser.email;
-        }
-        // Locate the password input and set its value (assuming there's an input with the name "password")
-        let passwordInput = document.querySelector('input[name="password"]');
-        if (passwordInput && passwordInput.value.length < 1) {
-            passwordInput.value = currentUser.password;
-        }
+    const { autoFillCheckbox = true, currentUser = undefined, storage_phone = undefined, smscode = undefined } = await browser.storage.local.get(["autoFillCheckbox", "currentUser", "storage_phone", "smscode"]);
 
-        const firstNameInput = document.querySelector('input[placeholder="First name"]');
-        if (firstNameInput && firstNameInput.value.length < 1) {
-            firstNameInput.value = currentUser.first_name;
-            firstNameInput.setAttribute('value', currentUser.first_name);
-        }
+    if (!autoFillCheckbox || !currentUser) {
+        return;
+    }
 
-        const lastNameInput = document.querySelector('input[placeholder="Last name"]');
-        if (lastNameInput && lastNameInput.value.length < 1) {
-            lastNameInput.value = currentUser.last_name;
-            lastNameInput.setAttribute('value', currentUser.last_name);
-        }
+    fillInputIfEmpty('input[name="username"]', currentUser.email);
+    fillInputIfEmpty('input[name="email"]', currentUser.email);
+    fillInputIfEmpty('input[name="password"]', currentUser.password);
+    fillInputIfEmpty('input[placeholder="First name"]', currentUser.first_name);
+    fillInputIfEmpty('input[placeholder="Last name"]', currentUser.last_name);
 
-        // Check if the page has the text "Verify your phone number"
-        let { storage_phone = { phone_number: null, count_of_use: 0 } } = await browser.storage.local.get("storage_phone");
-        const phoneNumberPage = document.body.textContent.includes("Verify your phone number");
-        if (phoneNumberPage && storage_phone.phone_number) {
-            // Select the phone number text box on this page
-            const phonenmbertxt = document.querySelector('.text-input.text-input-lg.text-input-full');
-            if (phonenmbertxt && phonenmbertxt.value.length < 1) {
-                phonenmbertxt.value = storage_phone.phone_number;
-            }
-        }
+    if (document.body.textContent.includes("Verify your phone number") && storage_phone && storage_phone.phone_number) {
+        fillInputIfEmpty(".text-input.text-input-lg.text-input-full", storage_phone.phone_number);
+    }
 
-        let { smscode = "" } = await browser.storage.local.get("smscode");
-        // Check if the page has the text "Enter code"
-        const codePage = document.body.textContent.includes("Enter code");
-        if (codePage && storage_phone.phone_number && smscode) {
-            // Select the code text box on this page
-            const codetxt = document.querySelector('.text-input.text-input-lg.text-input-full');
-            // If the code text box is present, set its value to user.code
-            if (codetxt && codetxt.value.length < 1) {
-                codetxt.value = smscode;
-                browser.storage.local.set({ "smscode": "" });
-                storage_phone.count_of_use++;
-                if (storage_phone.count_of_use == 2) {
-                    browser.storage.local.set({ "storage_phone": "" });
-                }
-            }
+    if (document.body.textContent.includes("Enter code") && storage_phone && storage_phone.phone_number && smscode) {
+        fillInputIfEmpty(".text-input.text-input-lg.text-input-full", smscode);
+        await browser.storage.local.set({ smscode: undefined });
+        storage_phone.count_of_use++;
+
+        if (storage_phone.count_of_use == 2) {
+            await browser.storage.local.set({ storage_phone: undefined });
         }
     }
 };
