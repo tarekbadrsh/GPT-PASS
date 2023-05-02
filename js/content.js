@@ -157,8 +157,7 @@ const handleFacebook = () => {
             continue;
         }
         if (emailInText(span.textContent)) {
-
-            (span);
+            addGptPassButton(span);
         }
     }
 };
