@@ -20,17 +20,22 @@ function createButtonContainer(text) {
     return container;
 }
 
-async function displayUsers() {
-    const { users = undefined } = await browser.storage.local.get("users");
-    if (!users) {
-        return;
+function setCheckboxStateFromLocalStorage() {
+    const checkbox = document.getElementById('auto-fill-checkbox');
+    if (checkbox) {
+        browser.storage.local.get("autoFillCheckbox", (result) => {
+            checkbox.checked = result.autoFillCheckbox;
+        });
     }
-    const usersList = document.getElementById("users-list");
+}
+
+async function display() {
+    const { users = [] } = await browser.storage.local.get("users");
+
     // Reverse the users array to display the users from last to first
     users.reverse();
 
-    const clearAllButton = document.getElementById("clear-all-button");
-    clearAllButton.textContent = `Clear All (${users.length})`;
+    const usersList = document.getElementById("users-list");
 
     users.forEach((userData) => {
         const li = document.createElement("li");
@@ -42,38 +47,33 @@ async function displayUsers() {
         const buttonRemove = document.createElement("button");
         buttonRemove.textContent = "X";
         buttonRemove.classList.add("remove");
-        buttonRemove.addEventListener("click", () => {
-            removeUserFromList(li, userData);
+        buttonRemove.addEventListener("click", async () => {
+            const index = users.findIndex(u => u.email === userData.email);
+            users.splice(index, 1);
+            await browser.storage.local.set({ users });
+            li.parentNode.removeChild(li);
         });
 
         li.appendChild(buttonRemove);
         usersList.appendChild(li);
     });
+
+    const clearAllButton = document.getElementById("clear-all-button");
+    clearAllButton.textContent = `Clear All (${users.length})`;
+    clearAllButton.addEventListener("click", async () => {
+        await browser.storage.local.set({ users: [] });
+        await browser.storage.local.set({ currentUser: {} });
+        const usersList = document.getElementById("users-list");
+        usersList.innerHTML = "";
+        clearAllButton.textContent = `Clear All (0)`;
+    });
 }
 
-displayUsers();
 
-async function removeUserFromList(li, user) {
-    const { users = undefined } = await browser.storage.local.get("users");
-    if (!users) {
-        return;
-    }
-    const index = users.findIndex(u => u.email === user.email);
-    if (index !== -1) {
-        users.splice(index, 1);
-        await browser.storage.local.set({ users });
-        li.parentNode.removeChild(li);
-    }
-}
-
-document.getElementById("clear-all-button").addEventListener("click", async () => {
-    await browser.storage.local.set({ users: undefined });
-    await browser.storage.local.set({ currentUser: undefined });
-
-    const usersList = document.getElementById("users-list");
-    usersList.innerHTML = "";
+document.getElementById("auto-fill-checkbox").addEventListener("change", async function (event) {
+    browser.storage.local.set({ autoFillCheckbox: event.target.checked });
 });
 
-document.getElementById("auto-fill-checkbox").addEventListener("change", async function () {
-    await browser.storage.local.set({ "autoFillCheckbox": this.checked });
-});
+
+display();
+setCheckboxStateFromLocalStorage();
