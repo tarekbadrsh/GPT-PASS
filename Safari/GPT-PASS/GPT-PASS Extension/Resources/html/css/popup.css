@@ -1,0 +1,133 @@
+body {
+  font-family: Arial, sans-serif;
+  font-size: 16px;
+  padding: 20px;
+  background-color: #15202b;
+  color: #d9d9d9;
+}
+
+h1 {
+  text-align: center;
+  margin-top: 0;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.button-container {
+  flex: 1;
+  padding: 0 5px;
+  position: relative;
+}
+
+.button-container button::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  left: 50%;
+  bottom: 100%;
+  transform: translateX(-50%);
+  margin-bottom: 8px;
+  background-color: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  padding: 2px 5px;
+  font-size: 12px;
+  white-space: nowrap;
+  border-radius: 3px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease-in-out;
+  z-index: 1000;
+}
+
+.button-container button:hover::after{
+  opacity: 1;
+}
+
+li button {
+  width: 100%;
+  padding: 5px 10px;
+  font-size: 14px;
+  background-color: #1da1f2;
+  border: none;
+  color: #fff;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+li button.remove {
+  margin-left: 10px;
+  background-color: #f44336;
+}
+
+button:hover {
+  background-color: #0c7fb0;
+}
+
+.button-clear-all {
+  background-color: #1da1f2;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  padding: 10px 20px;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.button-clear-all:hover {
+  background-color: #0c7fb0;
+}
+
+.checkbox-container {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+input[type="checkbox"] {
+  margin-right: 5px;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border: 2px solid #1da1f2;
+  border-radius: 3px;
+  outline: none;
+  cursor: pointer;
+  vertical-align: middle;
+}
+
+input[type="checkbox"]:checked {
+  background-color: #1da1f2;
+}
+
+label[for="auto-fill-checkbox"] {
+  font-size: 14px;
+  display: inline-block;
+  margin-left: 5px;
+}
+
+#clear-all-button {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+#clear-current-button {
+  margin-top: 5px;
+  margin-bottom: 10px;
+}

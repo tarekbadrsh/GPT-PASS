@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>GPT-PASS Options</title>
+    <link rel="stylesheet" href="css/options.css">
+</head>
+
+<body>
+    <h1>GPT-PASS Options</h1>
+
+    <form id="options-form">
+        <label for="password-length">Password Length:</label>
+        <input type="number" id="password-length" name="passwordLength" value="16" max="64" required>
+
+        <div class="checkbox-group" id="include-options">
+            <div class="option-group">
+                <label for="include-symbols">Include Symbols:</label><input type="checkbox" id="include-symbols"
+                    name="includeSymbols">
+            </div>
+            <div class="option-group">
+                <label for="include-numbers">Include Numbers:</label><input type="checkbox" id="include-numbers"
+                    name="includeNumbers">
+            </div>
+            <div class="option-group">
+                <label for="include-lowercase">Include Lowercase Characters:</label><input type="checkbox"
+                    id="include-lowercase" name="includeLowercase" checked>
+            </div>
+            <div class="option-group">
+                <label for="include-uppercase">Include Uppercase Characters:</label><input type="checkbox"
+                    id="include-uppercase" name="includeUppercase" checked>
+            </div>
+        </div>
+
+        <div class="checkbox-group" id="exclude-options">
+            <div class="option-group">
+                <label for="exclude-similar">Exclude Similar Characters:</label><input type="checkbox"
+                    id="exclude-similar" name="excludeSimilar" checked>
+            </div>
+            <div class="option-group">
+                <label for="exclude-ambiguous">Exclude Ambiguous Characters:</label><input type="checkbox"
+                    id="exclude-ambiguous" name="excludeAmbiguous" checked>
+            </div>
+        </div>
+
+        <!-- <input type="submit" value="Save"> -->
+    </form>
+
+    <script src="js/options.js"></script>
+</body>
+
+</html>

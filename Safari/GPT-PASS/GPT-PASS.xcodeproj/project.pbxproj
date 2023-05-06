@@ -1,0 +1,910 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		FE4E23BB2A0692FC008BB8E0 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE4E23BA2A0692FC008BB8E0 /* AppDelegate.swift */; };
+		FE4E23BF2A0692FC008BB8E0 /* Main.html in Resources */ = {isa = PBXBuildFile; fileRef = FE4E23BD2A0692FC008BB8E0 /* Main.html */; };
+		FE4E23C12A0692FC008BB8E0 /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = FE4E23C02A0692FC008BB8E0 /* Icon.png */; };
+		FE4E23C32A0692FC008BB8E0 /* Style.css in Resources */ = {isa = PBXBuildFile; fileRef = FE4E23C22A0692FC008BB8E0 /* Style.css */; };
+		FE4E23C52A0692FC008BB8E0 /* Script.js in Resources */ = {isa = PBXBuildFile; fileRef = FE4E23C42A0692FC008BB8E0 /* Script.js */; };
+		FE4E23C72A0692FC008BB8E0 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE4E23C62A0692FC008BB8E0 /* ViewController.swift */; };
+		FE4E23CA2A0692FC008BB8E0 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FE4E23C82A0692FC008BB8E0 /* Main.storyboard */; };
+		FE4E23CC2A0692FD008BB8E0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FE4E23CB2A0692FD008BB8E0 /* Assets.xcassets */; };
+		FE4E23D82A0692FD008BB8E0 /* GPT_PASSTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE4E23D72A0692FD008BB8E0 /* GPT_PASSTests.swift */; };
+		FE4E23E22A0692FD008BB8E0 /* GPT_PASSUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE4E23E12A0692FD008BB8E0 /* GPT_PASSUITests.swift */; };
+		FE4E23E42A0692FD008BB8E0 /* GPT_PASSUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE4E23E32A0692FD008BB8E0 /* GPT_PASSUITestsLaunchTests.swift */; };
+		FE4E23EA2A0692FD008BB8E0 /* GPT-PASS Extension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = FE4E23E92A0692FD008BB8E0 /* GPT-PASS Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		FE4E23EF2A0692FD008BB8E0 /* SafariWebExtensionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE4E23EE2A0692FD008BB8E0 /* SafariWebExtensionHandler.swift */; };
+		FE4E23F62A0692FD008BB8E0 /* manifest.json in Resources */ = {isa = PBXBuildFile; fileRef = FE4E23F52A0692FD008BB8E0 /* manifest.json */; };
+		FE4E24252A0693EB008BB8E0 /* popup.css in Resources */ = {isa = PBXBuildFile; fileRef = FE4E24142A0693EB008BB8E0 /* popup.css */; };
+		FE4E24262A0693EB008BB8E0 /* options.css in Resources */ = {isa = PBXBuildFile; fileRef = FE4E24152A0693EB008BB8E0 /* options.css */; };
+		FE4E24272A0693EB008BB8E0 /* popup.js in Resources */ = {isa = PBXBuildFile; fileRef = FE4E24172A0693EB008BB8E0 /* popup.js */; };
+		FE4E24282A0693EB008BB8E0 /* options.js in Resources */ = {isa = PBXBuildFile; fileRef = FE4E24182A0693EB008BB8E0 /* options.js */; };
+		FE4E24292A0693EB008BB8E0 /* popup.html in Resources */ = {isa = PBXBuildFile; fileRef = FE4E24192A0693EB008BB8E0 /* popup.html */; };
+		FE4E242A2A0693EB008BB8E0 /* notification.html in Resources */ = {isa = PBXBuildFile; fileRef = FE4E241A2A0693EB008BB8E0 /* notification.html */; };
+		FE4E242B2A0693EB008BB8E0 /* options.html in Resources */ = {isa = PBXBuildFile; fileRef = FE4E241B2A0693EB008BB8E0 /* options.html */; };
+		FE4E242C2A0693EB008BB8E0 /* icon16.png in Resources */ = {isa = PBXBuildFile; fileRef = FE4E241D2A0693EB008BB8E0 /* icon16.png */; };
+		FE4E242D2A0693EB008BB8E0 /* icon48.png in Resources */ = {isa = PBXBuildFile; fileRef = FE4E241E2A0693EB008BB8E0 /* icon48.png */; };
+		FE4E242E2A0693EB008BB8E0 /* icon64.png in Resources */ = {isa = PBXBuildFile; fileRef = FE4E241F2A0693EB008BB8E0 /* icon64.png */; };
+		FE4E242F2A0693EB008BB8E0 /* icon96.png in Resources */ = {isa = PBXBuildFile; fileRef = FE4E24202A0693EB008BB8E0 /* icon96.png */; };
+		FE4E24302A0693EB008BB8E0 /* icon32.png in Resources */ = {isa = PBXBuildFile; fileRef = FE4E24212A0693EB008BB8E0 /* icon32.png */; };
+		FE4E24312A0693EB008BB8E0 /* background.js in Resources */ = {isa = PBXBuildFile; fileRef = FE4E24232A0693EB008BB8E0 /* background.js */; };
+		FE4E24322A0693EB008BB8E0 /* content.js in Resources */ = {isa = PBXBuildFile; fileRef = FE4E24242A0693EB008BB8E0 /* content.js */; };
+		FE4E24332A06959D008BB8E0 /* icon32.png in Resources */ = {isa = PBXBuildFile; fileRef = FE4E24212A0693EB008BB8E0 /* icon32.png */; };
+		FE4E24342A06959D008BB8E0 /* icon32.png in Resources */ = {isa = PBXBuildFile; fileRef = FE4E24212A0693EB008BB8E0 /* icon32.png */; };
+		FE4E24352A06959E008BB8E0 /* icon32.png in Resources */ = {isa = PBXBuildFile; fileRef = FE4E24212A0693EB008BB8E0 /* icon32.png */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		FE4E23D42A0692FD008BB8E0 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = FE4E23AF2A0692FC008BB8E0 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = FE4E23B62A0692FC008BB8E0;
+			remoteInfo = "GPT-PASS";
+		};
+		FE4E23DE2A0692FD008BB8E0 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = FE4E23AF2A0692FC008BB8E0 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = FE4E23B62A0692FC008BB8E0;
+			remoteInfo = "GPT-PASS";
+		};
+		FE4E23EB2A0692FD008BB8E0 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = FE4E23AF2A0692FC008BB8E0 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = FE4E23E82A0692FD008BB8E0;
+			remoteInfo = "GPT-PASS Extension";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		FE4E24082A0692FD008BB8E0 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				FE4E23EA2A0692FD008BB8E0 /* GPT-PASS Extension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		FE4E23B72A0692FC008BB8E0 /* GPT-PASS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "GPT-PASS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		FE4E23BA2A0692FC008BB8E0 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		FE4E23BE2A0692FC008BB8E0 /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = Base; path = ../Base.lproj/Main.html; sourceTree = "<group>"; };
+		FE4E23C02A0692FC008BB8E0 /* Icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Icon.png; sourceTree = "<group>"; };
+		FE4E23C22A0692FC008BB8E0 /* Style.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = Style.css; sourceTree = "<group>"; };
+		FE4E23C42A0692FC008BB8E0 /* Script.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = Script.js; sourceTree = "<group>"; };
+		FE4E23C62A0692FC008BB8E0 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		FE4E23C92A0692FC008BB8E0 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		FE4E23CB2A0692FD008BB8E0 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		FE4E23CD2A0692FD008BB8E0 /* GPT_PASS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = GPT_PASS.entitlements; sourceTree = "<group>"; };
+		FE4E23CE2A0692FD008BB8E0 /* GPT-PASS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "GPT-PASS.entitlements"; sourceTree = "<group>"; };
+		FE4E23D32A0692FD008BB8E0 /* GPT-PASSTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "GPT-PASSTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		FE4E23D72A0692FD008BB8E0 /* GPT_PASSTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GPT_PASSTests.swift; sourceTree = "<group>"; };
+		FE4E23DD2A0692FD008BB8E0 /* GPT-PASSUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "GPT-PASSUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		FE4E23E12A0692FD008BB8E0 /* GPT_PASSUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GPT_PASSUITests.swift; sourceTree = "<group>"; };
+		FE4E23E32A0692FD008BB8E0 /* GPT_PASSUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GPT_PASSUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		FE4E23E92A0692FD008BB8E0 /* GPT-PASS Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "GPT-PASS Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+		FE4E23EE2A0692FD008BB8E0 /* SafariWebExtensionHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafariWebExtensionHandler.swift; sourceTree = "<group>"; };
+		FE4E23F52A0692FD008BB8E0 /* manifest.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = manifest.json; sourceTree = "<group>"; };
+		FE4E24012A0692FD008BB8E0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		FE4E24022A0692FD008BB8E0 /* GPT_PASS_Extension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = GPT_PASS_Extension.entitlements; sourceTree = "<group>"; };
+		FE4E24142A0693EB008BB8E0 /* popup.css */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.css; path = popup.css; sourceTree = "<group>"; };
+		FE4E24152A0693EB008BB8E0 /* options.css */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.css; path = options.css; sourceTree = "<group>"; };
+		FE4E24172A0693EB008BB8E0 /* popup.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = popup.js; sourceTree = "<group>"; };
+		FE4E24182A0693EB008BB8E0 /* options.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = options.js; sourceTree = "<group>"; };
+		FE4E24192A0693EB008BB8E0 /* popup.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = popup.html; sourceTree = "<group>"; };
+		FE4E241A2A0693EB008BB8E0 /* notification.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = notification.html; sourceTree = "<group>"; };
+		FE4E241B2A0693EB008BB8E0 /* options.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = options.html; sourceTree = "<group>"; };
+		FE4E241D2A0693EB008BB8E0 /* icon16.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = icon16.png; sourceTree = "<group>"; };
+		FE4E241E2A0693EB008BB8E0 /* icon48.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = icon48.png; sourceTree = "<group>"; };
+		FE4E241F2A0693EB008BB8E0 /* icon64.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = icon64.png; sourceTree = "<group>"; };
+		FE4E24202A0693EB008BB8E0 /* icon96.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = icon96.png; sourceTree = "<group>"; };
+		FE4E24212A0693EB008BB8E0 /* icon32.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = icon32.png; sourceTree = "<group>"; };
+		FE4E24232A0693EB008BB8E0 /* background.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = background.js; sourceTree = "<group>"; };
+		FE4E24242A0693EB008BB8E0 /* content.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = content.js; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		FE4E23B42A0692FC008BB8E0 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FE4E23D02A0692FD008BB8E0 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FE4E23DA2A0692FD008BB8E0 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FE4E23E62A0692FD008BB8E0 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		FE4E23AE2A0692FC008BB8E0 = {
+			isa = PBXGroup;
+			children = (
+				FE4E23B92A0692FC008BB8E0 /* GPT-PASS */,
+				FE4E23D62A0692FD008BB8E0 /* GPT-PASSTests */,
+				FE4E23E02A0692FD008BB8E0 /* GPT-PASSUITests */,
+				FE4E23ED2A0692FD008BB8E0 /* GPT-PASS Extension */,
+				FE4E23B82A0692FC008BB8E0 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		FE4E23B82A0692FC008BB8E0 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				FE4E23B72A0692FC008BB8E0 /* GPT-PASS.app */,
+				FE4E23D32A0692FD008BB8E0 /* GPT-PASSTests.xctest */,
+				FE4E23DD2A0692FD008BB8E0 /* GPT-PASSUITests.xctest */,
+				FE4E23E92A0692FD008BB8E0 /* GPT-PASS Extension.appex */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		FE4E23B92A0692FC008BB8E0 /* GPT-PASS */ = {
+			isa = PBXGroup;
+			children = (
+				FE4E23BA2A0692FC008BB8E0 /* AppDelegate.swift */,
+				FE4E23C62A0692FC008BB8E0 /* ViewController.swift */,
+				FE4E23C82A0692FC008BB8E0 /* Main.storyboard */,
+				FE4E23CB2A0692FD008BB8E0 /* Assets.xcassets */,
+				FE4E23CD2A0692FD008BB8E0 /* GPT_PASS.entitlements */,
+				FE4E23CE2A0692FD008BB8E0 /* GPT-PASS.entitlements */,
+				FE4E23BC2A0692FC008BB8E0 /* Resources */,
+			);
+			path = "GPT-PASS";
+			sourceTree = "<group>";
+		};
+		FE4E23BC2A0692FC008BB8E0 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				FE4E23BD2A0692FC008BB8E0 /* Main.html */,
+				FE4E23C02A0692FC008BB8E0 /* Icon.png */,
+				FE4E23C22A0692FC008BB8E0 /* Style.css */,
+				FE4E23C42A0692FC008BB8E0 /* Script.js */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		FE4E23D62A0692FD008BB8E0 /* GPT-PASSTests */ = {
+			isa = PBXGroup;
+			children = (
+				FE4E23D72A0692FD008BB8E0 /* GPT_PASSTests.swift */,
+			);
+			path = "GPT-PASSTests";
+			sourceTree = "<group>";
+		};
+		FE4E23E02A0692FD008BB8E0 /* GPT-PASSUITests */ = {
+			isa = PBXGroup;
+			children = (
+				FE4E23E12A0692FD008BB8E0 /* GPT_PASSUITests.swift */,
+				FE4E23E32A0692FD008BB8E0 /* GPT_PASSUITestsLaunchTests.swift */,
+			);
+			path = "GPT-PASSUITests";
+			sourceTree = "<group>";
+		};
+		FE4E23ED2A0692FD008BB8E0 /* GPT-PASS Extension */ = {
+			isa = PBXGroup;
+			children = (
+				FE4E23EE2A0692FD008BB8E0 /* SafariWebExtensionHandler.swift */,
+				FE4E24012A0692FD008BB8E0 /* Info.plist */,
+				FE4E24022A0692FD008BB8E0 /* GPT_PASS_Extension.entitlements */,
+				FE4E23F02A0692FD008BB8E0 /* Resources */,
+			);
+			path = "GPT-PASS Extension";
+			sourceTree = "<group>";
+		};
+		FE4E23F02A0692FD008BB8E0 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				FE4E24122A0693EB008BB8E0 /* html */,
+				FE4E241C2A0693EB008BB8E0 /* icons */,
+				FE4E24222A0693EB008BB8E0 /* js */,
+				FE4E23F52A0692FD008BB8E0 /* manifest.json */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		FE4E24122A0693EB008BB8E0 /* html */ = {
+			isa = PBXGroup;
+			children = (
+				FE4E24132A0693EB008BB8E0 /* css */,
+				FE4E24162A0693EB008BB8E0 /* js */,
+				FE4E24192A0693EB008BB8E0 /* popup.html */,
+				FE4E241A2A0693EB008BB8E0 /* notification.html */,
+				FE4E241B2A0693EB008BB8E0 /* options.html */,
+			);
+			path = html;
+			sourceTree = "<group>";
+		};
+		FE4E24132A0693EB008BB8E0 /* css */ = {
+			isa = PBXGroup;
+			children = (
+				FE4E24142A0693EB008BB8E0 /* popup.css */,
+				FE4E24152A0693EB008BB8E0 /* options.css */,
+			);
+			path = css;
+			sourceTree = "<group>";
+		};
+		FE4E24162A0693EB008BB8E0 /* js */ = {
+			isa = PBXGroup;
+			children = (
+				FE4E24172A0693EB008BB8E0 /* popup.js */,
+				FE4E24182A0693EB008BB8E0 /* options.js */,
+			);
+			path = js;
+			sourceTree = "<group>";
+		};
+		FE4E241C2A0693EB008BB8E0 /* icons */ = {
+			isa = PBXGroup;
+			children = (
+				FE4E241D2A0693EB008BB8E0 /* icon16.png */,
+				FE4E241E2A0693EB008BB8E0 /* icon48.png */,
+				FE4E241F2A0693EB008BB8E0 /* icon64.png */,
+				FE4E24202A0693EB008BB8E0 /* icon96.png */,
+				FE4E24212A0693EB008BB8E0 /* icon32.png */,
+			);
+			path = icons;
+			sourceTree = "<group>";
+		};
+		FE4E24222A0693EB008BB8E0 /* js */ = {
+			isa = PBXGroup;
+			children = (
+				FE4E24232A0693EB008BB8E0 /* background.js */,
+				FE4E24242A0693EB008BB8E0 /* content.js */,
+			);
+			path = js;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		FE4E23B62A0692FC008BB8E0 /* GPT-PASS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = FE4E24092A0692FD008BB8E0 /* Build configuration list for PBXNativeTarget "GPT-PASS" */;
+			buildPhases = (
+				FE4E23B32A0692FC008BB8E0 /* Sources */,
+				FE4E23B42A0692FC008BB8E0 /* Frameworks */,
+				FE4E23B52A0692FC008BB8E0 /* Resources */,
+				FE4E24082A0692FD008BB8E0 /* Embed Foundation Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				FE4E23EC2A0692FD008BB8E0 /* PBXTargetDependency */,
+			);
+			name = "GPT-PASS";
+			productName = "GPT-PASS";
+			productReference = FE4E23B72A0692FC008BB8E0 /* GPT-PASS.app */;
+			productType = "com.apple.product-type.application";
+		};
+		FE4E23D22A0692FD008BB8E0 /* GPT-PASSTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = FE4E240C2A0692FD008BB8E0 /* Build configuration list for PBXNativeTarget "GPT-PASSTests" */;
+			buildPhases = (
+				FE4E23CF2A0692FD008BB8E0 /* Sources */,
+				FE4E23D02A0692FD008BB8E0 /* Frameworks */,
+				FE4E23D12A0692FD008BB8E0 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				FE4E23D52A0692FD008BB8E0 /* PBXTargetDependency */,
+			);
+			name = "GPT-PASSTests";
+			productName = "GPT-PASSTests";
+			productReference = FE4E23D32A0692FD008BB8E0 /* GPT-PASSTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		FE4E23DC2A0692FD008BB8E0 /* GPT-PASSUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = FE4E240F2A0692FD008BB8E0 /* Build configuration list for PBXNativeTarget "GPT-PASSUITests" */;
+			buildPhases = (
+				FE4E23D92A0692FD008BB8E0 /* Sources */,
+				FE4E23DA2A0692FD008BB8E0 /* Frameworks */,
+				FE4E23DB2A0692FD008BB8E0 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				FE4E23DF2A0692FD008BB8E0 /* PBXTargetDependency */,
+			);
+			name = "GPT-PASSUITests";
+			productName = "GPT-PASSUITests";
+			productReference = FE4E23DD2A0692FD008BB8E0 /* GPT-PASSUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+		FE4E23E82A0692FD008BB8E0 /* GPT-PASS Extension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = FE4E24052A0692FD008BB8E0 /* Build configuration list for PBXNativeTarget "GPT-PASS Extension" */;
+			buildPhases = (
+				FE4E23E52A0692FD008BB8E0 /* Sources */,
+				FE4E23E62A0692FD008BB8E0 /* Frameworks */,
+				FE4E23E72A0692FD008BB8E0 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "GPT-PASS Extension";
+			productName = "GPT-PASS Extension";
+			productReference = FE4E23E92A0692FD008BB8E0 /* GPT-PASS Extension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		FE4E23AF2A0692FC008BB8E0 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1430;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					FE4E23B62A0692FC008BB8E0 = {
+						CreatedOnToolsVersion = 14.3;
+					};
+					FE4E23D22A0692FD008BB8E0 = {
+						CreatedOnToolsVersion = 14.3;
+						TestTargetID = FE4E23B62A0692FC008BB8E0;
+					};
+					FE4E23DC2A0692FD008BB8E0 = {
+						CreatedOnToolsVersion = 14.3;
+						TestTargetID = FE4E23B62A0692FC008BB8E0;
+					};
+					FE4E23E82A0692FD008BB8E0 = {
+						CreatedOnToolsVersion = 14.3;
+					};
+				};
+			};
+			buildConfigurationList = FE4E23B22A0692FC008BB8E0 /* Build configuration list for PBXProject "GPT-PASS" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = FE4E23AE2A0692FC008BB8E0;
+			productRefGroup = FE4E23B82A0692FC008BB8E0 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				FE4E23B62A0692FC008BB8E0 /* GPT-PASS */,
+				FE4E23D22A0692FD008BB8E0 /* GPT-PASSTests */,
+				FE4E23DC2A0692FD008BB8E0 /* GPT-PASSUITests */,
+				FE4E23E82A0692FD008BB8E0 /* GPT-PASS Extension */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		FE4E23B52A0692FC008BB8E0 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FE4E23C12A0692FC008BB8E0 /* Icon.png in Resources */,
+				FE4E23CA2A0692FC008BB8E0 /* Main.storyboard in Resources */,
+				FE4E24352A06959E008BB8E0 /* icon32.png in Resources */,
+				FE4E23C52A0692FC008BB8E0 /* Script.js in Resources */,
+				FE4E23BF2A0692FC008BB8E0 /* Main.html in Resources */,
+				FE4E23CC2A0692FD008BB8E0 /* Assets.xcassets in Resources */,
+				FE4E23C32A0692FC008BB8E0 /* Style.css in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FE4E23D12A0692FD008BB8E0 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FE4E24342A06959D008BB8E0 /* icon32.png in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FE4E23DB2A0692FD008BB8E0 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FE4E24332A06959D008BB8E0 /* icon32.png in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FE4E23E72A0692FD008BB8E0 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FE4E24252A0693EB008BB8E0 /* popup.css in Resources */,
+				FE4E24292A0693EB008BB8E0 /* popup.html in Resources */,
+				FE4E24312A0693EB008BB8E0 /* background.js in Resources */,
+				FE4E24302A0693EB008BB8E0 /* icon32.png in Resources */,
+				FE4E23F62A0692FD008BB8E0 /* manifest.json in Resources */,
+				FE4E242B2A0693EB008BB8E0 /* options.html in Resources */,
+				FE4E242D2A0693EB008BB8E0 /* icon48.png in Resources */,
+				FE4E242C2A0693EB008BB8E0 /* icon16.png in Resources */,
+				FE4E24262A0693EB008BB8E0 /* options.css in Resources */,
+				FE4E24322A0693EB008BB8E0 /* content.js in Resources */,
+				FE4E24272A0693EB008BB8E0 /* popup.js in Resources */,
+				FE4E24282A0693EB008BB8E0 /* options.js in Resources */,
+				FE4E242F2A0693EB008BB8E0 /* icon96.png in Resources */,
+				FE4E242E2A0693EB008BB8E0 /* icon64.png in Resources */,
+				FE4E242A2A0693EB008BB8E0 /* notification.html in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		FE4E23B32A0692FC008BB8E0 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FE4E23C72A0692FC008BB8E0 /* ViewController.swift in Sources */,
+				FE4E23BB2A0692FC008BB8E0 /* AppDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FE4E23CF2A0692FD008BB8E0 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FE4E23D82A0692FD008BB8E0 /* GPT_PASSTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FE4E23D92A0692FD008BB8E0 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FE4E23E42A0692FD008BB8E0 /* GPT_PASSUITestsLaunchTests.swift in Sources */,
+				FE4E23E22A0692FD008BB8E0 /* GPT_PASSUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FE4E23E52A0692FD008BB8E0 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FE4E23EF2A0692FD008BB8E0 /* SafariWebExtensionHandler.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		FE4E23D52A0692FD008BB8E0 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = FE4E23B62A0692FC008BB8E0 /* GPT-PASS */;
+			targetProxy = FE4E23D42A0692FD008BB8E0 /* PBXContainerItemProxy */;
+		};
+		FE4E23DF2A0692FD008BB8E0 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = FE4E23B62A0692FC008BB8E0 /* GPT-PASS */;
+			targetProxy = FE4E23DE2A0692FD008BB8E0 /* PBXContainerItemProxy */;
+		};
+		FE4E23EC2A0692FD008BB8E0 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = FE4E23E82A0692FD008BB8E0 /* GPT-PASS Extension */;
+			targetProxy = FE4E23EB2A0692FD008BB8E0 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		FE4E23BD2A0692FC008BB8E0 /* Main.html */ = {
+			isa = PBXVariantGroup;
+			children = (
+				FE4E23BE2A0692FC008BB8E0 /* Base */,
+			);
+			name = Main.html;
+			sourceTree = "<group>";
+		};
+		FE4E23C82A0692FC008BB8E0 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				FE4E23C92A0692FC008BB8E0 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		FE4E24032A0692FD008BB8E0 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 13.3;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		FE4E24042A0692FD008BB8E0 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 13.3;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+			};
+			name = Release;
+		};
+		FE4E24062A0692FD008BB8E0 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = "GPT-PASS Extension/GPT_PASS_Extension.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 2248Y3A4L6;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "GPT-PASS Extension/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "GPT-PASS Extension";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.tarekbadrsh.GPT-PASS.Extension";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		FE4E24072A0692FD008BB8E0 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = "GPT-PASS Extension/GPT_PASS_Extension.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 2248Y3A4L6;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "GPT-PASS Extension/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "GPT-PASS Extension";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.tarekbadrsh.GPT-PASS.Extension";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		FE4E240A2A0692FD008BB8E0 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "GPT-PASS/GPT-PASS.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 2248Y3A4L6;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "GPT-PASS";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INFOPLIST_KEY_NSMainStoryboardFile = Main;
+				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+					"-framework",
+					WebKit,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.tarekbadrsh.GPT-PASS";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		FE4E240B2A0692FD008BB8E0 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "GPT-PASS/GPT-PASS.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 2248Y3A4L6;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "GPT-PASS";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INFOPLIST_KEY_NSMainStoryboardFile = Main;
+				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+					"-framework",
+					WebKit,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.tarekbadrsh.GPT-PASS";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		FE4E240D2A0692FD008BB8E0 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 2248Y3A4L6;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.tarekbadrsh.GPT-PASSTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/GPT-PASS.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/GPT-PASS";
+			};
+			name = Debug;
+		};
+		FE4E240E2A0692FD008BB8E0 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 2248Y3A4L6;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.tarekbadrsh.GPT-PASSTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/GPT-PASS.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/GPT-PASS";
+			};
+			name = Release;
+		};
+		FE4E24102A0692FD008BB8E0 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 2248Y3A4L6;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.tarekbadrsh.GPT-PASSUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_TARGET_NAME = "GPT-PASS";
+			};
+			name = Debug;
+		};
+		FE4E24112A0692FD008BB8E0 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 2248Y3A4L6;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.tarekbadrsh.GPT-PASSUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_TARGET_NAME = "GPT-PASS";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		FE4E23B22A0692FC008BB8E0 /* Build configuration list for PBXProject "GPT-PASS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FE4E24032A0692FD008BB8E0 /* Debug */,
+				FE4E24042A0692FD008BB8E0 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		FE4E24052A0692FD008BB8E0 /* Build configuration list for PBXNativeTarget "GPT-PASS Extension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FE4E24062A0692FD008BB8E0 /* Debug */,
+				FE4E24072A0692FD008BB8E0 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		FE4E24092A0692FD008BB8E0 /* Build configuration list for PBXNativeTarget "GPT-PASS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FE4E240A2A0692FD008BB8E0 /* Debug */,
+				FE4E240B2A0692FD008BB8E0 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		FE4E240C2A0692FD008BB8E0 /* Build configuration list for PBXNativeTarget "GPT-PASSTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FE4E240D2A0692FD008BB8E0 /* Debug */,
+				FE4E240E2A0692FD008BB8E0 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		FE4E240F2A0692FD008BB8E0 /* Build configuration list for PBXNativeTarget "GPT-PASSUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FE4E24102A0692FD008BB8E0 /* Debug */,
+				FE4E24112A0692FD008BB8E0 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = FE4E23AF2A0692FC008BB8E0 /* Project object */;
+}

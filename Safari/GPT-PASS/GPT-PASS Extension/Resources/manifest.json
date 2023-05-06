@@ -1,0 +1,56 @@
+{
+    "manifest_version": 3,
+    "default_locale": "en",
+    "name": "GPT-PASS",
+    "version": "1.0.8",
+    "description": "Generate strong and secure passwords with the GPT-PASS extension.",
+    "applications": {
+        "safari-web-extension": {
+            "id": "com.tarekbadrsh.GPT-PASS",
+            "version": "1.0"
+        }
+    },
+    "icons": {
+        "16": "icon16.png",
+        "32": "icon32.png",
+        "48": "icon48.png",
+        "64": "icon64.png",
+        "96": "icon96.png"
+    },
+    "background": {
+        "scripts": [
+            "background.js"
+        ]
+    },
+    "content_scripts": [
+        {
+            "js": [
+                "content.js"
+            ],
+            "matches": [
+                "<all_urls>"
+            ]
+        }
+    ],
+    "action": {
+        "default_popup": "popup.html",
+        "default_title": "GPT-PASS",
+        "default_icon": {
+            "16": "icon16.png",
+            "32": "icon32.png",
+            "48": "icon48.png",
+            "64": "icon64.png",
+            "96": "icon96.png"
+        }
+    },
+    "permissions": [
+        "contextMenus",
+        "clipboardRead",
+        "clipboardWrite",
+        "storage",
+        "notifications",
+        "tabs",
+        "activeTab",
+        "<all_urls>"
+    ]
+}
