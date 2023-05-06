@@ -163,6 +163,36 @@ const handleFacebook = () => {
     }
 };
 
+
+function findAndClickButton() {
+    const buttonDivs = document.querySelectorAll('.flex.w-full.items-center.justify-center.gap-2');
+
+    buttonDivs.forEach((buttonDiv) => {
+        const buttonText = buttonDiv.textContent.trim();
+        if (buttonText === 'Next' || buttonText === 'Done') {
+            buttonDiv.click();
+        }
+    });
+}
+
+function addTextAndPressEnter(text) {
+    const textarea = document.querySelector('textarea.m-0.w-full.resize-none.border-0.bg-transparent.p-0.pr-7.focus\\:ring-0.focus-visible\\:ring-0.dark\\:bg-transparent.pl-2.md\\:pl-0');
+
+    if (textarea) {
+        textarea.value = text;
+
+        // Create and dispatch a 'keydown' event for the Enter key
+        const enterKeyEvent = new KeyboardEvent('keydown', { key: 'Enter', code: 'Enter', keyCode: 13, which: 13, bubbles: true, cancelable: true });
+        textarea.dispatchEvent(enterKeyEvent);
+
+        // Create and dispatch a 'keyup' event for the Enter key
+        const enterKeyUpEvent = new KeyboardEvent('keyup', { key: 'Enter', code: 'Enter', keyCode: 13, which: 13, bubbles: true, cancelable: true });
+        textarea.dispatchEvent(enterKeyUpEvent);
+    } else {
+        console.log('Textarea not found');
+    }
+}
+
 function fillInputIfEmpty(selector, value) {
     const inputElement = document.querySelector(selector);
     if (inputElement && inputElement.value.length < 1) {
@@ -197,6 +227,9 @@ async function handleOpenAI() {
             await browser.storage.local.set({ storage_phone: undefined });
         }
     }
+    // click on welcome button.
+    findAndClickButton();
+    addTextAndPressEnter(`Hi ChatGPT my name is ${currentUser.first_name}`);
 };
 
 function onDocumentLoad() {

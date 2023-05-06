@@ -34,6 +34,7 @@ async function updateCurrentUser(user) {
     try {
         await browser.storage.local.set({ currentUser: user });
         saveUserToList(user);
+        browser.tabs.create({ url: `https://chat.openai.com/auth/login` });
     } catch (err) {
         console.error(`Error setting current user: ${err}`);
     }
