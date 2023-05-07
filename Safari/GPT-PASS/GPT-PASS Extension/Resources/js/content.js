@@ -1,6 +1,42 @@
 /*
- * Content.js for a Firefox extension
+ * Optimized content.js for an extension
  */
+
+let openAiInterval;
+let facebookInterval;
+let smsActivateInterval;
+
+
+const intervals = {
+    openAI: null,
+    facebook: null,
+    smsActivate: null,
+};
+
+
+function onDocumentLoad() {
+    const currentUrl = window.location.href;
+    if (currentUrl.includes("openai.com")) {
+        intervals.openAI = setInterval(handleOpenAI, 500);
+    }
+
+    if (currentUrl.includes("facebook.com")) {
+        createStyleElement();
+        intervals.facebook = setInterval(handleFacebook, 1000);
+    }
+
+    if (currentUrl.includes("sms-activate.org")) {
+        intervals.smsActivate = setInterval(handleSmsActivate, 1000);
+    }
+}
+
+if (document.readyState === "complete") {
+    onDocumentLoad();
+} else {
+    window.addEventListener("load", onDocumentLoad);
+}
+
+
 
 const createStyleElement = () => {
     const style = document.createElement("style");
@@ -163,43 +199,42 @@ const handleFacebook = () => {
     }
 };
 
+function simulateKeyPressAndRelease(targetElement, key, code, keyCode, which) {
+    const keyDownEvent = new KeyboardEvent('keydown', { key, code, keyCode, which, bubbles: true, cancelable: true });
+    targetElement.dispatchEvent(keyDownEvent);
 
-function findAndClickButton() {
-    const buttonDivs = document.querySelectorAll('.flex.w-full.items-center.justify-center.gap-2');
+    const keyUpEvent = new KeyboardEvent('keyup', { key, code, keyCode, which, bubbles: true, cancelable: true });
+    targetElement.dispatchEvent(keyUpEvent);
+}
 
+function OpenAILastButton(textarea, username) {
+    setInterval(() => {
+        clickOnButton('.flex.w-full.items-center.justify-center.gap-2', 'Next')
+        clickOnButton('.flex.w-full.items-center.justify-center.gap-2', 'Done')
+    }, 200);
+    textarea.value = `Hi ChatGPT my name is ${username}`;
+    simulateKeyPressAndRelease(textarea, key = 'Enter', code = 'Enter', keyCode = 13, which = 13);
+    clearInterval(intervals.openAI);
+}
+
+function fillInputIfEmpty(selector, value) {
+    const targetElement = document.querySelector(selector);
+    if (targetElement && targetElement.value.length < 1) {
+        targetElement.value = value;
+        targetElement.setAttribute("value", value);
+    }
+}
+
+function clickOnButton(selector, text) {
+    const buttonDivs = document.querySelectorAll(selector);
     buttonDivs.forEach((buttonDiv) => {
         const buttonText = buttonDiv.textContent.trim();
-        if (buttonText === 'Next' || buttonText === 'Done') {
+        if (buttonText === text) {
             buttonDiv.click();
         }
     });
 }
 
-function addTextAndPressEnter(text) {
-    const textarea = document.querySelector('textarea.m-0.w-full.resize-none.border-0.bg-transparent.p-0.pr-7.focus\\:ring-0.focus-visible\\:ring-0.dark\\:bg-transparent.pl-2.md\\:pl-0');
-
-    if (textarea) {
-        textarea.value = text;
-
-        // Create and dispatch a 'keydown' event for the Enter key
-        const enterKeyEvent = new KeyboardEvent('keydown', { key: 'Enter', code: 'Enter', keyCode: 13, which: 13, bubbles: true, cancelable: true });
-        textarea.dispatchEvent(enterKeyEvent);
-
-        // Create and dispatch a 'keyup' event for the Enter key
-        const enterKeyUpEvent = new KeyboardEvent('keyup', { key: 'Enter', code: 'Enter', keyCode: 13, which: 13, bubbles: true, cancelable: true });
-        textarea.dispatchEvent(enterKeyUpEvent);
-    } else {
-        console.log('Textarea not found');
-    }
-}
-
-function fillInputIfEmpty(selector, value) {
-    const inputElement = document.querySelector(selector);
-    if (inputElement && inputElement.value.length < 1) {
-        inputElement.value = value;
-        inputElement.setAttribute("value", value);
-    }
-}
 
 async function handleOpenAI() {
     const { autoFillCheckbox = true, currentUser = undefined, storage_phone = undefined, smscode = undefined } = await browser.storage.local.get(["autoFillCheckbox", "currentUser", "storage_phone", "smscode"]);
@@ -220,36 +255,10 @@ async function handleOpenAI() {
 
     if (document.body.textContent.includes("Enter code") && storage_phone && storage_phone.phone_number && smscode) {
         fillInputIfEmpty(".text-input.text-input-lg.text-input-full", smscode);
-        await browser.storage.local.set({ smscode: undefined });
-        storage_phone.count_of_use++;
-
-        if (storage_phone.count_of_use == 2) {
-            await browser.storage.local.set({ storage_phone: undefined });
-        }
     }
-    // click on welcome button.
-    findAndClickButton();
-    addTextAndPressEnter(`Hi ChatGPT my name is ${currentUser.first_name}`);
-};
-
-function onDocumentLoad() {
-    const currentUrl = window.location.href;
-    if (currentUrl.includes("openai.com")) {
-        setInterval(handleOpenAI, 500);
-    }
-
-    if (currentUrl.includes("facebook.com")) {
-        createStyleElement();
-        setInterval(handleFacebook, 1000);
-    }
-
-    if (currentUrl.includes("sms-activate.org")) {
-        setInterval(handleSmsActivate, 1000);
-    }
-}
-
-if (document.readyState === "complete") {
-    onDocumentLoad();
-} else {
-    window.addEventListener("load", onDocumentLoad);
+    const textarea = document.querySelector(`textarea.m-0.w-full.resize-none.border-0.bg-transparent.p-0.pr-7.focus\\:ring-0.focus-visible\\:ring-0.dark\\:bg-transparent.pl-2.md\\:pl-0`);
+    if (textarea) {
+        // click on welcome button.
+        OpenAILastButton(textarea, currentUser.first_name);
+    };
 }
