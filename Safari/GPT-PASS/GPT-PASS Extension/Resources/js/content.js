@@ -2,41 +2,36 @@
  * Optimized content.js for an extension
  */
 
-let openAiInterval;
-let facebookInterval;
-let smsActivateInterval;
-
-
-const intervals = {
-    openAI: null,
-    facebook: null,
-    smsActivate: null,
-};
-
-
-function onDocumentLoad() {
-    const currentUrl = window.location.href;
-    if (currentUrl.includes("openai.com")) {
-        intervals.openAI = setInterval(handleOpenAI, 500);
+// Generate a random birth date
+function generateRandomBirthDate() {
+    const randomYear = Math.floor(Math.random() * (1995 - 1970 + 1)) + 1970;
+    const randomMonth = (Math.floor(Math.random() * 12) + 1).toString().padStart(2, '0');
+    const randomDay = (Math.floor(Math.random() * 25) + 1).toString().padStart(2, '0');
+    return `${randomMonth}/${randomDay}/${randomYear}`;
+}
+class User {
+    constructor(email, first_name, last_name) {
+        this.status = "";
+        this.tabId = "";
+        this.facebookUrl = window.location.href;
+        this.email = email;
+        this.setPassword(this.email);
+        this.first_name = first_name;
+        this.last_name = last_name;
+        this.setBirthDate();
+        this.phone_number = "";
+        this.smscode = "";
+        this.activationId = "";
     }
 
-    if (currentUrl.includes("facebook.com")) {
-        createStyleElement();
-        intervals.facebook = setInterval(handleFacebook, 1000);
+    async setPassword(password) {
+        this.password = await generateHash(password);
     }
 
-    if (currentUrl.includes("sms-activate.org")) {
-        intervals.smsActivate = setInterval(handleSmsActivate, 1000);
+    setBirthDate() {
+        this.birth_date = generateRandomBirthDate();
     }
 }
-
-if (document.readyState === "complete") {
-    onDocumentLoad();
-} else {
-    window.addEventListener("load", onDocumentLoad);
-}
-
-
 
 const createStyleElement = () => {
     const style = document.createElement("style");
@@ -125,11 +120,28 @@ const extractUserNameFromAnchor = () => {
     return null;
 };
 
-const extractUserFromText = (text) => {
-    let user = { email: "", password: "", first_name: "", last_name: "", birth_date: "" };
+// Generate a hash for a given string
+async function generateHash(str) {
+    try {
+        const encoder = new TextEncoder();
+        const data = encoder.encode(str);
+        const digest = await crypto.subtle.digest('SHA-256', data);
+        const hashArray = Array.from(new Uint8Array(digest));
+        const hashHex = hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
+        return hashHex.slice(0, 16);
+    } catch (err) {
+        console.error(`Failed to generate hash: ${err}`);
+        return null;
+    }
+}
+
+const extractUser = async (text) => {
+    let user = { email: "", password: "", first_name: "", last_name: "", birth_date: "", number: { phone_number: "NAN", smscode: "NAN", activationId: "NAN" } };
     const email = extractEmail(text);
     if (email) {
         user.email = email;
+        user.birth_date = generateRandomBirthDate();
+        user.password = await generateHash(user.email);
     }
 
     const user_name = extractUserNameFromAnchor();
@@ -141,14 +153,14 @@ const extractUserFromText = (text) => {
     return user;
 };
 
-const addGptPassButton = (span) => {
+const addGptPassButton = async (span) => {
     try {
         span.classList.add("gpt-pass-spen");
         const button = document.createElement("button");
         button.classList.add("gpt-pass-button");
 
-        button.addEventListener("click", (e) => {
-            const user = extractUserFromText(span.textContent);
+        button.addEventListener("click", async (e) => {
+            const user = await extractUser(span.textContent);
             browser.runtime.sendMessage({ type: "user", user: user });
             console.log(user);
         });
@@ -164,6 +176,12 @@ const isSixDigitNumber = (value) => {
 };
 
 async function handleSmsActivate() {
+    const { autoSmsCheckbox = true } = await browser.storage.local.get("autoSmsCheckbox");
+
+    if (!autoSmsCheckbox) {
+        return;
+    }
+
     const phoneElement = document.querySelector(".activate-grid-item__numberq");
     if (!phoneElement) {
         return;
@@ -183,7 +201,7 @@ async function handleSmsActivate() {
     }
 };
 
-const handleFacebook = () => {
+const handleFacebook = async () => {
     const spanElements = document.getElementsByTagName("span");
 
     for (const span of spanElements) {
@@ -194,7 +212,7 @@ const handleFacebook = () => {
             continue;
         }
         if (emailInText(span.textContent)) {
-            addGptPassButton(span);
+            await addGptPassButton(span);
         }
     }
 };
@@ -207,10 +225,10 @@ function simulateKeyPressAndRelease(targetElement, key, code, keyCode, which) {
     targetElement.dispatchEvent(keyUpEvent);
 }
 
-function OpenAILastButton(textarea, username) {
+function OpenAILastButton(textarea, username, autoCloseTab) {
     setInterval(() => {
-        clickOnButton('.flex.w-full.items-center.justify-center.gap-2', 'Next')
-        clickOnButton('.flex.w-full.items-center.justify-center.gap-2', 'Done')
+        clickOnButton('.flex.w-full.items-center.justify-center.gap-2', 'Next');
+        clickOnButton('.flex.w-full.items-center.justify-center.gap-2', 'Done', autoCloseTab);
     }, 200);
     textarea.value = `Hi ChatGPT my name is ${username}`;
     simulateKeyPressAndRelease(textarea, key = 'Enter', code = 'Enter', keyCode = 13, which = 13);
@@ -225,40 +243,82 @@ function fillInputIfEmpty(selector, value) {
     }
 }
 
-function clickOnButton(selector, text) {
+function clickOnButton(selector, text, closetab) {
     const buttonDivs = document.querySelectorAll(selector);
+    let done = false;
     buttonDivs.forEach((buttonDiv) => {
-        const buttonText = buttonDiv.textContent.trim();
-        if (buttonText === text) {
+        if (text) {
+            const buttonText = buttonDiv.textContent.trim();
+            if (buttonText === text) {
+                buttonDiv.click();
+                done = true;
+            }
+        } else {
             buttonDiv.click();
+            done = true;
+        }
+        if (closetab && done) {
+            browser.runtime.sendMessage({ type: "closeCurrentTab" });
         }
     });
 }
 
 
 async function handleOpenAI() {
-    const { autoFillCheckbox = true, currentUser = undefined, storage_phone = undefined, smscode = undefined } = await browser.storage.local.get(["autoFillCheckbox", "currentUser", "storage_phone", "smscode"]);
+    const { autoFillCheckbox = true, autoSmsCheckbox = true, currentUser = undefined, storage_phone = undefined, smscode = undefined, autoCloseTab = false } =
+        await browser.storage.local.get(["autoFillCheckbox", "autoSmsCheckbox", "currentUser", "storage_phone", "smscode", "autoCloseTab"]);
 
     if (!autoFillCheckbox || !currentUser) {
         return;
     }
-
-    fillInputIfEmpty('input[name="username"]', currentUser.email);
     fillInputIfEmpty('input[name="email"]', currentUser.email);
     fillInputIfEmpty('input[name="password"]', currentUser.password);
+    fillInputIfEmpty('input[name="username"]', currentUser.email);
     fillInputIfEmpty('input[placeholder="First name"]', currentUser.first_name);
     fillInputIfEmpty('input[placeholder="Last name"]', currentUser.last_name);
+    clickOnButton('.onb-resend-email-btn', null, autoCloseTab);
 
-    if (document.body.textContent.includes("Verify your phone number") && storage_phone && storage_phone.phone_number) {
+    if (autoSmsCheckbox && document.body.textContent.includes("Verify your phone number") && storage_phone && storage_phone.phone_number) {
         fillInputIfEmpty(".text-input.text-input-lg.text-input-full", storage_phone.phone_number);
     }
 
-    if (document.body.textContent.includes("Enter code") && storage_phone && storage_phone.phone_number && smscode) {
+    if (autoSmsCheckbox && document.body.textContent.includes("Enter code") && storage_phone && storage_phone.phone_number && smscode) {
         fillInputIfEmpty(".text-input.text-input-lg.text-input-full", smscode);
     }
     const textarea = document.querySelector(`textarea.m-0.w-full.resize-none.border-0.bg-transparent.p-0.pr-7.focus\\:ring-0.focus-visible\\:ring-0.dark\\:bg-transparent.pl-2.md\\:pl-0`);
     if (textarea) {
         // click on welcome button.
-        OpenAILastButton(textarea, currentUser.first_name);
+        OpenAILastButton(textarea, currentUser.first_name, autoCloseTab);
     };
+}
+
+
+
+const intervals = {
+    openAI: null,
+    facebook: null,
+    smsActivate: null,
+};
+
+
+function onDocumentLoad() {
+    const currentUrl = window.location.href;
+    if (currentUrl.includes("openai.com")) {
+        intervals.openAI = setInterval(handleOpenAI, 500);
+    }
+
+    if (currentUrl.includes("facebook.com")) {
+        createStyleElement();
+        intervals.facebook = setInterval(handleFacebook, 1000);
+    }
+
+    if (currentUrl.includes("sms-activate.org")) {
+        intervals.smsActivate = setInterval(handleSmsActivate, 1000);
+    }
+}
+
+if (document.readyState === "complete") {
+    onDocumentLoad();
+} else {
+    window.addEventListener("load", onDocumentLoad);
 }

@@ -1,13 +1,14 @@
 function truncate(text, maxLength) {
+    let noSpaces = text.replace(/[\s-]+/g, ',');
     if (text.length > maxLength) {
-        return text.substr(0, maxLength) + '...';
+        return noSpaces.substr(0, maxLength) + '...';
     }
     return text;
 }
 
 function createButtonContainer(text) {
     const button = document.createElement("button");
-    button.textContent = truncate(text, 20);
+    button.textContent = truncate(text, 10);
     button.setAttribute('data-tooltip', text);
     button.addEventListener("click", () => {
         navigator.clipboard.writeText(text);
@@ -21,17 +22,28 @@ function createButtonContainer(text) {
 }
 
 function setCheckboxStateFromLocalStorage() {
-    const checkbox = document.getElementById('auto-fill-checkbox');
-    if (checkbox) {
+    const autoFillCheckbox = document.getElementById('auto-fill-checkbox');
+    if (autoFillCheckbox) {
         browser.storage.local.get("autoFillCheckbox", (result) => {
-            checkbox.checked = result.autoFillCheckbox;
+            autoFillCheckbox.checked = result.autoFillCheckbox;
+        });
+    }
+    const autoSmsCheckbox = document.getElementById('auto-sms-checkbox');
+    if (autoSmsCheckbox) {
+        browser.storage.local.get("autoSmsCheckbox", (result) => {
+            autoSmsCheckbox.checked = result.autoSmsCheckbox;
+        });
+    }
+    const autoCloseTab = document.getElementById('auto-close-tab');
+    if (autoCloseTab) {
+        browser.storage.local.get("autoCloseTab", (result) => {
+            autoCloseTab.checked = result.autoCloseTab;
         });
     }
 }
 
 async function display() {
     const { users = [] } = await browser.storage.local.get("users");
-
     // Reverse the users array to display the users from last to first
     users.reverse();
 
@@ -44,6 +56,8 @@ async function display() {
         li.appendChild(createButtonContainer(userData.first_name));
         li.appendChild(createButtonContainer(userData.last_name));
         li.appendChild(createButtonContainer(userData.birth_date));
+        li.appendChild(createButtonContainer(userData.number.phone_number));
+        li.appendChild(createButtonContainer(userData.number.smscode));
         const buttonRemove = document.createElement("button");
         buttonRemove.textContent = "X";
         buttonRemove.classList.add("remove");
@@ -73,6 +87,13 @@ async function display() {
 document.getElementById("auto-fill-checkbox").addEventListener("change", async function (event) {
     browser.storage.local.set({ autoFillCheckbox: event.target.checked });
 });
+document.getElementById("auto-sms-checkbox").addEventListener("change", async function (event) {
+    browser.storage.local.set({ autoSmsCheckbox: event.target.checked });
+});
+document.getElementById("auto-close-tab").addEventListener("change", async function (event) {
+    browser.storage.local.set({ autoCloseTab: event.target.checked });
+});
+
 
 
 display();
