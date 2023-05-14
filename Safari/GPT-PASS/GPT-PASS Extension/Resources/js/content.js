@@ -181,17 +181,16 @@ async function handleSmsActivate() {
         return;
     }
     const phone_number = phoneElement.innerText.replace(/\D/g, "");
-    let { storage_phone = { phone_number: "", count_of_use: 0 } } = await browser.storage.local.get("storage_phone");
-    if (storage_phone.phone_number !== phone_number) {
-        await browser.storage.local.set({ smscode: undefined });
-        storage_phone = { phone_number: phone_number, count_of_use: 0 };
-        await browser.storage.local.set({ storage_phone });
+    if (phone_number) {
+        await browser.storage.local.set({ phone_number });
     }
     const smscodeElement = document.querySelector(".underline-orange.cursor-pointer");
     if (smscodeElement) {
         if (isSixDigitNumber(smscodeElement.textContent)) {
             await browser.storage.local.set({ smscode: smscodeElement.textContent });
         }
+    } else {
+        await browser.storage.local.set({ smscode: "" });
     }
 };
 
@@ -220,12 +219,15 @@ function simulateKeyPressAndRelease(targetElement, key, code, keyCode, which) {
 }
 
 function OpenAILastButton(textarea, username, autoCloseTab) {
-    setInterval(() => {
+    const welcomeInterval = setInterval(() => {
         clickOnButton('.flex.w-full.items-center.justify-center.gap-2', 'Next');
-        clickOnButton('.flex.w-full.items-center.justify-center.gap-2', 'Done', autoCloseTab);
+        const done = clickOnButton('.flex.w-full.items-center.justify-center.gap-2', 'Done', autoCloseTab);
+        if (done) {
+            textarea.value = `Hi ChatGPT my name is ${username}`;
+            simulateKeyPressAndRelease(textarea, key = 'Enter', code = 'Enter', keyCode = 13, which = 13);
+            clearInterval(welcomeInterval);
+        }
     }, 200);
-    textarea.value = `Hi ChatGPT my name is ${username}`;
-    simulateKeyPressAndRelease(textarea, key = 'Enter', code = 'Enter', keyCode = 13, which = 13);
     clearInterval(intervals.openAI);
 }
 
@@ -255,30 +257,33 @@ function clickOnButton(selector, text, closetab) {
             browser.runtime.sendMessage({ type: "closeCurrentTab" });
         }
     });
+    return done
 }
 
 
 async function handleOpenAI() {
-    const { autoFillCheckbox = true, autoSmsCheckbox = true, currentUser = undefined, storage_phone = undefined, smscode = undefined, autoCloseTab = false } =
-        await browser.storage.local.get(["autoFillCheckbox", "autoSmsCheckbox", "currentUser", "storage_phone", "smscode", "autoCloseTab"]);
+    const { autoFillCheckbox = true, autoSmsCheckbox = true, currentUser = undefined, phone_number = undefined, smscode = undefined, autoCloseTab = false } =
+        await browser.storage.local.get(["autoFillCheckbox", "autoSmsCheckbox", "currentUser", "phone_number", "smscode", "autoCloseTab"]);
 
-    if (!autoFillCheckbox || !currentUser) {
-        return;
-    }
-    fillInputIfEmpty('input[name="email"]', currentUser.email);
-    fillInputIfEmpty('input[name="password"]', currentUser.password);
-    fillInputIfEmpty('input[name="username"]', currentUser.email);
-    fillInputIfEmpty('input[placeholder="First name"]', currentUser.first_name);
-    fillInputIfEmpty('input[placeholder="Last name"]', currentUser.last_name);
-    clickOnButton('.onb-resend-email-btn', null, autoCloseTab);
-
-    if (autoSmsCheckbox && document.body.textContent.includes("Verify your phone number") && storage_phone && storage_phone.phone_number) {
-        fillInputIfEmpty(".text-input.text-input-lg.text-input-full", storage_phone.phone_number);
+    if (autoFillCheckbox && currentUser) {
+        fillInputIfEmpty('input[name="email"]', currentUser.email);
+        fillInputIfEmpty('input[name="password"]', currentUser.password);
+        fillInputIfEmpty('input[name="username"]', currentUser.email);
+        fillInputIfEmpty('input[placeholder="First name"]', currentUser.first_name);
+        fillInputIfEmpty('input[placeholder="Last name"]', currentUser.last_name);
+        clickOnButton('.onb-resend-email-btn', null, autoCloseTab);
     }
 
-    if (autoSmsCheckbox && document.body.textContent.includes("Enter code") && storage_phone && storage_phone.phone_number && smscode) {
-        fillInputIfEmpty(".text-input.text-input-lg.text-input-full", smscode);
+    if (autoSmsCheckbox && phone_number) {
+        if (autoSmsCheckbox && document.body.textContent.includes("Verify your phone number")) {
+            fillInputIfEmpty(".text-input.text-input-lg.text-input-full", phone_number);
+        }
+
+        if (autoSmsCheckbox && document.body.textContent.includes("Enter code") && smscode) {
+            fillInputIfEmpty(".text-input.text-input-lg.text-input-full", smscode);
+        }
     }
+
     const textarea = document.querySelector(`textarea.m-0.w-full.resize-none.border-0.bg-transparent.p-0.pr-7.focus\\:ring-0.focus-visible\\:ring-0.dark\\:bg-transparent.pl-2.md\\:pl-0`);
     if (textarea) {
         // click on welcome button.
@@ -298,7 +303,7 @@ const intervals = {
 function onDocumentLoad() {
     const currentUrl = window.location.href;
     if (currentUrl.includes("openai.com")) {
-        intervals.openAI = setInterval(handleOpenAI, 500);
+        intervals.openAI = setInterval(handleOpenAI, 100);
     }
 
     if (currentUrl.includes("facebook.com")) {
