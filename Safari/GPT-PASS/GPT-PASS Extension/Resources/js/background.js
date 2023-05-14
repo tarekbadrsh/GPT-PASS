@@ -70,7 +70,7 @@ async function saveUserToList(user) {
 // Update the current user
 async function updateCurrentUser(user) {
     await browser.storage.local.set({ currentUser: user });
-    saveUserToList(user);
+    await saveUserToList(user);
 }
 
 /*
@@ -209,11 +209,11 @@ async function requestActivationCode(activationId) {
 browser.runtime.onMessage.addListener(async (message) => {
     if (message.type === 'user') {
         const user = { ...message.user };
-        browser.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
+        await browser.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
             user.tabId = tabs[0].id;
         });
-        updateCurrentUser(user);
-        browser.tabs.create({ url: `https://chat.openai.com/auth/login` });
+        await updateCurrentUser(user);
+        await browser.tabs.create({ url: `https://chat.openai.com/auth/login` });
     }
     if (message.type === "closeCurrentTab") {
         browser.tabs.query({}).then((tabs) => {

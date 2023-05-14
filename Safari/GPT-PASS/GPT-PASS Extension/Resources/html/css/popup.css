@@ -70,6 +70,7 @@ li button {
 li button.remove {
   margin-left: 10px;
   background-color: #f44336;
+  width: 40px;
 }
 
 button:hover {

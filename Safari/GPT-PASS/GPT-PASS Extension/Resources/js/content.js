@@ -10,12 +10,11 @@ function generateRandomBirthDate() {
     return `${randomMonth}/${randomDay}/${randomYear}`;
 }
 class User {
-    constructor(email, first_name, last_name) {
+    constructor(facebookUrl, email, first_name, last_name) {
         this.status = "";
         this.tabId = "";
-        this.facebookUrl = window.location.href;
+        this.facebookUrl = facebookUrl;
         this.email = email;
-        this.setPassword(this.email);
         this.first_name = first_name;
         this.last_name = last_name;
         this.setBirthDate();
@@ -24,8 +23,8 @@ class User {
         this.activationId = "";
     }
 
-    async setPassword(password) {
-        this.password = await generateHash(password);
+    async SetPassword() {
+        this.password = await generateHash(this.email);
     }
 
     setBirthDate() {
@@ -81,15 +80,20 @@ const emailInText = (text) => {
 };
 
 function processUserName(username) {
+    let first_name = "GPT";
+    let last_name = "AI";
+
+    if (!username) {
+        return { first_name, last_name };
+    }
+
     username = username.trim();
-    let first_name, last_name;
     const spaceIndex = username.indexOf(" ");
     if (spaceIndex !== -1) {
         first_name = username.slice(0, spaceIndex);
         last_name = username.slice(spaceIndex + 1);
     } else {
         first_name = username;
-        last_name = "AI";
     }
     return { first_name, last_name };
 }
@@ -136,20 +140,10 @@ async function generateHash(str) {
 }
 
 const extractUser = async (text) => {
-    let user = { email: "", password: "", first_name: "", last_name: "", birth_date: "", number: { phone_number: "NAN", smscode: "NAN", activationId: "NAN" } };
     const email = extractEmail(text);
-    if (email) {
-        user.email = email;
-        user.birth_date = generateRandomBirthDate();
-        user.password = await generateHash(user.email);
-    }
-
-    const user_name = extractUserNameFromAnchor();
-    if (user_name) {
-        const result = processUserName(user_name);
-        user.first_name = result.first_name;
-        user.last_name = result.last_name;
-    }
+    const user_name = processUserName(extractUserNameFromAnchor());
+    let user = new User(window.location.href, email, user_name.first_name, user_name.last_name);
+    await user.SetPassword();
     return user;
 };
 
@@ -161,7 +155,7 @@ const addGptPassButton = async (span) => {
 
         button.addEventListener("click", async (e) => {
             const user = await extractUser(span.textContent);
-            browser.runtime.sendMessage({ type: "user", user: user });
+            await browser.runtime.sendMessage({ type: "user", user: user });
             console.log(user);
         });
         span.appendChild(button);

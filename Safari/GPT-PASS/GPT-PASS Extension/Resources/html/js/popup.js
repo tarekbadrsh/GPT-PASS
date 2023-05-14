@@ -1,14 +1,15 @@
 function truncate(text, maxLength) {
     let noSpaces = text.replace(/[\s-]+/g, ',');
-    if (text.length > maxLength) {
+    if (noSpaces.length > maxLength) {
         return noSpaces.substr(0, maxLength) + '...';
     }
-    return text;
+    return noSpaces;
 }
 
 function createButtonContainer(text) {
+    if (!text) { return document.createElement("div") }
     const button = document.createElement("button");
-    button.textContent = truncate(text, 10);
+    button.textContent = truncate(text, 16);
     button.setAttribute('data-tooltip', text);
     button.addEventListener("click", () => {
         navigator.clipboard.writeText(text);
@@ -21,32 +22,33 @@ function createButtonContainer(text) {
     return container;
 }
 
-function setCheckboxStateFromLocalStorage() {
+async function setCheckboxStateFromLocalStorage() {
     const autoFillCheckbox = document.getElementById('auto-fill-checkbox');
     if (autoFillCheckbox) {
-        browser.storage.local.get("autoFillCheckbox", (result) => {
+        await browser.storage.local.get("autoFillCheckbox", (result) => {
             autoFillCheckbox.checked = result.autoFillCheckbox;
         });
     }
     const autoSmsCheckbox = document.getElementById('auto-sms-checkbox');
     if (autoSmsCheckbox) {
-        browser.storage.local.get("autoSmsCheckbox", (result) => {
+        await browser.storage.local.get("autoSmsCheckbox", (result) => {
             autoSmsCheckbox.checked = result.autoSmsCheckbox;
         });
     }
     const autoCloseTab = document.getElementById('auto-close-tab');
     if (autoCloseTab) {
-        browser.storage.local.get("autoCloseTab", (result) => {
+        await browser.storage.local.get("autoCloseTab", (result) => {
             autoCloseTab.checked = result.autoCloseTab;
         });
     }
 }
 
 async function display() {
-    const { users = [] } = await browser.storage.local.get("users");
+    const { users = [] } = await browser.storage.local.get('users');
     // Reverse the users array to display the users from last to first
     users.reverse();
 
+    console.log("saveUserToList: ", users);
     const usersList = document.getElementById("users-list");
 
     users.forEach((userData) => {
@@ -56,8 +58,8 @@ async function display() {
         li.appendChild(createButtonContainer(userData.first_name));
         li.appendChild(createButtonContainer(userData.last_name));
         li.appendChild(createButtonContainer(userData.birth_date));
-        li.appendChild(createButtonContainer(userData.number.phone_number));
-        li.appendChild(createButtonContainer(userData.number.smscode));
+        li.appendChild(createButtonContainer(userData.phone_number));
+        li.appendChild(createButtonContainer(userData.smscode));
         const buttonRemove = document.createElement("button");
         buttonRemove.textContent = "X";
         buttonRemove.classList.add("remove");
