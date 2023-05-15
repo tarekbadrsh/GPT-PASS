@@ -33,33 +33,6 @@ class User {
     }
 }
 
-const createStyleElement = () => {
-    const style = document.createElement("style");
-    style.textContent = `
-      button:focus {
-        outline: none;
-      }
-  
-      button:active {
-        background-color: green;
-      }
-  
-      .gpt-pass-button {
-        background-color: red;
-        border: none;
-        border-radius: 50%;
-        color: white;
-        cursor: pointer;
-        font-size: 20px;
-        height: 20px;
-        margin-left: 5px;
-        padding: 0;
-        width: 20px;
-      }
-    `;
-    document.head.appendChild(style);
-};
-
 const isEmailValid = (email) => {
     const regex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
     return regex.test(email);
@@ -270,7 +243,7 @@ function OpenAILastButton(textarea, username, autoCloseTab) {
     clearInterval(intervals.openAI);
 }
 
-function fillInputIfEmpty(selector, value) {
+function fillInput(selector, value) {
     const targetElement = document.querySelector(selector);
     if (targetElement && targetElement.value.length < 1) {
         simulateMouseEvents(targetElement);
@@ -280,6 +253,27 @@ function fillInputIfEmpty(selector, value) {
     }
     return false;
 }
+
+function handleOpenAIButtons() {
+    // Find the Login and Sign Up buttons
+    let loginButton = Array.from(document.getElementsByClassName('btn relative btn-primary')).find(button => button.textContent === "Log in");
+    let signupButton = Array.from(document.getElementsByClassName('btn relative btn-primary')).find(button => button.textContent === "Sign up");
+
+    // If Login button found, add the event listener
+    if (loginButton) {
+        loginButton.addEventListener('click', function () {
+            browser.runtime.sendMessage({ type: "status", status: "login" });
+        });
+    }
+
+    // If Sign Up button found, add the event listener
+    if (signupButton) {
+        signupButton.addEventListener('click', function () {
+            browser.runtime.sendMessage({ type: "status", status: "signup" });
+        });
+    }
+}
+
 
 
 async function handleOpenAI() {
@@ -291,36 +285,57 @@ async function handleOpenAI() {
         await browser.storage.local.get(["autoFillCheckbox", "autoSmsCheckbox", "autoClickCheckbox", "autoCloseTab", "currentUser", "phone_number", "smscode"]);
 
     if (autoFillCheckbox && currentUser) {
-        const isInputEmail = fillInputIfEmpty('input[name="email"]', currentUser.email);
-        if (isInputEmail && autoClickCheckbox && document.body.textContent.includes("Create your account")) {
-            clickOnButton('button[type="submit"][name="action"][value="default"][data-action-button-primary="true"]', "Continue");
-        }
-        const isUserName = fillInputIfEmpty('input[name="username"]', currentUser.email);
-        if (isUserName && autoClickCheckbox && document.body.textContent.includes("Welcome back")) {
-            clickOnButton('button[type="submit"][name="action"][value="default"][data-action-button-primary="true"]', "Continue");
+        const isInputEmail = fillInput('input[name="email"]', currentUser.email);
+        if (isInputEmail && document.body.textContent.includes("Create your account")) {
+            browser.runtime.sendMessage({ type: "status", status: "signup-e" });
+            if (autoClickCheckbox) {
+                clickOnButton('button[type="submit"][name="action"][value="default"][data-action-button-primary="true"]', "Continue");
+            }
         }
 
-        const isPassword = fillInputIfEmpty('input[name="password"]', currentUser.password);
-        if (isPassword && autoClickCheckbox && document.body.textContent.includes("Create your account")) {
-            clickOnButton('button[type="submit"][name="action"][value="default"][data-action-button-primary="true"]', "Continue");
+        const isUserName = fillInput('input[name="username"]', currentUser.email);
+        if (isUserName && document.body.textContent.includes("Welcome back")) {
+            browser.runtime.sendMessage({ type: "status", status: "login-e" });
+            if (autoClickCheckbox) {
+                clickOnButton('button[type="submit"][name="action"][value="default"][data-action-button-primary="true"]', "Continue");
+            }
         }
-        if (isPassword && autoClickCheckbox && document.body.textContent.includes("Enter your password")) {
-            clickOnButton('button[type="submit"][name="action"][value="default"][data-action-button-primary="true"]', "Continue");
+
+        const isPassword = fillInput('input[name="password"]', currentUser.password);
+        if (isPassword) {
+            if (document.body.textContent.includes("Create your account")) {
+                browser.runtime.sendMessage({ type: "status", status: "signup-p" });
+            }
+            if (document.body.textContent.includes("Enter your password")) {
+                browser.runtime.sendMessage({ type: "status", status: "login-p" });
+            }
+            if (autoClickCheckbox) {
+                clickOnButton('button[type="submit"][name="action"][value="default"][data-action-button-primary="true"]', "Continue");
+            }
         }
-        fillInputIfEmpty('input[placeholder="First name"]', currentUser.first_name);
-        fillInputIfEmpty('input[placeholder="Last name"]', currentUser.last_name);
-        if (autoClickCheckbox && document.body.textContent.includes("Verify your email")) {
-            clickOnButton('.onb-resend-email-btn', null, autoCloseTab);
+        if (document.body.textContent.includes("Verify your email")) {
+            browser.runtime.sendMessage({ type: "status", status: "signup-v" });
+            if (autoClickCheckbox) {
+                clickOnButton('.onb-resend-email-btn', null, autoCloseTab);
+            }
         }
+        fillInput('input[placeholder="First name"]', currentUser.first_name);
+        fillInput('input[placeholder="Last name"]', currentUser.last_name);
     }
 
-    if (autoSmsCheckbox && phone_number) {
-        if (document.body.textContent.includes("Verify your phone number")) {
-            fillInputIfEmpty(".text-input.text-input-lg.text-input-full", phone_number);
+    if (autoSmsCheckbox) {
+        if (phone_number && document.body.textContent.includes("Verify your phone number")) {
+            fillInput(".text-input.text-input-lg.text-input-full", phone_number);
+            if (currentUser.status != "number") {
+                browser.runtime.sendMessage({ type: "status", status: "number" });
+            }
         }
 
-        if (document.body.textContent.includes("Enter code") && smscode) {
-            fillInputIfEmpty(".text-input.text-input-lg.text-input-full", smscode);
+        if (smscode && document.body.textContent.includes("Enter code")) {
+            fillInput(".text-input.text-input-lg.text-input-full", smscode);
+            if (currentUser.status != "smscode") {
+                browser.runtime.sendMessage({ type: "status", status: "smscode" });
+            }
         }
     }
 
@@ -328,10 +343,37 @@ async function handleOpenAI() {
     if (textarea) {
         // click on welcome button.
         OpenAILastButton(textarea, currentUser.first_name, autoCloseTab);
+        browser.runtime.sendMessage({ type: "status", status: "done" });
     };
 }
 
 
+const createStyleElement = () => {
+    const style = document.createElement("style");
+    style.textContent = `
+      button:focus {
+        outline: none;
+      }
+  
+      button:active {
+        background-color: green;
+      }
+  
+      .gpt-pass-button {
+        background-color: red;
+        border: none;
+        border-radius: 50%;
+        color: white;
+        cursor: pointer;
+        font-size: 20px;
+        height: 20px;
+        margin-left: 5px;
+        padding: 0;
+        width: 20px;
+      }
+    `;
+    document.head.appendChild(style);
+};
 
 const intervals = {
     openAI: null,
@@ -339,11 +381,13 @@ const intervals = {
     smsActivate: null,
 };
 
-
 function onDocumentLoad() {
     const currentUrl = window.location.href;
     if (currentUrl.includes("openai.com")) {
         intervals.openAI = setInterval(handleOpenAI, 100);
+        if (currentUrl.includes("chat.openai.com/auth/login")) {
+            handleOpenAIButtons();
+        }
     }
 
     if (currentUrl.includes("facebook.com")) {

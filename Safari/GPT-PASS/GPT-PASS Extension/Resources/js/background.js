@@ -11,7 +11,6 @@ function configureExtension() {
         .catch((error) => console.error('Error opening options page:', error));
 }
 
-
 class Number {
     constructor(phoneNumber, activationId) {
         this.phoneNumber = phoneNumber;
@@ -42,9 +41,6 @@ class Number {
         }
     }
 }
-
-
-
 
 // Save user to the list of users
 async function saveUserToList(user) {
@@ -88,6 +84,7 @@ async function updateCurrentUser(user) {
             //- update local storage for numbers
 
 */
+//--- sms api 
 async function handleUserNumbers(user) {
     const { numbers = [] } = await browser.storage.local.get('numbers');
 
@@ -152,17 +149,9 @@ async function handleUserNumbers(user) {
             numbers.push(newNumber);
             await browser.storage.local.set({ numbers });
         }
-        console.log("numbers ", numbers);
     }
     updateCurrentUser(user);
-    console.log("user :", user);
 }
-
-
-
-
-//--- sms api 
-
 
 // Replace these with your own values
 const apiKey = '';
@@ -209,11 +198,15 @@ async function requestActivationCode(activationId) {
 browser.runtime.onMessage.addListener(async (message) => {
     if (message.type === 'user') {
         const user = { ...message.user };
-        await browser.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
-            user.tabId = tabs[0].id;
-        });
+        const tab = await browser.tabs.create({ url: `https://chat.openai.com/auth/login` });
+        user.tabId = tab.id;
         await updateCurrentUser(user);
-        await browser.tabs.create({ url: `https://chat.openai.com/auth/login` });
+        console.log(user);
+    }
+    if (message.type === 'status') {
+        const result = await browser.storage.local.get("currentUser");
+        result.currentUser.status = message.status;
+        await updateCurrentUser(result.currentUser);
     }
     if (message.type === "closeCurrentTab") {
         browser.tabs.query({}).then((tabs) => {
