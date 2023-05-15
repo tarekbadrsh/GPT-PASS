@@ -10,10 +10,11 @@ function generateRandomBirthDate() {
     return `${randomMonth}/${randomDay}/${randomYear}`;
 }
 class User {
-    constructor(facebookUrl, email, first_name, last_name) {
+    constructor(facebookUrl, instagramUrl, email, first_name, last_name) {
         this.status = "";
         this.tabId = "";
         this.facebookUrl = facebookUrl;
+        this.instagramUrl = instagramUrl;
         this.email = email;
         this.first_name = first_name;
         this.last_name = last_name;
@@ -79,25 +80,6 @@ const emailInText = (text) => {
     return regex.test(text);
 };
 
-function processUserName(username) {
-    let first_name = "GPT";
-    let last_name = "AI";
-
-    if (!username) {
-        return { first_name, last_name };
-    }
-
-    username = username.trim();
-    const spaceIndex = username.indexOf(" ");
-    if (spaceIndex !== -1) {
-        first_name = username.slice(0, spaceIndex);
-        last_name = username.slice(spaceIndex + 1);
-    } else {
-        first_name = username;
-    }
-    return { first_name, last_name };
-}
-
 const findParentDiv = (element) => {
     while (element.parentElement) {
         element = element.parentElement;
@@ -108,21 +90,33 @@ const findParentDiv = (element) => {
     return null;
 };
 
-const extractUserNameFromAnchor = () => {
+function processUserName() {
     const anchorElements = document.getElementsByTagName("a");
+    let first_name = "GPT";
+    let last_name = "AI";
+    let instagramUrl = "instagram.com";
+
     for (const anchor of anchorElements) {
         if (anchor.textContent === "View profile") {
+            instagramUrl = anchor.href; // To get the link from the anchor tag
             const parentDiv = findParentDiv(anchor);
-
             if (parentDiv) {
                 const username = parentDiv.firstElementChild.textContent;
-                return username;
+                const spaceIndex = username.indexOf(" ");
+                if (spaceIndex !== -1) {
+                    first_name = username.slice(0, spaceIndex);
+                    last_name = username.slice(spaceIndex + 1);
+                } else {
+                    first_name = username;
+                }
             }
+            return { instagramUrl, first_name, last_name };
         }
     }
+
     console.error("Cannot find username in the input");
     return null;
-};
+}
 
 // Generate a hash for a given string
 async function generateHash(str) {
@@ -141,8 +135,8 @@ async function generateHash(str) {
 
 const extractUser = async (text) => {
     const email = extractEmail(text);
-    const user_name = processUserName(extractUserNameFromAnchor());
-    let user = new User(window.location.href, email, user_name.first_name, user_name.last_name);
+    const user_name = processUserName();
+    let user = new User(window.location.href, user_name.instagramUrl, email, user_name.first_name, user_name.last_name);
     await user.SetPassword();
     return user;
 };
@@ -155,8 +149,8 @@ const addGptPassButton = async (span) => {
 
         button.addEventListener("click", async (e) => {
             const user = await extractUser(span.textContent);
-            await browser.runtime.sendMessage({ type: "user", user: user });
             console.log(user);
+            await browser.runtime.sendMessage({ type: "user", user: user });
         });
         span.appendChild(button);
     } catch (err) {
@@ -218,10 +212,55 @@ function simulateKeyPressAndRelease(targetElement, key, code, keyCode, which) {
     targetElement.dispatchEvent(keyUpEvent);
 }
 
+function simulateMouseEvents(targetElement) {
+    // Simulate mouse movement towards the target element
+    const mouseMoveEvent = new MouseEvent('mousemove', { bubbles: true, cancelable: true, clientX: targetElement.getBoundingClientRect().x, clientY: targetElement.getBoundingClientRect().y });
+    document.dispatchEvent(mouseMoveEvent);
+
+    // Simulate mouse over
+    const mouseOverEvent = new MouseEvent('mouseover', { bubbles: true, cancelable: true });
+    targetElement.dispatchEvent(mouseOverEvent);
+
+    // Simulate mouse down (button press)
+    const mouseDownEvent = new MouseEvent('mousedown', { bubbles: true, cancelable: true });
+    targetElement.dispatchEvent(mouseDownEvent);
+
+    // Simulate mouse up (button release)
+    const mouseUpEvent = new MouseEvent('mouseup', { bubbles: true, cancelable: true });
+    targetElement.dispatchEvent(mouseUpEvent);
+
+    // Simulate click after a small delay to mimic human interaction
+    setTimeout(() => {
+        const clickEvent = new MouseEvent('click', { bubbles: true, cancelable: true });
+        targetElement.dispatchEvent(clickEvent);
+    }, 100);
+}
+
+function clickOnButton(selector, text, closetab) {
+    const buttonDivs = document.querySelectorAll(selector);
+    let done = false;
+    buttonDivs.forEach((buttonDiv) => {
+        if (text) {
+            const buttonText = buttonDiv.textContent.trim();
+            if (buttonText === text) {
+                simulateMouseEvents(buttonDiv);
+                done = true;
+            }
+        } else {
+            simulateMouseEvents(buttonDiv);
+            done = true;
+        }
+        if (closetab && done) {
+            browser.runtime.sendMessage({ type: "closeCurrentTab" });
+        }
+    });
+    return done
+}
+
 function OpenAILastButton(textarea, username, autoCloseTab) {
     const welcomeInterval = setInterval(() => {
-        clickOnButton('.flex.w-full.items-center.justify-center.gap-2', 'Next');
-        const done = clickOnButton('.flex.w-full.items-center.justify-center.gap-2', 'Done', autoCloseTab);
+        clickOnButton('.flex.w-full.items-center.justify-center.gap-2', 'Next', autoCloseTab);
+        const done = clickOnButton('.flex.w-full.items-center.justify-center.gap-2', 'Done');
         if (done) {
             textarea.value = `Hi ChatGPT my name is ${username}`;
             simulateKeyPressAndRelease(textarea, key = 'Enter', code = 'Enter', keyCode = 13, which = 13);
@@ -234,52 +273,53 @@ function OpenAILastButton(textarea, username, autoCloseTab) {
 function fillInputIfEmpty(selector, value) {
     const targetElement = document.querySelector(selector);
     if (targetElement && targetElement.value.length < 1) {
+        simulateMouseEvents(targetElement);
         targetElement.value = value;
         targetElement.setAttribute("value", value);
+        return true;
     }
-}
-
-function clickOnButton(selector, text, closetab) {
-    const buttonDivs = document.querySelectorAll(selector);
-    let done = false;
-    buttonDivs.forEach((buttonDiv) => {
-        if (text) {
-            const buttonText = buttonDiv.textContent.trim();
-            if (buttonText === text) {
-                buttonDiv.click();
-                done = true;
-            }
-        } else {
-            buttonDiv.click();
-            done = true;
-        }
-        if (closetab && done) {
-            browser.runtime.sendMessage({ type: "closeCurrentTab" });
-        }
-    });
-    return done
+    return false;
 }
 
 
 async function handleOpenAI() {
-    const { autoFillCheckbox = true, autoSmsCheckbox = true, currentUser = undefined, phone_number = undefined, smscode = undefined, autoCloseTab = false } =
-        await browser.storage.local.get(["autoFillCheckbox", "autoSmsCheckbox", "currentUser", "phone_number", "smscode", "autoCloseTab"]);
+    let errorElement = document.querySelector('[class*="error"], [data-error-code*="blocked"]');
+    if (errorElement) {
+        return;
+    }
+    const { autoFillCheckbox = true, autoSmsCheckbox = true, autoClickCheckbox = true, autoCloseTab = false, currentUser = undefined, phone_number = undefined, smscode = undefined } =
+        await browser.storage.local.get(["autoFillCheckbox", "autoSmsCheckbox", "autoClickCheckbox", "autoCloseTab", "currentUser", "phone_number", "smscode"]);
 
     if (autoFillCheckbox && currentUser) {
-        fillInputIfEmpty('input[name="email"]', currentUser.email);
-        fillInputIfEmpty('input[name="password"]', currentUser.password);
-        fillInputIfEmpty('input[name="username"]', currentUser.email);
+        const isInputEmail = fillInputIfEmpty('input[name="email"]', currentUser.email);
+        if (isInputEmail && autoClickCheckbox && document.body.textContent.includes("Create your account")) {
+            clickOnButton('button[type="submit"][name="action"][value="default"][data-action-button-primary="true"]', "Continue");
+        }
+        const isUserName = fillInputIfEmpty('input[name="username"]', currentUser.email);
+        if (isUserName && autoClickCheckbox && document.body.textContent.includes("Welcome back")) {
+            clickOnButton('button[type="submit"][name="action"][value="default"][data-action-button-primary="true"]', "Continue");
+        }
+
+        const isPassword = fillInputIfEmpty('input[name="password"]', currentUser.password);
+        if (isPassword && autoClickCheckbox && document.body.textContent.includes("Create your account")) {
+            clickOnButton('button[type="submit"][name="action"][value="default"][data-action-button-primary="true"]', "Continue");
+        }
+        if (isPassword && autoClickCheckbox && document.body.textContent.includes("Enter your password")) {
+            clickOnButton('button[type="submit"][name="action"][value="default"][data-action-button-primary="true"]', "Continue");
+        }
         fillInputIfEmpty('input[placeholder="First name"]', currentUser.first_name);
         fillInputIfEmpty('input[placeholder="Last name"]', currentUser.last_name);
-        clickOnButton('.onb-resend-email-btn', null, autoCloseTab);
+        if (autoClickCheckbox && document.body.textContent.includes("Verify your email")) {
+            clickOnButton('.onb-resend-email-btn', null, autoCloseTab);
+        }
     }
 
     if (autoSmsCheckbox && phone_number) {
-        if (autoSmsCheckbox && document.body.textContent.includes("Verify your phone number")) {
+        if (document.body.textContent.includes("Verify your phone number")) {
             fillInputIfEmpty(".text-input.text-input-lg.text-input-full", phone_number);
         }
 
-        if (autoSmsCheckbox && document.body.textContent.includes("Enter code") && smscode) {
+        if (document.body.textContent.includes("Enter code") && smscode) {
             fillInputIfEmpty(".text-input.text-input-lg.text-input-full", smscode);
         }
     }

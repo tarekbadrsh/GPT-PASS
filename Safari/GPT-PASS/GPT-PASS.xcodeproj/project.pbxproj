@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		FE2EE7EF2A1299B500A9FEDB /* facebook.svg in Resources */ = {isa = PBXBuildFile; fileRef = FE2EE7EE2A1299B500A9FEDB /* facebook.svg */; };
+		FE2EE7F12A12A1FE00A9FEDB /* instagram.svg in Resources */ = {isa = PBXBuildFile; fileRef = FE2EE7F02A12A1FE00A9FEDB /* instagram.svg */; };
 		FE4E23BB2A0692FC008BB8E0 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE4E23BA2A0692FC008BB8E0 /* AppDelegate.swift */; };
 		FE4E23BF2A0692FC008BB8E0 /* Main.html in Resources */ = {isa = PBXBuildFile; fileRef = FE4E23BD2A0692FC008BB8E0 /* Main.html */; };
 		FE4E23C12A0692FC008BB8E0 /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = FE4E23C02A0692FC008BB8E0 /* Icon.png */; };
@@ -79,6 +81,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		FE2EE7EE2A1299B500A9FEDB /* facebook.svg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = facebook.svg; sourceTree = "<group>"; };
+		FE2EE7F02A12A1FE00A9FEDB /* instagram.svg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = instagram.svg; sourceTree = "<group>"; };
 		FE4E23B72A0692FC008BB8E0 /* GPT-PASS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "GPT-PASS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		FE4E23BA2A0692FC008BB8E0 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		FE4E23BE2A0692FC008BB8E0 /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = Base; path = ../Base.lproj/Main.html; sourceTree = "<group>"; };
@@ -267,6 +271,8 @@
 		FE4E241C2A0693EB008BB8E0 /* icons */ = {
 			isa = PBXGroup;
 			children = (
+				FE2EE7F02A12A1FE00A9FEDB /* instagram.svg */,
+				FE2EE7EE2A1299B500A9FEDB /* facebook.svg */,
 				FE4E241D2A0693EB008BB8E0 /* icon16.png */,
 				FE4E241E2A0693EB008BB8E0 /* icon48.png */,
 				FE4E241F2A0693EB008BB8E0 /* icon64.png */,
@@ -442,10 +448,12 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FE2EE7F12A12A1FE00A9FEDB /* instagram.svg in Resources */,
 				FE4E24252A0693EB008BB8E0 /* popup.css in Resources */,
 				FE4E24292A0693EB008BB8E0 /* popup.html in Resources */,
 				FE4E24312A0693EB008BB8E0 /* background.js in Resources */,
 				FE4E24302A0693EB008BB8E0 /* icon32.png in Resources */,
+				FE2EE7EF2A1299B500A9FEDB /* facebook.svg in Resources */,
 				FE4E23F62A0692FD008BB8E0 /* manifest.json in Resources */,
 				FE4E242B2A0693EB008BB8E0 /* options.html in Resources */,
 				FE4E242D2A0693EB008BB8E0 /* icon48.png in Resources */,

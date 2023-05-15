@@ -220,8 +220,8 @@ function simulateKeyPressAndRelease(targetElement, key, code, keyCode, which) {
 
 function OpenAILastButton(textarea, username, autoCloseTab) {
     const welcomeInterval = setInterval(() => {
-        clickOnButton('.flex.w-full.items-center.justify-center.gap-2', 'Next');
-        const done = clickOnButton('.flex.w-full.items-center.justify-center.gap-2', 'Done', autoCloseTab);
+        clickOnButton('.flex.w-full.items-center.justify-center.gap-2', 'Next', autoCloseTab);
+        const done = clickOnButton('.flex.w-full.items-center.justify-center.gap-2', 'Done');
         if (done) {
             textarea.value = `Hi ChatGPT my name is ${username}`;
             simulateKeyPressAndRelease(textarea, key = 'Enter', code = 'Enter', keyCode = 13, which = 13);
