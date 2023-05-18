@@ -51,8 +51,6 @@ async function saveUserToList(user) {
 
         if (existingUserIndex !== -1) {
             users.splice(existingUserIndex, 1);
-        } else {
-            user.id = users.length + 1;
         }
 
         users.push(user);
@@ -194,39 +192,47 @@ async function requestActivationCode(activationId) {
     return "123456"
 }
 
+let messagedSignupV = new Set();
+
 // Listen for messages from other parts of the extension
 browser.runtime.onMessage.addListener(async (message) => {
-    if (message.type === 'user') {
-        const user = { ...message.user };
-        const tab = await browser.tabs.create({ url: `https://chat.openai.com/auth/login` });
-        user.tabId = tab.id;
-        await updateCurrentUser(user);
-        console.log(user);
-    }
-    if (message.type === 'status') {
-        const result = await browser.storage.local.get("currentUser");
-        result.currentUser.status = message.status;
-        await updateCurrentUser(result.currentUser);
-    }
-    if (message.type === "closeCurrentTab") {
-        browser.tabs.query({}).then((tabs) => {
-            for (let tab of tabs) {
-                // Check if the URL of the tab includes "openai.com"
-                if (tab.active && tab.url.includes("openai.com")) {
-                    // Wait for 5 seconds (5000 milliseconds)
-                    setTimeout(() => {
-                        // Then close the tab
-                        browser.tabs.remove(tab.id);
-                    }, 15000);
-                }
-                // Check if the URL of the tab includes "facebook.com"
-                if (tab.url.includes("facebook.com")) {
-                    setTimeout(() => {
-                        // Then close the tab
-                        browser.tabs.update(tab.id, { active: true });
-                    }, 100);
-                }
+    switch (message.type) {
+        case 'user':
+            const user = { ...message.user };
+            const tab = await browser.tabs.create({ url: `https://chat.openai.com/auth/login` });
+            user.tabId = tab.id;
+            await updateCurrentUser(user);
+            break;
+        case 'status':
+            const result = await browser.storage.local.get("currentUser");
+            result.currentUser.status = message.status;
+            await updateCurrentUser(result.currentUser);
+            if (message.status === 'signup-v' && !messagedSignupV.has(message.user.email)) {
+                browser.tabs.query({}).then(tabs => {
+                    tabs.forEach(tab => {
+                        if (tab.url.includes("facebook.com")) {
+                            browser.tabs.sendMessage(tab.id, { type: 'send-password', user: message.user });
+                            messagedSignupV.add(message.user.email);
+                        }
+                    });
+                });
             }
-        });
+            break;
+        case 'closeCurrentTab':
+            browser.tabs.query({}).then((tabs) => {
+                for (let tab of tabs) {
+                    if (tab.active && tab.url.includes("openai.com")) {
+                        setTimeout(() => {
+                            browser.tabs.remove(tab.id);
+                        }, 15000);
+                    }
+                    if (tab.url.includes("facebook.com")) {
+                        setTimeout(() => {
+                            browser.tabs.update(tab.id, { active: true });
+                        }, 100);
+                    }
+                }
+            });
+            break;
     }
 });

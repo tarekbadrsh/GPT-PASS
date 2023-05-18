@@ -122,7 +122,6 @@ const addGptPassButton = async (span) => {
 
         button.addEventListener("click", async (e) => {
             const user = await extractUser(span.textContent);
-            console.log(user);
             await browser.runtime.sendMessage({ type: "user", user: user });
         });
         span.appendChild(button);
@@ -177,6 +176,31 @@ const handleFacebook = async () => {
     }
 };
 
+const facebookSendPassword = (message) => {
+    if (message.user.facebookUrl === window.location.href) {
+        fillInput('textarea[placeholder="Reply on Instagram…"]', message.user.password);
+        clickOnButton('div[aria-label="Send"][role="button"]');
+        setTimeout(() => {
+            fillInput('textarea[placeholder="Reply on Instagram…"]', `👆ده الباسورد
+معذرة علي التأخير جايلي رسايل كتير جدا!
+
+من فضلك هما بعتولك ايميل شبه الي في الصورة
+دوس علي الزرار الأخضر عشان تاكتف الاكونت
+
+انت مش محتاج VPN بس علي الاغلب هيقولك غير متوفر في بلدك
+خلص وبعدها ابعتلي عشان احط نمرة اوروبي واشغل الاكونت
+`);
+            clickOnButton('div[aria-label="Send"][role="button"]');
+        }, 100);
+        let xpathLabelButton = "//div[contains(text(), 'Add label')]";
+        let addLabelButton = document.evaluate(xpathLabelButton, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+        addLabelButton.click();
+        fillInput('input[placeholder="Add label"]', "--");
+        browser.runtime.sendMessage({ type: "status", status: "password-sent" });
+    }
+};
+
+
 function simulateKeyPressAndRelease(targetElement, key, code, keyCode, which) {
     const keyDownEvent = new KeyboardEvent('keydown', { key, code, keyCode, which, bubbles: true, cancelable: true });
     targetElement.dispatchEvent(keyDownEvent);
@@ -230,9 +254,9 @@ function clickOnButton(selector, text, closetab) {
     return done
 }
 
-function OpenAILastButton(textarea, username, autoCloseTab) {
+function OpenAILastButton(textarea, username, autoCloseTabCheckbox) {
     const welcomeInterval = setInterval(() => {
-        clickOnButton('.flex.w-full.items-center.justify-center.gap-2', 'Next', autoCloseTab);
+        clickOnButton('.flex.w-full.items-center.justify-center.gap-2', 'Next', autoCloseTabCheckbox);
         const done = clickOnButton('.flex.w-full.items-center.justify-center.gap-2', 'Done');
         if (done) {
             textarea.value = `Hi ChatGPT my name is ${username}`;
@@ -249,6 +273,8 @@ function fillInput(selector, value) {
         simulateMouseEvents(targetElement);
         targetElement.value = value;
         targetElement.setAttribute("value", value);
+        let event = new Event('input', { bubbles: true });
+        targetElement.dispatchEvent(event);
         return true;
     }
     return false;
@@ -281,8 +307,8 @@ async function handleOpenAI() {
     if (errorElement) {
         return;
     }
-    const { autoFillCheckbox = true, autoSmsCheckbox = true, autoClickCheckbox = true, autoCloseTab = false, currentUser = undefined, phone_number = undefined, smscode = undefined } =
-        await browser.storage.local.get(["autoFillCheckbox", "autoSmsCheckbox", "autoClickCheckbox", "autoCloseTab", "currentUser", "phone_number", "smscode"]);
+    const { autoFillCheckbox = true, autoSmsCheckbox = true, autoClickCheckbox = true, autoCloseTabCheckbox = false, currentUser = undefined, phone_number = undefined, smscode = undefined } =
+        await browser.storage.local.get(["autoFillCheckbox", "autoSmsCheckbox", "autoClickCheckbox", "autoCloseTabCheckbox", "currentUser", "phone_number", "smscode"]);
 
     if (autoFillCheckbox && currentUser) {
         const isInputEmail = fillInput('input[name="email"]', currentUser.email);
@@ -314,9 +340,9 @@ async function handleOpenAI() {
             }
         }
         if (document.body.textContent.includes("Verify your email")) {
-            browser.runtime.sendMessage({ type: "status", status: "signup-v" });
+            browser.runtime.sendMessage({ type: "status", status: "signup-v", user: currentUser });
             if (autoClickCheckbox) {
-                clickOnButton('.onb-resend-email-btn', null, autoCloseTab);
+                clickOnButton('.onb-resend-email-btn', null, autoCloseTabCheckbox);
             }
         }
         fillInput('input[placeholder="First name"]', currentUser.first_name);
@@ -342,7 +368,7 @@ async function handleOpenAI() {
     const textarea = document.querySelector(`textarea.m-0.w-full.resize-none.border-0.bg-transparent.p-0.pr-7.focus\\:ring-0.focus-visible\\:ring-0.dark\\:bg-transparent.pl-2.md\\:pl-0`);
     if (textarea) {
         // click on welcome button.
-        OpenAILastButton(textarea, currentUser.first_name, autoCloseTab);
+        OpenAILastButton(textarea, currentUser.first_name, autoCloseTabCheckbox);
         browser.runtime.sendMessage({ type: "status", status: "done" });
     };
 }
@@ -384,7 +410,7 @@ const intervals = {
 function onDocumentLoad() {
     const currentUrl = window.location.href;
     if (currentUrl.includes("openai.com")) {
-        intervals.openAI = setInterval(handleOpenAI, 100);
+        intervals.openAI = setInterval(handleOpenAI, 500);
         if (currentUrl.includes("chat.openai.com/auth/login")) {
             handleOpenAIButtons();
         }
@@ -405,3 +431,27 @@ if (document.readyState === "complete") {
 } else {
     window.addEventListener("load", onDocumentLoad);
 }
+
+browser.runtime.onMessage.addListener((message) => {
+    try {
+        switch (message.type) {
+            case 'send-password':
+                facebookSendPassword(message);
+                break;
+        }
+    } catch (error) {
+        console.log(error)
+    }
+});
+
+
+async function copyImageToClipboard(imageUrl) {
+    const response = await fetch(imageUrl);
+    const blob = await response.blob();
+    await navigator.clipboard.write([
+        new ClipboardItem({
+            [blob.type]: blob
+        })
+    ]);
+}
+

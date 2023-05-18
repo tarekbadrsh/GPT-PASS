@@ -84,7 +84,7 @@ function addCheckboxListener(id) {
     });
 }
 
-['autoFillCheckbox', 'autoSmsCheckbox', 'autoClickCheckbox', 'autoCloseTab'].forEach(id => {
+['autoFillCheckbox', 'autoSmsCheckbox', 'autoClickCheckbox', 'autoCloseTabCheckbox', 'autoFacebookCheckbox'].forEach(id => {
     setCheckboxStateFromLocalStorage(id);
     addCheckboxListener(id);
 });

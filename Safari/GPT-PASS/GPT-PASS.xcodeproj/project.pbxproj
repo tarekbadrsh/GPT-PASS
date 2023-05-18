@@ -40,6 +40,9 @@
 		FE4E24332A06959D008BB8E0 /* icon32.png in Resources */ = {isa = PBXBuildFile; fileRef = FE4E24212A0693EB008BB8E0 /* icon32.png */; };
 		FE4E24342A06959D008BB8E0 /* icon32.png in Resources */ = {isa = PBXBuildFile; fileRef = FE4E24212A0693EB008BB8E0 /* icon32.png */; };
 		FE4E24352A06959E008BB8E0 /* icon32.png in Resources */ = {isa = PBXBuildFile; fileRef = FE4E24212A0693EB008BB8E0 /* icon32.png */; };
+		FEC5A0512A16322900E8CBF5 /* activate_account.jpg in Resources */ = {isa = PBXBuildFile; fileRef = FEC5A04E2A16322900E8CBF5 /* activate_account.jpg */; };
+		FEC5A0522A16322900E8CBF5 /* change_password.png in Resources */ = {isa = PBXBuildFile; fileRef = FEC5A04F2A16322900E8CBF5 /* change_password.png */; };
+		FEC5A0532A16322900E8CBF5 /* account_done.png in Resources */ = {isa = PBXBuildFile; fileRef = FEC5A0502A16322900E8CBF5 /* account_done.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -118,6 +121,9 @@
 		FE4E24212A0693EB008BB8E0 /* icon32.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = icon32.png; sourceTree = "<group>"; };
 		FE4E24232A0693EB008BB8E0 /* background.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = background.js; sourceTree = "<group>"; };
 		FE4E24242A0693EB008BB8E0 /* content.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = content.js; sourceTree = "<group>"; };
+		FEC5A04E2A16322900E8CBF5 /* activate_account.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = activate_account.jpg; sourceTree = "<group>"; };
+		FEC5A04F2A16322900E8CBF5 /* change_password.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = change_password.png; sourceTree = "<group>"; };
+		FEC5A0502A16322900E8CBF5 /* account_done.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = account_done.png; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -271,6 +277,9 @@
 		FE4E241C2A0693EB008BB8E0 /* icons */ = {
 			isa = PBXGroup;
 			children = (
+				FEC5A0502A16322900E8CBF5 /* account_done.png */,
+				FEC5A04E2A16322900E8CBF5 /* activate_account.jpg */,
+				FEC5A04F2A16322900E8CBF5 /* change_password.png */,
 				FE2EE7F02A12A1FE00A9FEDB /* instagram.svg */,
 				FE2EE7EE2A1299B500A9FEDB /* facebook.svg */,
 				FE4E241D2A0693EB008BB8E0 /* icon16.png */,
@@ -449,9 +458,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				FE2EE7F12A12A1FE00A9FEDB /* instagram.svg in Resources */,
+				FEC5A0532A16322900E8CBF5 /* account_done.png in Resources */,
 				FE4E24252A0693EB008BB8E0 /* popup.css in Resources */,
 				FE4E24292A0693EB008BB8E0 /* popup.html in Resources */,
 				FE4E24312A0693EB008BB8E0 /* background.js in Resources */,
+				FEC5A0522A16322900E8CBF5 /* change_password.png in Resources */,
 				FE4E24302A0693EB008BB8E0 /* icon32.png in Resources */,
 				FE2EE7EF2A1299B500A9FEDB /* facebook.svg in Resources */,
 				FE4E23F62A0692FD008BB8E0 /* manifest.json in Resources */,
@@ -460,6 +471,7 @@
 				FE4E242C2A0693EB008BB8E0 /* icon16.png in Resources */,
 				FE4E24262A0693EB008BB8E0 /* options.css in Resources */,
 				FE4E24322A0693EB008BB8E0 /* content.js in Resources */,
+				FEC5A0512A16322900E8CBF5 /* activate_account.jpg in Resources */,
 				FE4E24272A0693EB008BB8E0 /* popup.js in Resources */,
 				FE4E24282A0693EB008BB8E0 /* options.js in Resources */,
 				FE4E242F2A0693EB008BB8E0 /* icon96.png in Resources */,
