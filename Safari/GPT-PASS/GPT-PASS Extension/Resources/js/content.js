@@ -177,18 +177,20 @@ const handleFacebook = async () => {
 };
 
 const facebookSendPassword = (message) => {
-    if (message.user.facebookUrl === window.location.href) {
+    if (autoFacebookCheckbox && message.user.facebookUrl === window.location.href) {
         fillInput('textarea[placeholder="Reply on Instagram…"]', message.user.password);
         clickOnButton('div[aria-label="Send"][role="button"]');
         setTimeout(() => {
             fillInput('textarea[placeholder="Reply on Instagram…"]', `👆ده الباسورد
 معذرة علي التأخير جايلي رسايل كتير جدا!
 
-من فضلك هما بعتولك ايميل شبه الي في الصورة
+من فضلك هما بعتولك ايميل شبه الصورة الي في اللينك
 دوس علي الزرار الأخضر عشان تاكتف الاكونت
 
 انت مش محتاج VPN بس علي الاغلب هيقولك غير متوفر في بلدك
 خلص وبعدها ابعتلي عشان احط نمرة اوروبي واشغل الاكونت
+
+https://imgtr.ee/images/2023/05/18/280Kn.md.jpg
 `);
             clickOnButton('div[aria-label="Send"][role="button"]');
         }, 100);
@@ -197,6 +199,23 @@ const facebookSendPassword = (message) => {
         addLabelButton.click();
         fillInput('input[placeholder="Add label"]', "--");
         browser.runtime.sendMessage({ type: "status", status: "password-sent" });
+    }
+};
+
+
+const facebookUserAlreadyExists = (message) => {
+    if (message.user.facebookUrl === window.location.href) {
+        fillInput('textarea[placeholder="Reply on Instagram…"]', `
+انت عندك اكونت بالفعل ... ممكن تبعتلي الإيميل والباسورد الصح في رسايل منفصلة عشان احط رقم اوروبي واشغلهولك!
+وممكن تتأكد بنفسك لو عملت تسجيل دخول من اللينك ده وتقدر كمان تغير الباسورد
+
+https://chat.openai.com/auth/login`);
+        clickOnButton('div[aria-label="Send"][role="button"]');
+        let xpathLabelButton = "//div[contains(text(), 'Add label')]";
+        let addLabelButton = document.evaluate(xpathLabelButton, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+        addLabelButton.click();
+        fillInput('input[placeholder="Add label"]', "--");
+        browser.runtime.sendMessage({ type: "status", status: "user-already-exists-sent" });
     }
 };
 
@@ -304,11 +323,16 @@ function handleOpenAIButtons() {
 
 async function handleOpenAI() {
     let errorElement = document.querySelector('[class*="error"], [data-error-code*="blocked"]');
-    if (errorElement) {
-        return;
-    }
     const { autoFillCheckbox = true, autoSmsCheckbox = true, autoClickCheckbox = true, autoCloseTabCheckbox = false, currentUser = undefined, phone_number = undefined, smscode = undefined } =
         await browser.storage.local.get(["autoFillCheckbox", "autoSmsCheckbox", "autoClickCheckbox", "autoCloseTabCheckbox", "currentUser", "phone_number", "smscode"]);
+
+    if (errorElement) {
+        if (document.body.textContent.includes("The user already exists")) {
+            browser.runtime.sendMessage({ type: "status", status: "user-already-exists", user: currentUser });
+            browser.runtime.sendMessage({ type: "closeCurrentTab" });
+        }
+        return;
+    }
 
     if (autoFillCheckbox && currentUser) {
         const isInputEmail = fillInput('input[name="email"]', currentUser.email);
@@ -432,26 +456,20 @@ if (document.readyState === "complete") {
     window.addEventListener("load", onDocumentLoad);
 }
 
-browser.runtime.onMessage.addListener((message) => {
+browser.runtime.onMessage.addListener(async (message) => {
+    const { autoFacebookCheckbox = true } = await browser.storage.local.get("autoFacebookCheckbox");
     try {
-        switch (message.type) {
-            case 'send-password':
-                facebookSendPassword(message);
-                break;
+        if (autoFacebookCheckbox) {
+            switch (message.type) {
+                case 'send-password':
+                    facebookSendPassword(message);
+                    break;
+                case 'send-user-already-exists':
+                    facebookUserAlreadyExists(message);
+                    break;
+            }
         }
     } catch (error) {
         console.log(error)
     }
 });
-
-
-async function copyImageToClipboard(imageUrl) {
-    const response = await fetch(imageUrl);
-    const blob = await response.blob();
-    await navigator.clipboard.write([
-        new ClipboardItem({
-            [blob.type]: blob
-        })
-    ]);
-}
-

@@ -192,7 +192,7 @@ async function requestActivationCode(activationId) {
     return "123456"
 }
 
-let messagedSignupV = new Set();
+let sendMessageFacebook = new Set();
 
 // Listen for messages from other parts of the extension
 browser.runtime.onMessage.addListener(async (message) => {
@@ -207,12 +207,22 @@ browser.runtime.onMessage.addListener(async (message) => {
             const result = await browser.storage.local.get("currentUser");
             result.currentUser.status = message.status;
             await updateCurrentUser(result.currentUser);
-            if (message.status === 'signup-v' && !messagedSignupV.has(message.user.email)) {
+            if (message.status === 'signup-v' && !sendMessageFacebook.has(message.user.email)) {
                 browser.tabs.query({}).then(tabs => {
                     tabs.forEach(tab => {
                         if (tab.url.includes("facebook.com")) {
                             browser.tabs.sendMessage(tab.id, { type: 'send-password', user: message.user });
-                            messagedSignupV.add(message.user.email);
+                            sendMessageFacebook.add(message.user.email);
+                        }
+                    });
+                });
+            }
+            if (message.status === 'user-already-exists' && !sendMessageFacebook.has(message.user.email)) {
+                browser.tabs.query({}).then(tabs => {
+                    tabs.forEach(tab => {
+                        if (tab.url.includes("facebook.com")) {
+                            browser.tabs.sendMessage(tab.id, { type: 'send-user-already-exists', user: message.user });
+                            sendMessageFacebook.add(message.user.email);
                         }
                     });
                 });
