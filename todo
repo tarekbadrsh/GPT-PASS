@@ -1,4 +1,6 @@
-- user state
-- auto replay to facebook
+- split content.js scripts 
+- use facebook api
 - use sms api
 - create chrome extension
+- set new password after change 
+- get the text in the text content

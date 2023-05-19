@@ -142,22 +142,24 @@ async function handleSmsActivate() {
         return;
     }
 
-    const phoneElement = document.querySelector(".activate-grid-item__numberq");
+    let phoneElement = document.querySelector(".activate-grid-item__numberq");
+    let phone_number = ""
     if (!phoneElement) {
+        await browser.storage.local.set({ phone_number });
         return;
     }
-    const phone_number = phoneElement.innerText.replace(/\D/g, "");
+    phone_number = phoneElement.innerText.replace(/\D/g, "");
     if (phone_number) {
         await browser.storage.local.set({ phone_number });
     }
     const smscodeElement = document.querySelector(".underline-orange.cursor-pointer");
-    if (smscodeElement) {
-        if (isSixDigitNumber(smscodeElement.textContent)) {
-            await browser.storage.local.set({ smscode: smscodeElement.textContent });
-        }
-    } else {
-        await browser.storage.local.set({ smscode: "" });
+    let smscode = ""
+    if (!smscodeElement || !isSixDigitNumber(smscodeElement.textContent)) {
+        await browser.storage.local.set({ smscode });
+        return;
     }
+    smscode = smscodeElement.textContent;
+    await browser.storage.local.set({ smscode });
 };
 
 const handleFacebook = async () => {
@@ -177,11 +179,14 @@ const handleFacebook = async () => {
 };
 
 const facebookSendPassword = (message) => {
-    if (autoFacebookCheckbox && message.user.facebookUrl === window.location.href) {
-        fillInput('textarea[placeholder="Reply on Instagram…"]', message.user.password);
+    if (message.user.facebookUrl === window.location.href) {
+        fillInput('textarea[placeholder="Reply on Instagram…"]', message.user.email);
         clickOnButton('div[aria-label="Send"][role="button"]');
         setTimeout(() => {
-            fillInput('textarea[placeholder="Reply on Instagram…"]', `👆ده الباسورد
+            fillInput('textarea[placeholder="Reply on Instagram…"]', message.user.password);
+            clickOnButton('div[aria-label="Send"][role="button"]');
+            setTimeout(() => {
+                fillInput('textarea[placeholder="Reply on Instagram…"]', `👆ده الباسورد
 معذرة علي التأخير جايلي رسايل كتير جدا!
 
 من فضلك هما بعتولك ايميل شبه الصورة الي في اللينك
@@ -189,11 +194,13 @@ const facebookSendPassword = (message) => {
 
 انت مش محتاج VPN بس علي الاغلب هيقولك غير متوفر في بلدك
 خلص وبعدها ابعتلي عشان احط نمرة اوروبي واشغل الاكونت
-
+    
 https://imgtr.ee/images/2023/05/18/280Kn.md.jpg
-`);
-            clickOnButton('div[aria-label="Send"][role="button"]');
+                `);
+                clickOnButton('div[aria-label="Send"][role="button"]');
+            }, 100);
         }, 100);
+
         let xpathLabelButton = "//div[contains(text(), 'Add label')]";
         let addLabelButton = document.evaluate(xpathLabelButton, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
         addLabelButton.click();
@@ -369,8 +376,14 @@ async function handleOpenAI() {
                 clickOnButton('.onb-resend-email-btn', null, autoCloseTabCheckbox);
             }
         }
-        fillInput('input[placeholder="First name"]', currentUser.first_name);
-        fillInput('input[placeholder="Last name"]', currentUser.last_name);
+        if (document.body.textContent.includes("Tell us about you")) {
+            fillInput('input[placeholder="First name"]', currentUser.first_name);
+            fillInput('input[placeholder="Last name"]', currentUser.last_name);
+            fillInput('input[placeholder="MM/DD/YYYY"]', currentUser.birth_date);
+            if (autoClickCheckbox) {
+                clickOnButton('button[type="submit"]');
+            }
+        }
     }
 
     if (autoSmsCheckbox) {
@@ -446,7 +459,7 @@ function onDocumentLoad() {
     }
 
     if (currentUrl.includes("sms-activate.org")) {
-        intervals.smsActivate = setInterval(handleSmsActivate, 1000);
+        intervals.smsActivate = setInterval(handleSmsActivate, 500);
     }
 }
 
@@ -457,17 +470,19 @@ if (document.readyState === "complete") {
 }
 
 browser.runtime.onMessage.addListener(async (message) => {
-    const { autoFacebookCheckbox = true } = await browser.storage.local.get("autoFacebookCheckbox");
+    const { autoFacebookCheckbox = true } = await browser.storage.local.get(["autoFacebookCheckbox"]);
     try {
-        if (autoFacebookCheckbox) {
-            switch (message.type) {
-                case 'send-password':
+        switch (message.type) {
+            case 'send-password':
+                if (autoFacebookCheckbox) {
                     facebookSendPassword(message);
-                    break;
-                case 'send-user-already-exists':
+                }
+                break;
+            case 'send-user-already-exists':
+                if (autoFacebookCheckbox) {
                     facebookUserAlreadyExists(message);
-                    break;
-            }
+                }
+                break;
         }
     } catch (error) {
         console.log(error)
