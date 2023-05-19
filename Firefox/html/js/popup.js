@@ -3,12 +3,11 @@ const truncate = (text, maxLength) => {
     return noSpaces.length > maxLength ? `${noSpaces.substr(0, maxLength)}...` : noSpaces;
 }
 
-
 const createButtonContainer = (text) => {
     if (!text) { return document.createElement("div") }
 
     const button = document.createElement("button");
-    button.textContent = truncate(text, 16);
+    button.textContent = truncate(text, 14);
     button.setAttribute('data-tooltip', text);
     button.addEventListener("click", () => navigator.clipboard.writeText(text));
 
@@ -19,6 +18,19 @@ const createButtonContainer = (text) => {
     return container;
 }
 
+const createIconContainer = (icon, url) => {
+    if (!url) { return document.createElement("div") }
+
+    const img = document.createElement("img");
+    img.src = icon;
+    img.style.cursor = "pointer";
+    img.addEventListener("click", () => browser.tabs.create({ url: url }));
+    const container = document.createElement("div");
+    container.classList.add("icon-container");
+    container.appendChild(img);
+
+    return container;
+}
 
 async function display() {
     const { users: storedUsers = [] } = await browser.storage.local.get('users');
@@ -28,10 +40,8 @@ async function display() {
 
     users.forEach((userData) => {
         const li = document.createElement("li");
-        ['email', 'password', 'first_name', 'last_name', 'birth_date', 'phone_number', 'smscode'].forEach(field =>
-            li.appendChild(createButtonContainer(userData[field]))
-        );
-
+        li.appendChild(createIconContainer("icons/facebook.svg", userData.facebookUrl));
+        li.appendChild(createIconContainer("icons/instagram.svg", userData.instagramUrl));
         const buttonRemove = document.createElement("button");
         buttonRemove.textContent = "X";
         buttonRemove.classList.add("remove");
@@ -42,6 +52,10 @@ async function display() {
         });
 
         li.appendChild(buttonRemove);
+
+        ['email', 'password', 'first_name', 'last_name', 'birth_date', 'phone_number', 'smscode'].forEach(field =>
+            li.appendChild(createButtonContainer(userData[field]))
+        );
         usersList.appendChild(li);
     });
 
@@ -70,7 +84,7 @@ function addCheckboxListener(id) {
     });
 }
 
-['autoFillCheckbox', 'autoSmsCheckbox', 'autoCloseTab'].forEach(id => {
+['autoFillCheckbox', 'autoSmsCheckbox', 'autoClickCheckbox', 'autoCloseTabCheckbox', 'autoFacebookCheckbox'].forEach(id => {
     setCheckboxStateFromLocalStorage(id);
     addCheckboxListener(id);
 });

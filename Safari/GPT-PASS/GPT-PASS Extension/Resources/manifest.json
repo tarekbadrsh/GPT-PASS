@@ -2,7 +2,7 @@
     "manifest_version": 3,
     "default_locale": "en",
     "name": "GPT-PASS",
-    "version": "1.1.0",
+    "version": "1.1.1",
     "description": "Generate strong and secure passwords with the GPT-PASS extension.",
     "applications": {
         "safari-web-extension": {

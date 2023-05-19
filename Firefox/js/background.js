@@ -3,6 +3,14 @@
  * This file contains the logic for the GPT-PASS extension.
  */
 
+
+// Open extension options page
+function configureExtension() {
+    browser.runtime.openOptionsPage()
+        .then(() => console.log('Opened options page'))
+        .catch((error) => console.error('Error opening options page:', error));
+}
+
 // Save user to the list of users
 async function saveUserToList(user) {
     if (!user || !user.email) return;
@@ -12,8 +20,6 @@ async function saveUserToList(user) {
 
         if (existingUserIndex !== -1) {
             users.splice(existingUserIndex, 1);
-        } else {
-            user.id = users.length + 1;
         }
 
         users.push(user);
@@ -30,44 +36,72 @@ async function updateCurrentUser(user) {
     await saveUserToList(user);
 }
 
+let sendMessageFacebook = new Set();
+
 // Listen for messages from other parts of the extension
 browser.runtime.onMessage.addListener(async (message) => {
-    if (message.type === 'user') {
-        const user = { ...message.user };
-        await browser.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
-            user.tabId = tabs[0].id;
-        });
-        await updateCurrentUser(user);
-        let privateWindow = {
-            url: "https://chat.openai.com/auth/login",
-            incognito: true
-        };
-        await browser.windows.create(privateWindow);
-    }
-    if (message.type === "closeCurrentTab") {
-        browser.tabs.query({}).then((tabs) => {
-            for (let tab of tabs) {
-                // Check if the URL of the tab includes "openai.com"
-                if (tab.active && tab.url.includes("openai.com")) {
-                    // Wait for 15 seconds (15000 milliseconds)
-                    setTimeout(() => {
-                        // Then close the tab
-                        browser.tabs.remove(tab.id);
-                    }, 15000);
-                }
+    switch (message.type) {
+        case 'user':
+            const user = { ...message.user };
+            await browser.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
+                user.tabId = tabs[0].id;
+            });
+            await updateCurrentUser(user);
+            let privateWindow = {
+                url: "https://chat.openai.com/auth/login",
+                incognito: true
+            };
+            await browser.windows.create(privateWindow);
+            break;
+        case 'status':
+            console.log(message);
+            const result = await browser.storage.local.get("currentUser");
+            await updateCurrentUser(result.currentUser);
+            if (message.status === 'signup-v' && !sendMessageFacebook.has(message.user.email)) {
+                browser.windows.getAll({ populate: true }).then(windows => {
+                    windows.forEach(window => {
+                        window.tabs.forEach(tab => {
+                            if (tab.url.includes("facebook.com")) {
+                                browser.tabs.sendMessage(tab.id, { type: 'send-password', user: message.user });
+                                sendMessageFacebook.add(message.user.email);
+                            }
+                        });
+                    });
+                });
             }
-        });
-        browser.windows.getAll({ populate: true }).then(windows => {
-            windows.forEach(window => {
-                window.tabs.forEach(tab => {
-                    if (tab.url.includes("facebook.com")) {
-                        // Focus this window
-                        browser.windows.update(window.id, { focused: true });
-                        // And make this tab active in its window
-                        browser.tabs.update(tab.id, { active: true });
+            if (message.status === 'user-already-exists' && !sendMessageFacebook.has(message.user.email)) {
+                browser.windows.getAll({ populate: true }).then(windows => {
+                    windows.forEach(window => {
+                        window.tabs.forEach(tab => {
+                            if (tab.url.includes("facebook.com")) {
+                                browser.tabs.sendMessage(tab.id, { type: 'send-user-already-exists', user: message.user });
+                                sendMessageFacebook.add(message.user.email);
+                            }
+                        });
+                    });
+                });
+            }
+            break;
+        case 'closeCurrentTab':
+            browser.tabs.query({}).then((tabs) => {
+                for (let tab of tabs) {
+                    if (tab.active && tab.url.includes("openai.com")) {
+                        setTimeout(() => {
+                            browser.tabs.remove(tab.id);
+                        }, 15000);
                     }
+                }
+            });
+            browser.windows.getAll({ populate: true }).then(windows => {
+                windows.forEach(window => {
+                    window.tabs.forEach(tab => {
+                        if (tab.url.includes("facebook.com")) {
+                            browser.windows.update(window.id, { focused: true });
+                            browser.tabs.update(tab.id, { active: true });
+                        }
+                    });
                 });
             });
-        });
+            break;
     }
 });

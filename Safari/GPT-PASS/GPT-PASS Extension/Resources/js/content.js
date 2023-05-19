@@ -306,7 +306,7 @@ function fillInput(selector, value) {
     return false;
 }
 
-function handleOpenAIButtons() {
+function handleOpenAILogin() {
     // Find the Login and Sign Up buttons
     let loginButton = Array.from(document.getElementsByClassName('btn relative btn-primary')).find(button => button.textContent === "Log in");
     let signupButton = Array.from(document.getElementsByClassName('btn relative btn-primary')).find(button => button.textContent === "Sign up");
@@ -449,7 +449,7 @@ function onDocumentLoad() {
     if (currentUrl.includes("openai.com")) {
         intervals.openAI = setInterval(handleOpenAI, 500);
         if (currentUrl.includes("chat.openai.com/auth/login")) {
-            handleOpenAIButtons();
+            handleOpenAILogin();
         }
     }
 
