@@ -179,7 +179,6 @@ const handleFacebook = async () => {
 };
 
 const facebookSendPassword = (message) => {
-    console.log(message);
     if (message.user.facebookUrl === window.location.href) {
         fillInput('textarea[placeholder="Reply on Instagram…"]', message.user.email);
         clickOnButton('div[aria-label="Send"][role="button"]');
@@ -206,7 +205,7 @@ https://imgtr.ee/images/2023/05/18/280Kn.md.jpg
         let addLabelButton = document.evaluate(xpathLabelButton, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
         addLabelButton.click();
         fillInput('input[placeholder="Add label"]', "--");
-        message.status = "password-sent";
+        message.user.status = "password-sent";
         browser.runtime.sendMessage({ type: "status", status: "password-sent", user: message.user });
     }
 };
@@ -224,7 +223,7 @@ https://chat.openai.com/auth/login`);
         let addLabelButton = document.evaluate(xpathLabelButton, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
         addLabelButton.click();
         fillInput('input[placeholder="Add label"]', "--");
-        message.user = "user-already-exists-sent";
+        message.user.status = "user-already-exists-sent";
         browser.runtime.sendMessage({ type: "status", status: "user-already-exists-sent", user: message.user });
     }
 };
@@ -378,10 +377,8 @@ async function handleOpenAI() {
                 clickOnButton('button[type="submit"][name="action"][value="default"][data-action-button-primary="true"]', "Continue");
             }
         }
-        let testobj = document.body.textContent.includes("Verify your email");
         if (document.body.textContent.includes("Verify your email")) {
             if (autoClickCheckbox) {
-                console.log(testobj);
                 const done = clickOnButton('.onb-resend-email-btn', null, autoCloseTabCheckbox);
                 if (done) {
                     currentUser.status = "signup-v";

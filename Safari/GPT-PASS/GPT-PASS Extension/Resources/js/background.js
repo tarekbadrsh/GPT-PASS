@@ -198,32 +198,34 @@ let sendMessageFacebook = new Set();
 browser.runtime.onMessage.addListener(async (message) => {
     switch (message.type) {
         case 'user':
-            const user = { ...message.user };
-            const tab = await browser.tabs.create({ url: `https://chat.openai.com/auth/login` });
-            user.tabId = tab.id;
+            const user = message.user;
+            await browser.tabs.create({ url: `https://chat.openai.com/auth/login` });
             await updateCurrentUser(user);
             break;
         case 'status':
             const result = await browser.storage.local.get("currentUser");
-            result.currentUser.status = message.status;
             await updateCurrentUser(result.currentUser);
             if (message.status === 'signup-v' && !sendMessageFacebook.has(message.user.email)) {
-                browser.tabs.query({}).then(tabs => {
-                    tabs.forEach(tab => {
-                        if (tab.url.includes("facebook.com")) {
-                            browser.tabs.sendMessage(tab.id, { type: 'send-password', user: message.user });
-                            sendMessageFacebook.add(message.user.email);
-                        }
+                browser.windows.getAll({ populate: true }).then(windows => {
+                    windows.forEach(window => {
+                        window.tabs.forEach(tab => {
+                            if (tab.url.includes("facebook.com")) {
+                                browser.tabs.sendMessage(tab.id, { type: 'send-password', user: message.user });
+                                sendMessageFacebook.add(message.user.email);
+                            }
+                        });
                     });
                 });
             }
             if (message.status === 'user-already-exists' && !sendMessageFacebook.has(message.user.email)) {
-                browser.tabs.query({}).then(tabs => {
-                    tabs.forEach(tab => {
-                        if (tab.url.includes("facebook.com")) {
-                            browser.tabs.sendMessage(tab.id, { type: 'send-user-already-exists', user: message.user });
-                            sendMessageFacebook.add(message.user.email);
-                        }
+                browser.windows.getAll({ populate: true }).then(windows => {
+                    windows.forEach(window => {
+                        window.tabs.forEach(tab => {
+                            if (tab.url.includes("facebook.com")) {
+                                browser.tabs.sendMessage(tab.id, { type: 'send-user-already-exists', user: message.user });
+                                sendMessageFacebook.add(message.user.email);
+                            }
+                        });
                     });
                 });
             }
@@ -236,12 +238,17 @@ browser.runtime.onMessage.addListener(async (message) => {
                             browser.tabs.remove(tab.id);
                         }, 15000);
                     }
-                    if (tab.url.includes("facebook.com")) {
-                        setTimeout(() => {
-                            browser.tabs.update(tab.id, { active: true });
-                        }, 100);
-                    }
                 }
+            });
+            browser.windows.getAll({ populate: true }).then(windows => {
+                windows.forEach(window => {
+                    window.tabs.forEach(tab => {
+                        if (tab.url.includes("facebook.com")) {
+                            browser.windows.update(window.id, { focused: true });
+                            browser.tabs.update(tab.id, { active: true });
+                        }
+                    });
+                });
             });
             break;
     }

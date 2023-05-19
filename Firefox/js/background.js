@@ -42,7 +42,7 @@ let sendMessageFacebook = new Set();
 browser.runtime.onMessage.addListener(async (message) => {
     switch (message.type) {
         case 'user':
-            const user = { ...message.user };
+            const user = message.user;
             await browser.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
                 user.tabId = tabs[0].id;
             });
@@ -54,7 +54,6 @@ browser.runtime.onMessage.addListener(async (message) => {
             await browser.windows.create(privateWindow);
             break;
         case 'status':
-            console.log(message);
             const result = await browser.storage.local.get("currentUser");
             await updateCurrentUser(result.currentUser);
             if (message.status === 'signup-v' && !sendMessageFacebook.has(message.user.email)) {

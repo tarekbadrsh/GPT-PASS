@@ -205,7 +205,8 @@ https://imgtr.ee/images/2023/05/18/280Kn.md.jpg
         let addLabelButton = document.evaluate(xpathLabelButton, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
         addLabelButton.click();
         fillInput('input[placeholder="Add label"]', "--");
-        browser.runtime.sendMessage({ type: "status", status: "password-sent" });
+        message.user.status = "password-sent";
+        browser.runtime.sendMessage({ type: "status", status: "password-sent", user: message.user });
     }
 };
 
@@ -222,7 +223,8 @@ https://chat.openai.com/auth/login`);
         let addLabelButton = document.evaluate(xpathLabelButton, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
         addLabelButton.click();
         fillInput('input[placeholder="Add label"]', "--");
-        browser.runtime.sendMessage({ type: "status", status: "user-already-exists-sent" });
+        message.user.status = "user-already-exists-sent";
+        browser.runtime.sendMessage({ type: "status", status: "user-already-exists-sent", user: message.user });
     }
 };
 
@@ -335,6 +337,7 @@ async function handleOpenAI() {
 
     if (errorElement) {
         if (document.body.textContent.includes("The user already exists")) {
+            currentUser.status = "user-already-exists";
             browser.runtime.sendMessage({ type: "status", status: "user-already-exists", user: currentUser });
             browser.runtime.sendMessage({ type: "closeCurrentTab" });
         }
@@ -344,7 +347,8 @@ async function handleOpenAI() {
     if (autoFillCheckbox && currentUser) {
         const isInputEmail = fillInput('input[name="email"]', currentUser.email);
         if (isInputEmail && document.body.textContent.includes("Create your account")) {
-            browser.runtime.sendMessage({ type: "status", status: "signup-e" });
+            currentUser.status = "signup-e";
+            browser.runtime.sendMessage({ type: "status", status: "signup-e", user: currentUser });
             if (autoClickCheckbox) {
                 clickOnButton('button[type="submit"][name="action"][value="default"][data-action-button-primary="true"]', "Continue");
             }
@@ -352,7 +356,8 @@ async function handleOpenAI() {
 
         const isUserName = fillInput('input[name="username"]', currentUser.email);
         if (isUserName && document.body.textContent.includes("Welcome back")) {
-            browser.runtime.sendMessage({ type: "status", status: "login-e" });
+            currentUser.status = "login-e";
+            browser.runtime.sendMessage({ type: "status", status: "login-e", user: currentUser });
             if (autoClickCheckbox) {
                 clickOnButton('button[type="submit"][name="action"][value="default"][data-action-button-primary="true"]', "Continue");
             }
@@ -361,19 +366,24 @@ async function handleOpenAI() {
         const isPassword = fillInput('input[name="password"]', currentUser.password);
         if (isPassword) {
             if (document.body.textContent.includes("Create your account")) {
-                browser.runtime.sendMessage({ type: "status", status: "signup-p" });
+                currentUser.status = "signup-p";
+                browser.runtime.sendMessage({ type: "status", status: "signup-p", user: currentUser });
             }
             if (document.body.textContent.includes("Enter your password")) {
-                browser.runtime.sendMessage({ type: "status", status: "login-p" });
+                currentUser.status = "login-p";
+                browser.runtime.sendMessage({ type: "status", status: "login-p", user: currentUser });
             }
             if (autoClickCheckbox) {
                 clickOnButton('button[type="submit"][name="action"][value="default"][data-action-button-primary="true"]', "Continue");
             }
         }
         if (document.body.textContent.includes("Verify your email")) {
-            browser.runtime.sendMessage({ type: "status", status: "signup-v", user: currentUser });
             if (autoClickCheckbox) {
-                clickOnButton('.onb-resend-email-btn', null, autoCloseTabCheckbox);
+                const done = clickOnButton('.onb-resend-email-btn', null, autoCloseTabCheckbox);
+                if (done) {
+                    currentUser.status = "signup-v";
+                    browser.runtime.sendMessage({ type: "status", status: "signup-v", user: currentUser });
+                }
             }
         }
         if (document.body.textContent.includes("Tell us about you")) {
@@ -390,14 +400,16 @@ async function handleOpenAI() {
         if (phone_number && document.body.textContent.includes("Verify your phone number")) {
             fillInput(".text-input.text-input-lg.text-input-full", phone_number);
             if (currentUser.status != "number") {
-                browser.runtime.sendMessage({ type: "status", status: "number" });
+                currentUser.status = "number";
+                browser.runtime.sendMessage({ type: "status", status: "number", user: currentUser });
             }
         }
 
         if (smscode && document.body.textContent.includes("Enter code")) {
             fillInput(".text-input.text-input-lg.text-input-full", smscode);
             if (currentUser.status != "smscode") {
-                browser.runtime.sendMessage({ type: "status", status: "smscode" });
+                currentUser.status = "smscode";
+                browser.runtime.sendMessage({ type: "status", status: "smscode", user: currentUser });
             }
         }
     }
@@ -406,7 +418,8 @@ async function handleOpenAI() {
     if (textarea) {
         // click on welcome button.
         OpenAILastButton(textarea, currentUser.first_name, autoCloseTabCheckbox);
-        browser.runtime.sendMessage({ type: "status", status: "done" });
+        currentUser.status = "done";
+        browser.runtime.sendMessage({ type: "status", status: "done", user: currentUser });
     };
 }
 
