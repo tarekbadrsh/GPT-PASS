@@ -2,13 +2,6 @@
  * Optimized content.js for an extension
  */
 
-// Generate a random birth date
-function generateRandomBirthDate() {
-    const randomYear = Math.floor(Math.random() * (1995 - 1970 + 1)) + 1970;
-    const randomMonth = (Math.floor(Math.random() * 12) + 1).toString().padStart(2, '0');
-    const randomDay = (Math.floor(Math.random() * 25) + 1).toString().padStart(2, '0');
-    return `${randomMonth}/${randomDay}/${randomYear}`;
-}
 class User {
     constructor(facebookUrl, instagramUrl, email, first_name, last_name) {
         this.status = "";
@@ -32,87 +25,6 @@ class User {
         this.birth_date = generateRandomBirthDate();
     }
 }
-
-const isEmailValid = (email) => {
-    const regex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
-    return regex.test(email);
-};
-
-const extractEmail = (text) => {
-    const emailRegex = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g;
-    const emails = text.match(emailRegex);
-    if (emails && emails.length > 0 && isEmailValid(emails[0])) {
-        return emails[0];
-    }
-    console.error(`Cannot find email in the input: ${text}`);
-    return null;
-};
-
-const emailInText = (text) => {
-    const regex = /^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/;
-    return regex.test(text);
-};
-
-const findParentDiv = (element) => {
-    while (element.parentElement) {
-        element = element.parentElement;
-        if (element.tagName.toLowerCase() === "div") {
-            return element;
-        }
-    }
-    return null;
-};
-
-function processUserName() {
-    const anchorElements = document.getElementsByTagName("a");
-    let first_name = "GPT";
-    let last_name = "AI";
-    let instagramUrl = "instagram.com";
-
-    for (const anchor of anchorElements) {
-        if (anchor.textContent === "View profile") {
-            instagramUrl = anchor.href; // To get the link from the anchor tag
-            const parentDiv = findParentDiv(anchor);
-            if (parentDiv) {
-                const username = parentDiv.firstElementChild.textContent;
-                const spaceIndex = username.indexOf(" ");
-                if (spaceIndex !== -1) {
-                    first_name = username.slice(0, spaceIndex);
-                    last_name = username.slice(spaceIndex + 1);
-                } else {
-                    first_name = username;
-                }
-            }
-            return { instagramUrl, first_name, last_name };
-        }
-    }
-
-    console.error("Cannot find username in the input");
-    return null;
-}
-
-// Generate a hash for a given string
-async function generateHash(str) {
-    try {
-        const encoder = new TextEncoder();
-        const data = encoder.encode(str);
-        const digest = await crypto.subtle.digest('SHA-256', data);
-        const hashArray = Array.from(new Uint8Array(digest));
-        const hashHex = hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
-        return hashHex.slice(0, 16);
-    } catch (err) {
-        console.error(`Failed to generate hash: ${err}`);
-        return null;
-    }
-}
-
-const extractUser = async (text) => {
-    const email = extractEmail(text);
-    const user_name = processUserName();
-    let user = new User(window.location.href, user_name.instagramUrl, email, user_name.first_name, user_name.last_name);
-    await user.SetPassword();
-    return user;
-};
 
 const isSixDigitNumber = (value) => {
     const regex = /^\d{6}$/;

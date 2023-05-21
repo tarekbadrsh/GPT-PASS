@@ -54,6 +54,18 @@ function addLabel(txt) {
     }
 }
 
+function clickMoveToDone() {
+    let xpath = "//div[contains(text(), 'Move to done')]";
+    let doneButton = document.evaluate(xpath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+    if (doneButton) {
+        let button = doneButton.parentNode.parentNode.parentNode;
+        if (button) {
+            setTimeout(() => {
+                button.click();
+            }, 1000);
+        }
+    }
+}
 
 
 function addButtonToNotes(css_class, text, message, label, click_done) {
@@ -78,16 +90,7 @@ function addButtonToNotes(css_class, text, message, label, click_done) {
                         addLabel(label);
                     }
                     if (clickbuttondone && click_done) {
-                        let xpath = "//div[contains(text(), 'Move to done')]";
-                        let doneButton = document.evaluate(xpath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
-                        if (doneButton) {
-                            let button = doneButton.parentNode.parentNode.parentNode;
-                            if (button) {
-                                setTimeout(() => {
-                                    button.click();
-                                }, 1000);
-                            }
-                        }
+                        clickMoveToDone();
                     }
                 }
             });
@@ -112,18 +115,20 @@ function addResponseButtons() {
         true);
 
     addButtonToNotes("wrong_password_btn",
-        "🔴 الباسورد غلط 🔴",
+        "🔴الباسورد غلط🔴",
         "الباسورد غلط ... ممكن من فضلك تبعتلي الإيميل والباسورد الصح في رسايل منفصلة عشان احط رقم اوروبي واشغلهولك!",
         "--",
         true
     );
 
-    addButtonToNotes("gpt4_btn",
-        "ChatGPT-⓸⓸⓸",
-        `للاسف، مش بقدر اساعد في ChatGPT-4 🙏
-ممكن تشوف الي كتبته في التويته ديه
-https://twitter.com/tarekbadrsh/status/1641394327015370754
-`);
+    addButtonToNotes("wrong_password_btn",
+        "🔐ايميل تغييرالباسورد🔐",
+        `انا بعتلك ايميل تغيير الباسورد .. دور عندك في الرسايل
+هما بعتولك ايميل شبه الصورة الي في اللينك او سيرش علي OpenAI وغير الباسورد وابعتلي الجديد
+https://imgtr.ee/images/2023/05/21/2fJ0U.png`,
+        "--",
+        true
+    );
 
     addButtonToNotes("outlook_btn",
         "outlook",
@@ -138,6 +143,13 @@ https://twitter.com/tarekbadrsh/status/1641394327015370754
         "done",
         true
     );
+
+    addButtonToNotes("gpt4_btn",
+        "ChatGPT-⓸⓸⓸",
+        `للاسف، مش بقدر اساعد في ChatGPT-4 🙏
+ممكن تشوف الي كتبته في التويته ديه
+https://twitter.com/tarekbadrsh/status/1641394327015370754
+`);
 
 }
 
@@ -159,9 +171,12 @@ const facebookSendPassword = (message) => {
 انت مش محتاج VPN بس علي الاغلب هيقولك غير متوفر في بلدك
 خلص وبعدها ابعتلي عشان احط نمرة اوروبي واشغل الاكونت
     
-https://imgtr.ee/images/2023/05/18/280Kn.md.jpg
+https://imgtr.ee/images/2023/05/18/280Kn.jpg
                 `);
                 clickOnButton('div[aria-label="Send"][role="button"]');
+                setTimeout(() => {
+                    clickMoveToDone();
+                }, 100);
             }, 100);
         }, 100);
 
@@ -173,18 +188,148 @@ https://imgtr.ee/images/2023/05/18/280Kn.md.jpg
 
 const facebookUserAlreadyExists = (message) => {
     if (message.user.facebookUrl === window.location.href) {
+        addLabel("--");
         fillInput('textarea[placeholder="Reply on Instagram…"]', `
 انت عندك اكونت بالفعل ... ممكن تبعتلي الإيميل والباسورد الصح في رسايل منفصلة عشان احط رقم اوروبي واشغلهولك!
 وممكن تتأكد بنفسك لو عملت تسجيل دخول من اللينك ده وتقدر كمان تغير الباسورد
 
 https://chat.openai.com/auth/login`);
         clickOnButton('div[aria-label="Send"][role="button"]');
-        addLabel("--");
+        setTimeout(() => {
+            clickMoveToDone();
+        }, 100);
         message.user.status = "user-already-exists-sent";
         browser.runtime.sendMessage({ type: "status", status: "user-already-exists-sent", user: message.user });
     }
 };
 
+const userDone = (message) => {
+    if (message.user.facebookUrl === window.location.href) {
+        addLabel("done");
+        fillInput('textarea[placeholder="Reply on Instagram…"]', message.user.email);
+        clickOnButton('div[aria-label="Send"][role="button"]');
+        setTimeout(() => {
+            fillInput('textarea[placeholder="Reply on Instagram…"]', message.user.password);
+            clickOnButton('div[aria-label="Send"][role="button"]');
+
+            setTimeout(() => {
+                fillInput('textarea[placeholder="Reply on Instagram…"]', `- انا شغلت ليك الاكونت🤟🎉🎊
+هتلاقي ChatGPT & DALL-E شغالين معاك
+ChatGPT:  https://chat.openai.com/chat
+DALL-E : https://labs.openai.com
+
+- ديه فيدوهات عن الشات في قناة اليوتوب 🎥 
+
+ازاي بعمل حسابات للناس بسرعه!؟
+https://youtu.be/JKbIstFXB1Y
+
+ازاي تستعمله | 🤖ChatGPT
+https://youtu.be/OKCMfCdLqXA
+
+
+- انت هتحتاج تغير الباسورد ... بص علي التويته ديه عشان تعرف ازاي 🔐
+https://twitter.com/tarekbadrsh/status/1619418114340585472
+
+- انا هبقي شاكر جدا لو تقدر تنزل استوري علي الانستجرام او تكتب تويته ان اي حد محتاج اكونت ChatGPT يبعتلي اهلا وسهلا
+انا بحاول اعمل حسابات لأكبر قدر ممكن من الناس دلوقتي🙏`);
+
+                clickOnButton('div[aria-label="Send"][role="button"]');
+                clickMoveToDone();
+            }, 100);
+        }, 100);
+    }
+};
+
+const isEmailValid = (email) => {
+    const regex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
+    return regex.test(email);
+};
+
+const extractEmail = (text) => {
+    const emailRegex = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g;
+    const emails = text.match(emailRegex);
+    if (emails && emails.length > 0 && isEmailValid(emails[0])) {
+        return emails[0];
+    }
+    console.error(`Cannot find email in the input: ${text}`);
+    return null;
+};
+
+const emailInText = (text) => {
+    const regex = /^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/;
+    return regex.test(text);
+};
+
+const findParentDiv = (element) => {
+    while (element.parentElement) {
+        element = element.parentElement;
+        if (element.tagName.toLowerCase() === "div") {
+            return element;
+        }
+    }
+    return null;
+};
+
+// Generate a random birth date
+function generateRandomBirthDate() {
+    const randomYear = Math.floor(Math.random() * (1995 - 1970 + 1)) + 1970;
+    const randomMonth = (Math.floor(Math.random() * 12) + 1).toString().padStart(2, '0');
+    const randomDay = (Math.floor(Math.random() * 25) + 1).toString().padStart(2, '0');
+    return `${randomMonth}/${randomDay}/${randomYear}`;
+}
+
+function processUserName() {
+    const anchorElements = document.getElementsByTagName("a");
+    let first_name = "GPT";
+    let last_name = "AI";
+    let instagramUrl = "instagram.com";
+
+    for (const anchor of anchorElements) {
+        if (anchor.textContent === "View profile") {
+            instagramUrl = anchor.href; // To get the link from the anchor tag
+            const parentDiv = findParentDiv(anchor);
+            if (parentDiv) {
+                const username = parentDiv.firstElementChild.textContent;
+                const spaceIndex = username.indexOf(" ");
+                if (spaceIndex !== -1) {
+                    first_name = username.slice(0, spaceIndex);
+                    last_name = username.slice(spaceIndex + 1);
+                } else {
+                    first_name = username;
+                }
+            }
+            return { instagramUrl, first_name, last_name };
+        }
+    }
+
+    console.error("Cannot find username in the input");
+    return null;
+}
+
+
+
+// Generate a hash for a given string
+async function generateHash(str) {
+    try {
+        const encoder = new TextEncoder();
+        const data = encoder.encode(str);
+        const digest = await crypto.subtle.digest('SHA-256', data);
+        const hashArray = Array.from(new Uint8Array(digest));
+        const hashHex = hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
+        return hashHex.slice(0, 16);
+    } catch (err) {
+        console.error(`Failed to generate hash: ${err}`);
+        return null;
+    }
+}
+
+const extractUser = async (text) => {
+    const email = extractEmail(text);
+    const user_name = processUserName();
+    let user = new User(window.location.href, user_name.instagramUrl, email, user_name.first_name, user_name.last_name);
+    await user.SetPassword();
+    return user;
+};
 
 const addGptPassButton = async (span) => {
     try {
@@ -254,7 +399,7 @@ browser.runtime.onMessage.addListener(async (message) => {
                 break;
             case 'send-done-to-user':
                 if (autoFacebookCheckbox) {
-                    addLabel("done");
+                    userDone(message)
                 }
                 break;
         }
