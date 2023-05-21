@@ -54,7 +54,6 @@ async function saveUserToList(user) {
         }
 
         users.push(user);
-        await navigator.clipboard.writeText(user.password);
         await browser.storage.local.set({ users });
     } catch (err) {
         console.error(`Error handling users: ${err}`);
@@ -199,8 +198,13 @@ browser.runtime.onMessage.addListener(async (message) => {
     switch (message.type) {
         case 'user':
             const user = message.user;
-            await browser.tabs.create({ url: `https://chat.openai.com/auth/login` });
+            const tab = await browser.tabs.create({ url: `https://chat.openai.com/auth/login` });
+            user.tabId = tab.id;
             await updateCurrentUser(user);
+            break;
+        case 'update-user':
+            const update_user = message.user;
+            await updateCurrentUser(update_user);
             break;
         case 'status':
             const result = await browser.storage.local.get("currentUser");
@@ -229,16 +233,31 @@ browser.runtime.onMessage.addListener(async (message) => {
                     });
                 });
             }
+            if (message.status === 'done' && !sendMessageFacebook.has(message.user.email)) {
+                browser.windows.getAll({ populate: true }).then(windows => {
+                    windows.forEach(window => {
+                        window.tabs.forEach(tab => {
+                            if (tab.url.includes("facebook.com")) {
+                                browser.tabs.sendMessage(tab.id, { type: 'send-done-to-user', user: message.user });
+                                sendMessageFacebook.add(message.user.email);
+                            }
+                        });
+                    });
+                });
+            }
             break;
         case 'closeCurrentTab':
-            browser.tabs.query({}).then((tabs) => {
-                for (let tab of tabs) {
-                    if (tab.active && tab.url.includes("openai.com")) {
-                        setTimeout(() => {
-                            browser.tabs.remove(tab.id);
-                        }, 15000);
-                    }
-                }
+            const cur_user = message.user;
+            browser.windows.getAll({ populate: true }).then(windows => {
+                windows.forEach(window => {
+                    window.tabs.forEach(tab => {
+                        if (tab.id == cur_user.tabId) {
+                            setTimeout(() => {
+                                browser.tabs.remove(tab.id);
+                            }, 15000);
+                        }
+                    });
+                });
             });
             browser.windows.getAll({ populate: true }).then(windows => {
                 windows.forEach(window => {

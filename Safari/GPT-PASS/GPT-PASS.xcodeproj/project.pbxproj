@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		FE2EE7EF2A1299B500A9FEDB /* facebook.svg in Resources */ = {isa = PBXBuildFile; fileRef = FE2EE7EE2A1299B500A9FEDB /* facebook.svg */; };
 		FE2EE7F12A12A1FE00A9FEDB /* instagram.svg in Resources */ = {isa = PBXBuildFile; fileRef = FE2EE7F02A12A1FE00A9FEDB /* instagram.svg */; };
+		FE4271572A1A265B005875DE /* content_facebook.js in Resources */ = {isa = PBXBuildFile; fileRef = FE4271562A1A265B005875DE /* content_facebook.js */; };
 		FE4E23BB2A0692FC008BB8E0 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE4E23BA2A0692FC008BB8E0 /* AppDelegate.swift */; };
 		FE4E23BF2A0692FC008BB8E0 /* Main.html in Resources */ = {isa = PBXBuildFile; fileRef = FE4E23BD2A0692FC008BB8E0 /* Main.html */; };
 		FE4E23C12A0692FC008BB8E0 /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = FE4E23C02A0692FC008BB8E0 /* Icon.png */; };
@@ -86,6 +87,7 @@
 /* Begin PBXFileReference section */
 		FE2EE7EE2A1299B500A9FEDB /* facebook.svg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = facebook.svg; sourceTree = "<group>"; };
 		FE2EE7F02A12A1FE00A9FEDB /* instagram.svg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = instagram.svg; sourceTree = "<group>"; };
+		FE4271562A1A265B005875DE /* content_facebook.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = content_facebook.js; sourceTree = "<group>"; };
 		FE4E23B72A0692FC008BB8E0 /* GPT-PASS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "GPT-PASS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		FE4E23BA2A0692FC008BB8E0 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		FE4E23BE2A0692FC008BB8E0 /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = Base; path = ../Base.lproj/Main.html; sourceTree = "<group>"; };
@@ -294,6 +296,7 @@
 		FE4E24222A0693EB008BB8E0 /* js */ = {
 			isa = PBXGroup;
 			children = (
+				FE4271562A1A265B005875DE /* content_facebook.js */,
 				FE4E24232A0693EB008BB8E0 /* background.js */,
 				FE4E24242A0693EB008BB8E0 /* content.js */,
 			);
@@ -473,6 +476,7 @@
 				FE4E24322A0693EB008BB8E0 /* content.js in Resources */,
 				FEC5A0512A16322900E8CBF5 /* activate_account.jpg in Resources */,
 				FE4E24272A0693EB008BB8E0 /* popup.js in Resources */,
+				FE4271572A1A265B005875DE /* content_facebook.js in Resources */,
 				FE4E24282A0693EB008BB8E0 /* options.js in Resources */,
 				FE4E242F2A0693EB008BB8E0 /* icon96.png in Resources */,
 				FE4E242E2A0693EB008BB8E0 /* icon64.png in Resources */,

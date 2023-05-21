@@ -114,22 +114,6 @@ const extractUser = async (text) => {
     return user;
 };
 
-const addGptPassButton = async (span) => {
-    try {
-        span.classList.add("gpt-pass-spen");
-        const button = document.createElement("button");
-        button.classList.add("gpt-pass-button");
-
-        button.addEventListener("click", async (e) => {
-            const user = await extractUser(span.textContent);
-            await browser.runtime.sendMessage({ type: "user", user: user });
-        });
-        span.appendChild(button);
-    } catch (err) {
-        console.error(`Error sending user: ${err}`);
-    }
-};
-
 const isSixDigitNumber = (value) => {
     const regex = /^\d{6}$/;
     return regex.test(value);
@@ -162,78 +146,24 @@ async function handleSmsActivate() {
     await browser.storage.local.set({ smscode });
 };
 
-const handleFacebook = async () => {
-    const spanElements = document.getElementsByTagName("span");
 
-    for (const span of spanElements) {
-        if (span.classList.contains("gpt-pass-spen")) {
-            continue;
-        }
-        if (span.parentNode.classList.contains("gpt-pass-spen")) {
-            continue;
-        }
-        if (emailInText(span.textContent)) {
-            await addGptPassButton(span);
-        }
-    }
-};
-
-const facebookSendPassword = (message) => {
-    if (message.user.facebookUrl === window.location.href) {
-        fillInput('textarea[placeholder="Reply on Instagram…"]', message.user.email);
-        clickOnButton('div[aria-label="Send"][role="button"]');
-        setTimeout(() => {
-            fillInput('textarea[placeholder="Reply on Instagram…"]', message.user.password);
-            clickOnButton('div[aria-label="Send"][role="button"]');
-            setTimeout(() => {
-                fillInput('textarea[placeholder="Reply on Instagram…"]', `👆ده الباسورد
-معذرة علي التأخير جايلي رسايل كتير جدا!
-
-من فضلك هما بعتولك ايميل شبه الصورة الي في اللينك
-دوس علي الزرار الأخضر عشان تاكتف الاكونت
-
-انت مش محتاج VPN بس علي الاغلب هيقولك غير متوفر في بلدك
-خلص وبعدها ابعتلي عشان احط نمرة اوروبي واشغل الاكونت
-    
-https://imgtr.ee/images/2023/05/18/280Kn.md.jpg
-                `);
-                clickOnButton('div[aria-label="Send"][role="button"]');
-            }, 100);
-        }, 100);
-
-        let xpathLabelButton = "//div[contains(text(), 'Add label')]";
-        let addLabelButton = document.evaluate(xpathLabelButton, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
-        addLabelButton.click();
-        fillInput('input[placeholder="Add label"]', "--");
-        message.user.status = "password-sent";
-        browser.runtime.sendMessage({ type: "status", status: "password-sent", user: message.user });
-    }
-};
-
-
-const facebookUserAlreadyExists = (message) => {
-    if (message.user.facebookUrl === window.location.href) {
-        fillInput('textarea[placeholder="Reply on Instagram…"]', `
-انت عندك اكونت بالفعل ... ممكن تبعتلي الإيميل والباسورد الصح في رسايل منفصلة عشان احط رقم اوروبي واشغلهولك!
-وممكن تتأكد بنفسك لو عملت تسجيل دخول من اللينك ده وتقدر كمان تغير الباسورد
-
-https://chat.openai.com/auth/login`);
-        clickOnButton('div[aria-label="Send"][role="button"]');
-        let xpathLabelButton = "//div[contains(text(), 'Add label')]";
-        let addLabelButton = document.evaluate(xpathLabelButton, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
-        addLabelButton.click();
-        fillInput('input[placeholder="Add label"]', "--");
-        message.user.status = "user-already-exists-sent";
-        browser.runtime.sendMessage({ type: "status", status: "user-already-exists-sent", user: message.user });
-    }
-};
-
-
-function simulateKeyPressAndRelease(targetElement, key, code, keyCode, which) {
-    const keyDownEvent = new KeyboardEvent('keydown', { key, code, keyCode, which, bubbles: true, cancelable: true });
+function simulateKeyPressAndRelease(targetElement, key, code, keyCode, charCode) {
+    const keyDownEvent = new KeyboardEvent('keydown', {
+        key: key,
+        code: code,
+        keyCode: keyCode,
+        charCode: charCode,
+        bubbles: true
+    });
     targetElement.dispatchEvent(keyDownEvent);
 
-    const keyUpEvent = new KeyboardEvent('keyup', { key, code, keyCode, which, bubbles: true, cancelable: true });
+    const keyUpEvent = new KeyboardEvent('keyup', {
+        key: key,
+        code: code,
+        keyCode: keyCode,
+        charCode: charCode,
+        bubbles: true
+    });
     targetElement.dispatchEvent(keyUpEvent);
 }
 
@@ -261,7 +191,7 @@ function simulateMouseEvents(targetElement) {
     }, 100);
 }
 
-function clickOnButton(selector, text, closetab) {
+function clickOnButton(selector, text, closetab, user) {
     const buttonDivs = document.querySelectorAll(selector);
     let done = false;
     buttonDivs.forEach((buttonDiv) => {
@@ -276,19 +206,19 @@ function clickOnButton(selector, text, closetab) {
             done = true;
         }
         if (closetab && done) {
-            browser.runtime.sendMessage({ type: "closeCurrentTab" });
+            browser.runtime.sendMessage({ type: "closeCurrentTab", user: user });
         }
     });
     return done
 }
 
-function OpenAILastButton(textarea, username, autoCloseTabCheckbox) {
+function OpenAILastButton(textarea, user, autoCloseTabCheckbox) {
     const welcomeInterval = setInterval(() => {
-        clickOnButton('.flex.w-full.items-center.justify-center.gap-2', 'Next', autoCloseTabCheckbox);
+        clickOnButton('.flex.w-full.items-center.justify-center.gap-2', 'Next', autoCloseTabCheckbox, user);
         const done = clickOnButton('.flex.w-full.items-center.justify-center.gap-2', 'Done');
         if (done) {
-            textarea.value = `Hi ChatGPT my name is ${username}`;
-            simulateKeyPressAndRelease(textarea, key = 'Enter', code = 'Enter', keyCode = 13, which = 13);
+            textarea.value = `Hi ChatGPT my name is ${user.first_name}`;
+            simulateKeyPressAndRelease(textarea, key = 'Enter', code = 'Enter', keyCode = 13, charCode = 13);
             clearInterval(welcomeInterval);
         }
     }, 200);
@@ -303,7 +233,7 @@ function fillInput(selector, value) {
         targetElement.setAttribute("value", value);
         let event = new Event('input', { bubbles: true });
         targetElement.dispatchEvent(event);
-        return true;
+        return targetElement;
     }
     return false;
 }
@@ -328,18 +258,25 @@ function handleOpenAILogin() {
     }
 }
 
-
-
 async function handleOpenAI() {
     let errorElement = document.querySelector('[class*="error"], [data-error-code*="blocked"]');
-    const { autoFillCheckbox = true, autoSmsCheckbox = true, autoClickCheckbox = true, autoCloseTabCheckbox = false, currentUser = undefined, phone_number = undefined, smscode = undefined } =
+    const { autoFillCheckbox = true, autoSmsCheckbox = true, autoClickCheckbox = true, autoCloseTabCheckbox = true, currentUser = undefined, phone_number = undefined, smscode = undefined } =
         await browser.storage.local.get(["autoFillCheckbox", "autoSmsCheckbox", "autoClickCheckbox", "autoCloseTabCheckbox", "currentUser", "phone_number", "smscode"]);
+
+    const passTxt = document.querySelector('input[name="password"]');
+    if (passTxt) {
+        passTxt.addEventListener("change", function (event) {
+            currentUser.password = passTxt.value;
+            browser.runtime.sendMessage({ type: "update-user", user: currentUser });
+            console.log(currentUser);
+        });
+    }
 
     if (errorElement) {
         if (document.body.textContent.includes("The user already exists")) {
             currentUser.status = "user-already-exists";
             browser.runtime.sendMessage({ type: "status", status: "user-already-exists", user: currentUser });
-            browser.runtime.sendMessage({ type: "closeCurrentTab" });
+            browser.runtime.sendMessage({ type: "closeCurrentTab", user: currentUser });
         }
         return;
     }
@@ -379,7 +316,7 @@ async function handleOpenAI() {
         }
         if (document.body.textContent.includes("Verify your email")) {
             if (autoClickCheckbox) {
-                const done = clickOnButton('.onb-resend-email-btn', null, autoCloseTabCheckbox);
+                const done = clickOnButton('.onb-resend-email-btn', null, autoCloseTabCheckbox, currentUser);
                 if (done) {
                     currentUser.status = "signup-v";
                     browser.runtime.sendMessage({ type: "status", status: "signup-v", user: currentUser });
@@ -417,43 +354,14 @@ async function handleOpenAI() {
     const textarea = document.querySelector(`textarea.m-0.w-full.resize-none.border-0.bg-transparent.p-0.pr-7.focus\\:ring-0.focus-visible\\:ring-0.dark\\:bg-transparent.pl-2.md\\:pl-0`);
     if (textarea) {
         // click on welcome button.
-        OpenAILastButton(textarea, currentUser.first_name, autoCloseTabCheckbox);
+        OpenAILastButton(textarea, currentUser, autoCloseTabCheckbox);
         currentUser.status = "done";
         browser.runtime.sendMessage({ type: "status", status: "done", user: currentUser });
     };
 }
 
-
-const createStyleElement = () => {
-    const style = document.createElement("style");
-    style.textContent = `
-      button:focus {
-        outline: none;
-      }
-  
-      button:active {
-        background-color: green;
-      }
-  
-      .gpt-pass-button {
-        background-color: red;
-        border: none;
-        border-radius: 50%;
-        color: white;
-        cursor: pointer;
-        font-size: 20px;
-        height: 20px;
-        margin-left: 5px;
-        padding: 0;
-        width: 20px;
-      }
-    `;
-    document.head.appendChild(style);
-};
-
 const intervals = {
     openAI: null,
-    facebook: null,
     smsActivate: null,
 };
 
@@ -466,11 +374,6 @@ function onDocumentLoad() {
         }
     }
 
-    if (currentUrl.includes("facebook.com")) {
-        createStyleElement();
-        intervals.facebook = setInterval(handleFacebook, 1000);
-    }
-
     if (currentUrl.includes("sms-activate.org")) {
         intervals.smsActivate = setInterval(handleSmsActivate, 500);
     }
@@ -481,23 +384,3 @@ if (document.readyState === "complete") {
 } else {
     window.addEventListener("load", onDocumentLoad);
 }
-
-browser.runtime.onMessage.addListener(async (message) => {
-    const { autoFacebookCheckbox = true } = await browser.storage.local.get(["autoFacebookCheckbox"]);
-    try {
-        switch (message.type) {
-            case 'send-password':
-                if (autoFacebookCheckbox) {
-                    facebookSendPassword(message);
-                }
-                break;
-            case 'send-user-already-exists':
-                if (autoFacebookCheckbox) {
-                    facebookUserAlreadyExists(message);
-                }
-                break;
-        }
-    } catch (error) {
-        console.log(error)
-    }
-});

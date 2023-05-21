@@ -1,6 +1,6 @@
-- split content.js scripts 
+- create openai.js scripts 
+- create sms.js scripts 
 - use facebook api
 - use sms api
 - create chrome extension
-- set new password after change 
-- get the text in the text content
+- get the text(email) in the text content
