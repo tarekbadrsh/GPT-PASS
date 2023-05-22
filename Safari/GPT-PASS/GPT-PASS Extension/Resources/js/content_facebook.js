@@ -27,21 +27,19 @@ const createStyleElement = () => {
     clearInterval(facebook_intervals.createStyleElement);
 };
 
-function removeLable() {
+function removeLables() {
     var element = document.querySelector('[aria-label="clearLabel"]');
     if (element) {
         element.click();
-        removeLable();
+        removeLables();
     }
 }
+
 function addLabel(txt) {
     let xpath = "//div[contains(text(), 'Add label')]";
     let matchingElement = document.evaluate(xpath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
 
     if (matchingElement) {
-        // clear all labels
-        removeLable();
-
         let addLabelbtn = matchingElement.parentNode.parentNode;
         if (addLabelbtn) {
             addLabelbtn.click();
@@ -67,37 +65,73 @@ function clickMoveToDone() {
     }
 }
 
+function fillFacebookInput(selector, value) {
+    const targetElement = document.querySelector(selector);
+    if (targetElement && targetElement.value.length < 1) {
+        targetElement.value = value;
+        let event = new Event('input', { bubbles: true });
+        targetElement.dispatchEvent(event);
+        return true;
+    }
+    return false;
+}
+
+
+function sendFacebookMessage(message) {
+    try {
+        let fillInputDone = fillFacebookInput('textarea[placeholder="Reply on Instagram…"]', message)
+        const sendbutton = document.querySelector('div[aria-label="Send"][role="button"]');
+
+        if (fillInputDone && sendbutton) {
+            sendbutton.click();
+            return true;
+        }
+    } catch (err) {
+        console.error(`Send facebook message: ${message}, Error: ${err}`);
+        return false;
+    }
+    return false;
+}
+
+
+function sendMultipleFacebookMessages(messages, moveToDone = true, index = 0) {
+    if (index >= messages.length && moveToDone) {
+        setTimeout(clickMoveToDone, 100);
+        return true;
+    }
+
+    const done = sendFacebookMessage(messages[index]);
+
+    if (!done) {
+        return false;
+    }
+
+    setTimeout(() => sendMultipleFacebookMessages(messages, moveToDone, index + 1), 100);
+}
 
 function addButtonToNotes(css_class, text, message, label, click_done) {
-
     let xpath = "//div[contains(text(), 'Notes')]";
     let matchingElement = document.evaluate(xpath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
 
     if (matchingElement) {
         // Check if button with specific class already exists
         let existingButton = matchingElement.querySelector(`button.${css_class}`);
-
-        // If the button doesn't exist, create it
         if (!existingButton) {
             let btn = document.createElement("button");
             btn.innerHTML = text;
             btn.classList.add(css_class); // add the class to the button
             btn.addEventListener('click', function () {
-                const filltextdone = fillInput('textarea[placeholder="Reply on Instagram…"]', message);
-                if (filltextdone) {
-                    const clickbuttondone = clickOnButton('div[aria-label="Send"][role="button"]');
-                    if (clickbuttondone && label) {
-                        addLabel(label);
-                    }
-                    if (clickbuttondone && click_done) {
-                        clickMoveToDone();
-                    }
+                const messageSent = sendFacebookMessage(message);
+                if (messageSent && label) {
+                    removeLables();
+                    addLabel(label);
+                }
+                if (messageSent && click_done) {
+                    clickMoveToDone();
                 }
             });
             matchingElement.appendChild(btn);
         }
-    } else {
-        console.log('No element with "Notes" found');
     }
 }
 
@@ -118,7 +152,7 @@ function addResponseButtons() {
         "🔴الباسورد غلط🔴",
         "الباسورد غلط ... ممكن من فضلك تبعتلي الإيميل والباسورد الصح في رسايل منفصلة عشان احط رقم اوروبي واشغلهولك!",
         "--",
-        true
+        false
     );
 
     addButtonToNotes("wrong_password_btn",
@@ -127,7 +161,7 @@ function addResponseButtons() {
 هما بعتولك ايميل شبه الصورة الي في اللينك او سيرش علي OpenAI وغير الباسورد وابعتلي الجديد
 https://imgtr.ee/images/2023/05/21/2fJ0U.png`,
         "--",
-        true
+        false
     );
 
     addButtonToNotes("outlook_btn",
@@ -155,14 +189,11 @@ https://twitter.com/tarekbadrsh/status/1641394327015370754
 
 const facebookSendPassword = (message) => {
     if (message.user.facebookUrl === window.location.href) {
+        removeLables();
         addLabel("--");
-        fillInput('textarea[placeholder="Reply on Instagram…"]', message.user.email);
-        clickOnButton('div[aria-label="Send"][role="button"]');
-        setTimeout(() => {
-            fillInput('textarea[placeholder="Reply on Instagram…"]', message.user.password);
-            clickOnButton('div[aria-label="Send"][role="button"]');
-            setTimeout(() => {
-                fillInput('textarea[placeholder="Reply on Instagram…"]', `👆ده الباسورد
+        const messages = [
+            message.user.email,
+            message.user.password, `👆ده الباسورد
 معذرة علي التأخير جايلي رسايل كتير جدا!
 
 من فضلك هما بعتولك ايميل شبه الصورة الي في اللينك
@@ -172,15 +203,8 @@ const facebookSendPassword = (message) => {
 خلص وبعدها ابعتلي عشان احط نمرة اوروبي واشغل الاكونت
     
 https://imgtr.ee/images/2023/05/18/280Kn.jpg
-                `);
-                clickOnButton('div[aria-label="Send"][role="button"]');
-                setTimeout(() => {
-                    clickMoveToDone();
-                }, 100);
-            }, 100);
-        }, 100);
-
-        message.user.status = "password-sent";
+`];
+        sendMultipleFacebookMessages(messages);
         browser.runtime.sendMessage({ type: "status", status: "password-sent", user: message.user });
     }
 };
@@ -188,35 +212,29 @@ https://imgtr.ee/images/2023/05/18/280Kn.jpg
 
 const facebookUserAlreadyExists = (message) => {
     if (message.user.facebookUrl === window.location.href) {
+        removeLables();
         addLabel("--");
-        fillInput('textarea[placeholder="Reply on Instagram…"]', `
-انت عندك اكونت بالفعل ... ممكن تبعتلي الإيميل والباسورد الصح في رسايل منفصلة عشان احط رقم اوروبي واشغلهولك!
+        const messages = [
+            message.user.email,
+            `انت عندك اكونت بالفعل ... ممكن تبعتلي الإيميل والباسورد الصح في رسايل منفصلة عشان احط رقم اوروبي واشغلهولك!
 وممكن تتأكد بنفسك لو عملت تسجيل دخول من اللينك ده وتقدر كمان تغير الباسورد
 
-https://chat.openai.com/auth/login`);
-        clickOnButton('div[aria-label="Send"][role="button"]');
-        setTimeout(() => {
-            clickMoveToDone();
-        }, 100);
-        message.user.status = "user-already-exists-sent";
+https://chat.openai.com/auth/login`
+        ];
+        sendMultipleFacebookMessages(messages, true);
         browser.runtime.sendMessage({ type: "status", status: "user-already-exists-sent", user: message.user });
     }
 };
 
 const userDone = (message) => {
     if (message.user.facebookUrl === window.location.href) {
+        removeLables();
         addLabel("done");
-        fillInput('textarea[placeholder="Reply on Instagram…"]', message.user.email);
-        clickOnButton('div[aria-label="Send"][role="button"]');
-        setTimeout(() => {
-            fillInput('textarea[placeholder="Reply on Instagram…"]', message.user.password);
-            clickOnButton('div[aria-label="Send"][role="button"]');
-
-            setTimeout(() => {
-                fillInput('textarea[placeholder="Reply on Instagram…"]', `- انا شغلت ليك الاكونت🤟🎉🎊
-هتلاقي ChatGPT & DALL-E شغالين معاك
-ChatGPT:  https://chat.openai.com/chat
-DALL-E : https://labs.openai.com
+        const messages = [
+            message.user.email,
+            message.user.password,
+            "https://chat.openai.com/chat",
+            `- انا شغلت ليك الاكونت🤟🎉🎊
 
 - ديه فيدوهات عن الشات في قناة اليوتوب 🎥 
 
@@ -231,12 +249,8 @@ https://youtu.be/OKCMfCdLqXA
 https://twitter.com/tarekbadrsh/status/1619418114340585472
 
 - انا هبقي شاكر جدا لو تقدر تنزل استوري علي الانستجرام او تكتب تويته ان اي حد محتاج اكونت ChatGPT يبعتلي اهلا وسهلا
-انا بحاول اعمل حسابات لأكبر قدر ممكن من الناس دلوقتي🙏`);
-
-                clickOnButton('div[aria-label="Send"][role="button"]');
-                clickMoveToDone();
-            }, 100);
-        }, 100);
+انا بحاول اعمل حسابات لأكبر قدر ممكن من الناس دلوقتي🙏`];
+        sendMultipleFacebookMessages(messages);
     }
 };
 
@@ -338,7 +352,11 @@ const addGptPassButton = async (span) => {
         button.classList.add("gpt-pass-button");
 
         button.addEventListener("click", async (e) => {
+            const selectedText = window.getSelection().toString();
             const user = await extractUser(span.textContent);
+            if (selectedText) {
+                user.password = selectedText;
+            }
             await browser.runtime.sendMessage({ type: "user", user: user });
         });
         span.appendChild(button);

@@ -254,7 +254,7 @@ browser.runtime.onMessage.addListener(async (message) => {
                         if (tab.id == cur_user.tabId) {
                             setTimeout(() => {
                                 browser.tabs.remove(tab.id);
-                            }, 15000);
+                            }, 10000);
                         }
                     });
                 });
