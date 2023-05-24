@@ -195,8 +195,12 @@ let sendMessageFacebook = new Set();
 
 // Listen for messages from other parts of the extension
 browser.runtime.onMessage.addListener(async (message) => {
+    console.log(message);
     switch (message.type) {
-        case 'user':
+        case 'log-error':
+            console.error(message.error, message.user);
+            break;
+        case 'new_user':
             const user = message.user;
             const tab = await browser.tabs.create({ url: `https://chat.openai.com/auth/login` });
             user.tabId = tab.id;
@@ -207,8 +211,8 @@ browser.runtime.onMessage.addListener(async (message) => {
             await updateCurrentUser(update_user);
             break;
         case 'status':
-            const result = await browser.storage.local.get("currentUser");
-            await updateCurrentUser(result.currentUser);
+            message.user.status = message.status;
+            await updateCurrentUser(message.user);
             if (message.status === 'signup-v' && !sendMessageFacebook.has(message.user.email)) {
                 browser.windows.getAll({ populate: true }).then(windows => {
                     windows.forEach(window => {
@@ -232,6 +236,17 @@ browser.runtime.onMessage.addListener(async (message) => {
                         });
                     });
                 });
+            }
+            if (message.status === 'request-phone-nubmer') {
+                const { phone_number = undefined } = await browser.storage.local.get("phone_number");
+                if (phone_number) {
+                    message.user.phone_number = phone_number;
+                    message.user.status = 'add-number-to-user';
+                    await updateCurrentUser(message.user);
+                } else {
+                    message.user.phone_number = "";
+                    await updateCurrentUser(message.user);
+                }
             }
             if (message.status === 'done' && !sendMessageFacebook.has(message.user.email)) {
                 browser.windows.getAll({ populate: true }).then(windows => {

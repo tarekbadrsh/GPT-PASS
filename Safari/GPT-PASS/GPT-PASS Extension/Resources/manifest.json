@@ -38,6 +38,22 @@
             "matches": [
                 "*://*.facebook.com/*"
             ]
+        },
+        {
+            "js": [
+                "content_openai.js"
+            ],
+            "matches": [
+                "*://*.openai.com/*"
+            ]
+        },
+        {
+            "js": [
+                "content_smsactivate.js"
+            ],
+            "matches": [
+                "*://*.sms-activate.org/*"
+            ]
         }
     ],
     "action": {

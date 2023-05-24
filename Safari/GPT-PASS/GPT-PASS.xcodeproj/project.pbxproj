@@ -44,6 +44,8 @@
 		FEC5A0512A16322900E8CBF5 /* activate_account.jpg in Resources */ = {isa = PBXBuildFile; fileRef = FEC5A04E2A16322900E8CBF5 /* activate_account.jpg */; };
 		FEC5A0522A16322900E8CBF5 /* change_password.png in Resources */ = {isa = PBXBuildFile; fileRef = FEC5A04F2A16322900E8CBF5 /* change_password.png */; };
 		FEC5A0532A16322900E8CBF5 /* account_done.png in Resources */ = {isa = PBXBuildFile; fileRef = FEC5A0502A16322900E8CBF5 /* account_done.png */; };
+		FEFB1D732A1D3D0E007FB0CB /* content_openai.js in Resources */ = {isa = PBXBuildFile; fileRef = FEFB1D712A1D3D0E007FB0CB /* content_openai.js */; };
+		FEFB1D742A1D3D0E007FB0CB /* content_smsactivate.js in Resources */ = {isa = PBXBuildFile; fileRef = FEFB1D722A1D3D0E007FB0CB /* content_smsactivate.js */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -126,6 +128,8 @@
 		FEC5A04E2A16322900E8CBF5 /* activate_account.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = activate_account.jpg; sourceTree = "<group>"; };
 		FEC5A04F2A16322900E8CBF5 /* change_password.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = change_password.png; sourceTree = "<group>"; };
 		FEC5A0502A16322900E8CBF5 /* account_done.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = account_done.png; sourceTree = "<group>"; };
+		FEFB1D712A1D3D0E007FB0CB /* content_openai.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = content_openai.js; sourceTree = "<group>"; };
+		FEFB1D722A1D3D0E007FB0CB /* content_smsactivate.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = content_smsactivate.js; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -297,6 +301,8 @@
 			isa = PBXGroup;
 			children = (
 				FE4271562A1A265B005875DE /* content_facebook.js */,
+				FEFB1D712A1D3D0E007FB0CB /* content_openai.js */,
+				FEFB1D722A1D3D0E007FB0CB /* content_smsactivate.js */,
 				FE4E24232A0693EB008BB8E0 /* background.js */,
 				FE4E24242A0693EB008BB8E0 /* content.js */,
 			);
@@ -468,10 +474,12 @@
 				FEC5A0522A16322900E8CBF5 /* change_password.png in Resources */,
 				FE4E24302A0693EB008BB8E0 /* icon32.png in Resources */,
 				FE2EE7EF2A1299B500A9FEDB /* facebook.svg in Resources */,
+				FEFB1D742A1D3D0E007FB0CB /* content_smsactivate.js in Resources */,
 				FE4E23F62A0692FD008BB8E0 /* manifest.json in Resources */,
 				FE4E242B2A0693EB008BB8E0 /* options.html in Resources */,
 				FE4E242D2A0693EB008BB8E0 /* icon48.png in Resources */,
 				FE4E242C2A0693EB008BB8E0 /* icon16.png in Resources */,
+				FEFB1D732A1D3D0E007FB0CB /* content_openai.js in Resources */,
 				FE4E24262A0693EB008BB8E0 /* options.css in Resources */,
 				FE4E24322A0693EB008BB8E0 /* content.js in Resources */,
 				FEC5A0512A16322900E8CBF5 /* activate_account.jpg in Resources */,

@@ -44,7 +44,7 @@ function addLabel(txt) {
         if (addLabelbtn) {
             addLabelbtn.click();
         }
-        let inputElement = fillInput('input[placeholder="Add label"]', txt);
+        let inputElement = fillFacebookInput('input[placeholder="Add label"]', txt);
         simulateKeyPressAndRelease(inputElement, key = 'Enter', code = 'Enter', keyCode = 13, charCode = 13);
         if (addLabelbtn) {
             addLabelbtn.click();
@@ -71,7 +71,7 @@ function fillFacebookInput(selector, value) {
         targetElement.value = value;
         let event = new Event('input', { bubbles: true });
         targetElement.dispatchEvent(event);
-        return true;
+        return targetElement;
     }
     return false;
 }
@@ -342,6 +342,7 @@ const extractUser = async (text) => {
     const user_name = processUserName();
     let user = new User(window.location.href, user_name.instagramUrl, email, user_name.first_name, user_name.last_name);
     await user.SetPassword();
+    user.status = "new_user";
     return user;
 };
 
@@ -357,7 +358,7 @@ const addGptPassButton = async (span) => {
             if (selectedText) {
                 user.password = selectedText;
             }
-            await browser.runtime.sendMessage({ type: "user", user: user });
+            await browser.runtime.sendMessage({ type: "new_user", user: user });
         });
         span.appendChild(button);
     } catch (err) {

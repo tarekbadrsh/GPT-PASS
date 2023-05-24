@@ -53,7 +53,7 @@ async function display() {
 
         li.appendChild(buttonRemove);
 
-        ['email', 'password', 'first_name', 'last_name', 'birth_date', 'phone_number', 'smscode'].forEach(field =>
+        ['email', 'password', 'status', 'first_name', 'last_name', 'birth_date', 'phone_number', 'smscode'].forEach(field =>
             li.appendChild(createButtonContainer(userData[field]))
         );
         usersList.appendChild(li);
