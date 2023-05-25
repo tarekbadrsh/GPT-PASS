@@ -23,7 +23,6 @@ function simulateMouseEvents(targetElement) {
     }, 100);
 }
 
-
 function clickOnButton(selector, text, closetab, user) {
     const allBtns = document.querySelectorAll(selector);
     let done = false;
@@ -43,19 +42,6 @@ function clickOnButton(selector, text, closetab, user) {
         }
     });
     return done
-}
-
-function OpenAILastButton(textarea, user, autoCloseTabCheckbox) {
-    const welcomeInterval = setInterval(() => {
-        clickOnButton('.flex.w-full.items-center.justify-center.gap-2', 'Next', autoCloseTabCheckbox, user);
-        const done = clickOnButton('.flex.w-full.items-center.justify-center.gap-2', 'Done');
-        if (done) {
-            textarea.value = `Hi ChatGPT my name is ${user.first_name}`;
-            simulateKeyPressAndRelease(textarea, key = 'Enter', code = 'Enter', keyCode = 13, charCode = 13);
-            clearInterval(welcomeInterval);
-        }
-    }, 200);
-    // clearInterval(openai_intervals.handleOpenAI);
 }
 
 function fillInput(selector, value) {
@@ -237,45 +223,76 @@ function requestPhoneNumber(user, autoClickOpenAIButton) {
     }
     if (!user.phone_number) {
         browser.runtime.sendMessage({ type: "status", status: "request-phone-nubmer", user: user });
-    }
-    return true;
-}
-
-
-function selectCountryPhoneNumber(user, autoClickOpenAIButton) {
-    if (!document.body.textContent.includes("Verify your phone number")) {
         return true;
     }
-    const targetElement = document.querySelector(".select-dropdown-indicator");
-    simulateMouseEvents(targetElement);
-    const romania = document.getElementById("react-select-2-option-181");
-    simulateMouseEvents(romania);
-    // Romania react-select-2-option-181
-    // Kenya react-select-2-option-115  
-    browser.runtime.sendMessage({ type: "status", status: "select-country-phone-number", user: user });
+    browser.runtime.sendMessage({ type: "status", status: "add-number-to-user", user: user });
     return true;
 }
 
+let selectPhoneCountry = new Set();
 function verifyYourPhoneNumber(user, autoClickOpenAIButton) {
     if (!document.body.textContent.includes("Verify your phone number")) {
         return true;
     }
     if (!user.phone_number) {
-        return false;
+        return true;
     }
-    let done = fillInput('.text-input', user.phone_number);
+    if (!selectPhoneCountry.has(user.email)) {
+        const targetElement = document.querySelector(".select-dropdown-indicator");
+        simulateMouseEvents(targetElement);
+        const romania = document.getElementById("react-select-2-option-181");
+        simulateMouseEvents(romania);
+        selectPhoneCountry.add(user.email);
+    }
+    setTimeout(() => {
+        let done = fillInput('.text-input', user.phone_number);
+        if (!done) {
+            return false;
+        }
+        if (!autoClickOpenAIButton) {
+            return true;
+        }
+        done = clickOnButton('button[type="submit"]');
+        if (!done) {
+            return false;
+        }
+        browser.runtime.sendMessage({ type: "status", status: "phone-nubmer-added", user: user });
+        return true;
+    }, 1000);
+}
+
+function enterCode(user, autoClickOpenAIButton) {
+    if (!document.body.textContent.includes("Enter code")) {
+        return true;
+    }
+    if (!user.smscode) {
+        return true;
+    }
+    let done = fillInput(".text-input.text-input-lg.text-input-full", user.smscode);
     if (!done) {
         return false;
     }
+    browser.runtime.sendMessage({ type: "status", status: "done", user: user });
     if (!autoClickOpenAIButton) {
         return true;
     }
-    // done = clickOnButton('button[type="submit"]');
-    // if (!done) {
-    //     return false;
-    // }
-    browser.runtime.sendMessage({ type: "status", status: "phone-nubmer-done", user: user });
+    done = clickOnButton('button[type="submit"]');
+    if (!done) {
+        return false;
+    }
     return true;
+}
+
+function openAIWelcomeMessage(user, autoCloseTabCheckbox) {
+    clickOnButton('.btn.relative.btn-neutral.ml-auto');
+    clickOnButton('.btn.relative.btn-neutral.ml-auto');
+    const done = clickOnButton('.btn.relative.btn-primary.ml-auto');
+    if (done) {
+        const textarea = document.querySelector(`textarea.m-0.w-full.resize-none.border-0.bg-transparent.p-0.pr-7.focus\\:ring-0.focus-visible\\:ring-0.dark\\:bg-transparent.pl-2.md\\:pl-0`);
+        textarea.value = `Hi ChatGPT my name is ${user.first_name}`;
+        simulateKeyPressAndRelease(textarea, key = 'Enter', code = 'Enter', keyCode = 13, charCode = 13);
+        clearInterval(openai_intervals.handleOpenAI);
+    }
 }
 
 async function handleOpenAI() {
@@ -336,38 +353,32 @@ async function handleOpenAI() {
             }
             break;
         case "login-n":
-        case "request-phone-nubmer":
-            if (!requestPhoneNumber(user, autoClickCheckbox)) {
-                browser.runtime.sendMessage({ type: "log-error", error: "Could not request phone number", user: user });
-            }
-        case "add-number-to-user":
-            if (!selectCountryPhoneNumber(user, autoClickCheckbox)) {
-                browser.runtime.sendMessage({ type: "log-error", error: "Could not select Country Phone Number", user: user });
+            if (!verifyYourPhoneNumber(user, autoClickCheckbox)) {
+                browser.runtime.sendMessage({ type: "log-error", error: "Could not verify user phone number", user: user });
             }
             break;
-        case "select-country-phone-number":
-            if (!verifyYourPhoneNumber(user, autoClickCheckbox)) {
-                browser.runtime.sendMessage({ type: "log-error", error: "Could not Tell us about you", user: user });
+        case "phone-nubmer-added":
+            if (!enterCode(user, autoClickCheckbox)) {
+                browser.runtime.sendMessage({ type: "log-error", error: "Could not Enter code", user: user });
+            }
+            break;
+        case "done":
+            if (!openAIWelcomeMessage(user, autoClickCheckbox)) {
+                browser.runtime.sendMessage({ type: "log-error", error: "Could not openAI Welcome Message", user: user });
             }
             break;
         //----
-        /*
-
-        if (smscode && document.body.textContent.includes("Enter code")) {
-            fillInput(".text-input.text-input-lg.text-input-full", smscode);
-            if (currentUser.status != "smscode") {
-                currentUser.status = "smscode";
-                browser.runtime.sendMessage({ type: "status", status: "smscode", user: currentUser });
-            }
-        }
-        */
         default:
             break;
     }
 }
 
+const openai_intervals = {
+    handleOpenAI: null
+};
+
 function onOpenAILoad() {
-    setInterval(handleOpenAI, 500);
+    openai_intervals.handleOpenAI = setInterval(handleOpenAI, 500);
 }
 
 if (document.readyState === "complete") {
