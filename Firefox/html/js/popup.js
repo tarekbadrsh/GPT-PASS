@@ -40,8 +40,7 @@ async function display() {
 
     users.forEach((userData) => {
         const li = document.createElement("li");
-        li.appendChild(createIconContainer("icons/facebook.svg", userData.facebookUrl));
-        li.appendChild(createIconContainer("icons/instagram.svg", userData.instagramUrl));
+        li.appendChild(createIconContainer(browser.runtime.getURL('icons/instagram.svg'), userData.instagramUrl));
         const buttonRemove = document.createElement("button");
         buttonRemove.textContent = "X";
         buttonRemove.classList.add("remove");

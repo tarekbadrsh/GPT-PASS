@@ -1,7 +1,7 @@
 {
     "manifest_version": 2,
     "name": "GPT-PASS",
-    "version": "1.1.1",
+    "version": "1.2.0",
     "description": "Generate strong and secure passwords with the GPT-PASS extension.",
     "icons": {
         "16": "icons/icon16.png",
@@ -22,13 +22,39 @@
                 "js/content.js"
             ],
             "matches": [
-                "<all_urls>"
+                "*://*.openai.com/*",
+                "*://*.facebook.com/*",
+                "*://*.sms-activate.org/*"
+            ]
+        },
+        {
+            "js": [
+                "js/content_openai.js"
+            ],
+            "matches": [
+                "*://*.openai.com/*"
+            ]
+        },
+        {
+            "js": [
+                "js/content_facebook.js"
+            ],
+            "matches": [
+                "*://*.facebook.com/*"
+            ]
+        },
+        {
+            "js": [
+                "js/content_smsactivate.js"
+            ],
+            "matches": [
+                "*://*.sms-activate.org/*"
             ]
         }
     ],
     "browser_action": {
-        "default_title": "GPT-PASS",
         "default_popup": "html/popup.html",
+        "default_title": "GPT-PASS",
         "default_icon": {
             "16": "icons/icon16.png",
             "32": "icons/icon32.png",
@@ -37,6 +63,15 @@
             "96": "icons/icon96.png"
         }
     },
+    "incognito": "spanning",
+    "browser_specific_settings": {
+        "edge": {
+            "browser_action_next_to_addressbar": true
+        }
+    },
+    "web_accessible_resources": [
+        "icons/*"
+    ],
     "permissions": [
         "contextMenus",
         "clipboardRead",
@@ -46,19 +81,5 @@
         "tabs",
         "activeTab",
         "<all_urls>"
-    ],
-    "options_ui": {
-        "page": "html/options.html",
-        "browser_style": true,
-        "open_in_tab": true
-    },
-    "web_accessible_resources": [
-        "icons/*"
-    ],
-    "incognito": "spanning",
-    "browser_specific_settings": {
-        "edge": {
-            "browser_action_next_to_addressbar": true
-        }
-    }
+    ]
 }

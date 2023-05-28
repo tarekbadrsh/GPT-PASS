@@ -204,6 +204,7 @@ https://imgtr.ee/images/2023/05/18/280Kn.jpg`,
         "--",
         true);
 
+    clearInterval(facebook_intervals.createStyleElement);
 }
 
 const sendMessageFacebook_signup_p = new Set();

@@ -399,6 +399,7 @@ if (document.readyState === "complete") {
 }
 
 browser.runtime.onMessage.addListener(async (message) => {
+    console.log("Hello from OpenAI");
     try {
         switch (message.type) {
             case 'clear-all-data':

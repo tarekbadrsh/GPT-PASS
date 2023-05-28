@@ -27,6 +27,11 @@ li {
   width: 100%;
 }
 
+.icon-container {
+  flex: 0 0 20px;
+  padding: 0 2px;
+}
+
 .button-container {
   flex: 1;
   padding: 0 5px;
@@ -68,9 +73,8 @@ li button {
 }
 
 li button.remove {
-  margin-left: 10px;
   background-color: #f44336;
-  width: 40px;
+  width: 29px;
 }
 
 button:hover {
