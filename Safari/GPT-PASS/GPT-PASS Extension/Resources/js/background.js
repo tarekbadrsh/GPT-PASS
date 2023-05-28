@@ -54,12 +54,13 @@ const clearAllData = async () => {
 
 // Listen for messages from other parts of the extension
 browser.runtime.onMessage.addListener(async (message) => {
-    console.log(message)
-    const windows = await browser.windows.getAll({ populate: true });
+    let result = await browser.storage.local.get("currentUser");
+    let currentUser = result.currentUser;
     let facebookWindow;
     let facebookTab;
     let openAIWindow;
     let openAITab;
+    const windows = await browser.windows.getAll({ populate: true });
     for (const window of windows) {
         for (const tab of window.tabs) {
             if (tab.url.includes("facebook.com")) {
@@ -87,18 +88,16 @@ browser.runtime.onMessage.addListener(async (message) => {
             await updateCurrentUser(update_user);
             break;
         case 'phone_number':
-            let currentUser = await browser.storage.local.get("currentUser");
-            currentUser.currentUser.phone_number = message.phone_number;
-            await updateCurrentUser(currentUser.currentUser);
+            currentUser.phone_number = message.phone_number;
+            await updateCurrentUser(currentUser);
             break;
         case 'smscode':
-            let currentUserSms = await browser.storage.local.get("currentUser");
             if (smscodeSet.has(message.smscode)) {
                 await browser.storage.local.set({ smscode: "" });
-                break;
+                return;
             }
-            currentUserSms.currentUser.smscode = message.smscode;
-            await updateCurrentUser(currentUserSms.currentUser);
+            currentUser.smscode = message.smscode;
+            await updateCurrentUser(currentUser);
             smscodeSet.add(message.smscode);
             break;
         case 'clear-all-data':
@@ -112,21 +111,21 @@ browser.runtime.onMessage.addListener(async (message) => {
             switch (message.status) {
                 case 'signup-v':
                     if (sendMessageFacebook_signup_v.has(message.user.email)) {
-                        break;
+                        return;
                     }
                     sendMessageFacebook_signup_v.add(message.user.email);
                     await browser.tabs.sendMessage(facebookTab.id, { type: 'send-password', user: message.user });
                     break;
                 case 'user-already-exists':
                     if (sendMessageFacebook_user_exists.has(message.user.email)) {
-                        break;
+                        return;
                     }
                     sendMessageFacebook_user_exists.add(message.user.email);
                     await browser.tabs.sendMessage(facebookTab.id, { type: 'send-user-already-exists', user: message.user });
                     break;
                 case 'done':
                     if (sendMessageFacebook_done.has(message.user.email)) {
-                        break;
+                        return;
                     }
                     sendMessageFacebook_done.add(message.user.email);
                     await browser.tabs.sendMessage(facebookTab.id, { type: 'send-done-to-user', user: message.user });
@@ -137,17 +136,18 @@ browser.runtime.onMessage.addListener(async (message) => {
             break;
         case 'closeCurrentTab':
             const cur_user = message.user;
+            await browser.windows.update(facebookWindow.id, { focused: true });
+            await browser.tabs.update(facebookTab.id, { active: true });
+
             const windows = await browser.windows.getAll({ populate: true });
             for (const window of windows) {
                 for (const tab of window.tabs) {
                     if (tab.id == cur_user.tabId) {
-                        await sleep(5000);
+                        await sleep(2000);
                         await browser.tabs.remove(tab.id);
                     }
                 }
             }
-            await browser.windows.update(facebookWindow.id, { focused: true });
-            await browser.tabs.update(facebookTab.id, { active: true });
             break;
     }
 });

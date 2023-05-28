@@ -459,6 +459,6 @@ browser.runtime.onMessage.addListener(async (message) => {
                 break;
         }
     } catch (error) {
-        console.log(error)
+        console.error(error)
     }
 });

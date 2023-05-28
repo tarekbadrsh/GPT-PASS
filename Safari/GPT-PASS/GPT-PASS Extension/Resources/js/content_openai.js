@@ -18,9 +18,9 @@ const simulateMouseEvents = async (targetElement) => {
     const mouseUpEvent = new MouseEvent('mouseup', { bubbles: true, cancelable: true });
     targetElement.dispatchEvent(mouseUpEvent);
 
-    // Simulate click after a small delay to mimic human interaction
-    await sleep(100);
+    // Simulate click after a small delay to mimic human interaction 
     const clickEvent = new MouseEvent('click', { bubbles: true, cancelable: true });
+    await sleep(100);
     targetElement.dispatchEvent(clickEvent);
 }
 
@@ -106,16 +106,20 @@ const createYourAccount = async () => {
     if (!autoClickOpenAIButton) {
         return true;
     }
-    done = await clickOnButton('button[type="submit"]');
+    for (let index = 0; index < 5; index++) {
+        sleep(100);
+        done = await clickOnButton('button[type="submit"]');
+        if (done) {
+            await sendMessage(type = "status", userstatus = "signup-e");
+        }
+    }
     if (!done) {
         return false;
     }
-    await sendMessage(type = "status", userstatus = "signup-e");
     return true;
 }
 
 const createYourAccountPassword = async () => {
-    await sleep(500);
     if (!document.body.textContent.includes("Create your account")) {
         return true;
     }
@@ -123,11 +127,16 @@ const createYourAccountPassword = async () => {
     if (!done) {
         return false;
     }
-    await sendMessage(type = "status", userstatus = "signup-p");
     if (!autoClickOpenAIButton) {
         return true;
     }
-    done = await clickOnButton('button[type="submit"][name="action"][value="default"][data-action-button-primary="true"]', "Continue");
+    for (let index = 0; index < 5; index++) {
+        sleep(100);
+        done = await clickOnButton('button[type="submit"][name="action"][value="default"][data-action-button-primary="true"]', "Continue");
+        if (done) {
+            await sendMessage(type = "status", userstatus = "signup-p");
+        }
+    }
     if (!done) {
         return false;
     }
@@ -141,11 +150,17 @@ const verifyYourEmail = async () => {
     if (!autoClickOpenAIButton) {
         return true;
     }
-    let done = await clickOnButton('.onb-resend-email-btn');
+    let done = false;
+    for (let index = 0; index < 5; index++) {
+        sleep(100);
+        done = await clickOnButton('.onb-resend-email-btn');
+        if (done) {
+            await sendMessage(type = "status", userstatus = "signup-v");
+        }
+    }
     if (!done) {
         return false;
     }
-    await sendMessage(type = "status", userstatus = "signup-v");
     return true;
 }
 
@@ -157,11 +172,16 @@ const loginYourAccount = async () => {
     if (!done) {
         return false;
     }
-    await sendMessage(type = "status", userstatus = "login-e");
     if (!autoClickOpenAIButton) {
         return true;
     }
-    done = await clickOnButton('button[type="submit"][name="action"][value="default"][data-action-button-primary="true"]', "Continue");
+    for (let index = 0; index < 5; index++) {
+        sleep(100);
+        done = await clickOnButton('button[type="submit"][name="action"][value="default"][data-action-button-primary="true"]', "Continue");
+        if (done) {
+            await sendMessage(type = "status", userstatus = "login-e");
+        }
+    }
     if (!done) {
         return false;
     }
@@ -176,11 +196,16 @@ const loginYourAccountPassword = async () => {
     if (!done) {
         return false;
     }
-    await sendMessage(type = "status", userstatus = "login-p");
     if (!autoClickOpenAIButton) {
         return true;
     }
-    done = await clickOnButton('button[type="submit"][name="action"][value="default"][data-action-button-primary="true"]', "Continue");
+    for (let index = 0; index < 5; index++) {
+        sleep(100);
+        done = await clickOnButton('button[type="submit"][name="action"][value="default"][data-action-button-primary="true"]', "Continue");
+        if (done) {
+            await sendMessage(type = "status", userstatus = "login-p");
+        }
+    }
     if (!done) {
         return false;
     }
@@ -217,11 +242,16 @@ const tellUsAboutYou = async () => {
     if (!done) {
         return false;
     }
-    await sendMessage(type = "status", userstatus = "login-n");
     if (!autoClickOpenAIButton) {
         return true;
     }
-    done = await clickOnButton('button[type="submit"]');
+    for (let index = 0; index < 5; index++) {
+        sleep(100);
+        done = await clickOnButton('button[type="submit"]');
+        if (done) {
+            await sendMessage(type = "status", userstatus = "login-n");
+        }
+    }
     if (!done) {
         return false;
     }
@@ -248,28 +278,28 @@ const verifyYourPhoneNumber = async () => {
         return true;
     }
     if (!selectPhoneCountry.has(user.email)) {
-        const targetElement = document.querySelector(".select-dropdown-indicator");
-        await simulateMouseEvents(targetElement);
+        selectPhoneCountry.add(user.email);
+        const dropdownCountry = document.querySelector(".select-dropdown-indicator");
+        await simulateMouseEvents(dropdownCountry);
+        await sleep(500);
         const romania = document.getElementById("react-select-2-option-181");
         await simulateMouseEvents(romania);
-        selectPhoneCountry.add(user.email);
     }
-    await sleep(500);
     let done = await fillInput('.text-input', user.phone_number);
+    await sleep(500);
     if (!done) {
         return false;
     }
     if (!autoClickOpenAIButton) {
         return true;
     }
-    await sleep(500);
+
     done = await clickOnButton('button[type="submit"]');
     if (!done) {
         return false;
     }
     await sendMessage(type = "status", userstatus = "phone-nubmer-added");
     return true;
-
 }
 
 const enterCode = async () => {
@@ -284,15 +314,6 @@ const enterCode = async () => {
         return false;
     }
     await sendMessage(type = "status", userstatus = "done");
-
-    if (!autoClickOpenAIButton) {
-        return true;
-    }
-    done = await clickOnButton('button[type="submit"]');
-    if (!done) {
-        return false;
-    }
-    return true;
 }
 
 const openAIWelcomeMessage = async () => {
@@ -315,7 +336,6 @@ const handleOpenAI = async () => {
         user = currentUser;
         openAIAddEventListener();
         autoClickOpenAIButton = autoClickCheckbox;
-
         if (errorElement) {
             if (document.body.textContent.includes("The user already exists")) {
                 user.status = "user-already-exists";
@@ -385,7 +405,7 @@ const handleOpenAI = async () => {
                 break;
         }
     } catch (error) {
-        console.log(error)
+        console.error(error)
     }
 }
 
@@ -408,20 +428,14 @@ if (document.readyState === "complete") {
 }
 
 browser.runtime.onMessage.addListener(async (message) => {
-    const { autoFillCheckbox = true } = await browser.storage.local.get(["autoFillCheckbox"]);
     try {
         switch (message.type) {
-            case 'get-phone-number':
-                if (autoFillCheckbox) {
-                    console.log(message);
-                }
-                break;
             case 'clear-all-data':
                 await clearAllData();
                 break;
         }
     } catch (error) {
-        console.log(error)
+        console.error(error)
     }
 });
 
