@@ -40,7 +40,6 @@ async function display() {
 
     users.forEach((userData) => {
         const li = document.createElement("li");
-        li.appendChild(createIconContainer("facebook.svg", userData.facebookUrl));
         li.appendChild(createIconContainer("instagram.svg", userData.instagramUrl));
         const buttonRemove = document.createElement("button");
         buttonRemove.textContent = "X";
@@ -53,7 +52,7 @@ async function display() {
 
         li.appendChild(buttonRemove);
 
-        ['email', 'password', 'status', 'first_name', 'last_name', 'birth_date', 'phone_number', 'smscode'].forEach(field =>
+        ['email', 'password', 'first_name', 'last_name', 'birth_date', 'phone_number', 'smscode'].forEach(field =>
             li.appendChild(createButtonContainer(userData[field]))
         );
         usersList.appendChild(li);

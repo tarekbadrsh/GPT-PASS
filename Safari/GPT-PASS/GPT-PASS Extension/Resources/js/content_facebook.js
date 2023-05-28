@@ -124,10 +124,14 @@ function addButtonToNotes(css_class, text, message, label, click_done) {
                 const messageSent = sendFacebookMessage(message);
                 if (messageSent && label) {
                     removeLables();
-                    addLabel(label);
+                    setTimeout(() => {
+                        addLabel(label);
+                    }, 1000);
                 }
                 if (messageSent && click_done) {
-                    clickMoveToDone();
+                    setTimeout(() => {
+                        clickMoveToDone();
+                    }, 2000);
                 }
             });
             matchingElement.appendChild(btn);
@@ -150,7 +154,10 @@ function addResponseButtons() {
 
     addButtonToNotes("wrong_password_btn",
         "🔴الباسورد غلط🔴",
-        "الباسورد غلط ... ممكن من فضلك تبعتلي الإيميل والباسورد الصح في رسايل منفصلة عشان احط رقم اوروبي واشغلهولك!",
+        `الباسورد غلط ... ممكن من فضلك تبعتلي الإيميل والباسورد الصح في رسايل منفصلة عشان احط رقم اوروبي واشغلهولك!
+وممكن تتأكد بنفسك لو عملت تسجيل دخول من اللينك ده وتقدر كمان تغير الباسورد
+
+https://chat.openai.com/auth/login`,
         "--",
         false
     );
@@ -185,15 +192,30 @@ https://imgtr.ee/images/2023/05/21/2fJ0U.png`,
 https://twitter.com/tarekbadrsh/status/1641394327015370754
 `);
 
+    addButtonToNotes("activate_your_account",
+        "🥦🥦اكتف الإيميل بتاعك🥦🥦",
+        `من فضلك هما بعتولك ايميل شبه الصورة الي في اللينك
+دوس علي الزرار الأخضر عشان تاكتف الاكونت
+
+انت مش محتاج VPN بس علي الاغلب هيقولك غير متوفر في بلدك
+خلص وبعدها ابعتلي عشان احط نمرة اوروبي واشغل الاكونت
+    
+https://imgtr.ee/images/2023/05/18/280Kn.jpg`,
+        "--",
+        true);
+
 }
 
+const sendMessageFacebook_signup_p = new Set();
 const facebookSendPassword = (message) => {
-    if (message.user.facebookUrl === window.location.href) {
-        removeLables();
-        addLabel("--");
-        const messages = [
-            message.user.email,
-            message.user.password, `👆ده الباسورد
+    if (sendMessageFacebook_signup_v.has(message.user.email)) {
+        return;
+    }
+    sendMessageFacebook_signup_v.add(message.user.email);
+    removeLables();
+    const messages = [
+        message.user.email,
+        message.user.password, `👆ده الباسورد
 معذرة علي التأخير جايلي رسايل كتير جدا!
 
 من فضلك هما بعتولك ايميل شبه الصورة الي في اللينك
@@ -204,37 +226,43 @@ const facebookSendPassword = (message) => {
     
 https://imgtr.ee/images/2023/05/18/280Kn.jpg
 `];
-        sendMultipleFacebookMessages(messages);
-        browser.runtime.sendMessage({ type: "status", status: "password-sent", user: message.user });
-    }
+    addLabel("--");
+    sendMultipleFacebookMessages(messages);
+    browser.runtime.sendMessage({ type: "status", status: "password-sent", user: message.user });
 };
 
-
+const sendMessageFacebook_signup_v = new Set();
 const facebookUserAlreadyExists = (message) => {
-    if (message.user.facebookUrl === window.location.href) {
-        removeLables();
-        addLabel("--");
-        const messages = [
-            message.user.email,
-            `انت عندك اكونت بالفعل ... ممكن تبعتلي الإيميل والباسورد الصح في رسايل منفصلة عشان احط رقم اوروبي واشغلهولك!
+    if (sendMessageFacebook_signup_v.has(message.user.email)) {
+        return;
+    }
+    sendMessageFacebook_signup_v.add(message.user.email);
+    removeLables();
+    const messages = [
+        message.user.email,
+        `انت عندك اكونت بالفعل ... ممكن تبعتلي الإيميل والباسورد الصح في رسايل منفصلة عشان احط رقم اوروبي واشغلهولك!
 وممكن تتأكد بنفسك لو عملت تسجيل دخول من اللينك ده وتقدر كمان تغير الباسورد
 
 https://chat.openai.com/auth/login`
-        ];
-        sendMultipleFacebookMessages(messages, true);
-        browser.runtime.sendMessage({ type: "status", status: "user-already-exists-sent", user: message.user });
-    }
+    ];
+    addLabel("--");
+    sendMultipleFacebookMessages(messages, true);
+    browser.runtime.sendMessage({ type: "status", status: "user-already-exists-sent", user: message.user });
 };
 
+const sendMessageFacebook_done = new Set();
 const userDone = (message) => {
-    if (message.user.facebookUrl === window.location.href) {
-        removeLables();
-        addLabel("done");
-        const messages = [
-            message.user.email,
-            message.user.password,
-            "https://chat.openai.com/chat",
-            `- انا شغلت ليك الاكونت🤟🎉🎊
+    if (sendMessageFacebook_done.has(message.user.email)) {
+        return;
+    }
+    sendMessageFacebook_done.add(message.user.email);
+    removeLables();
+    addLabel("done");
+    const messages = [
+        message.user.email,
+        message.user.password,
+        "https://chat.openai.com/chat",
+        `- انا شغلت ليك الاكونت🤟🎉🎊
 
 - ديه فيدوهات عن الشات في قناة اليوتوب 🎥 
 
@@ -250,8 +278,7 @@ https://twitter.com/tarekbadrsh/status/1619418114340585472
 
 - انا هبقي شاكر جدا لو تقدر تنزل استوري علي الانستجرام او تكتب تويته ان اي حد محتاج اكونت ChatGPT يبعتلي اهلا وسهلا
 انا بحاول اعمل حسابات لأكبر قدر ممكن من الناس دلوقتي🙏`];
-        sendMultipleFacebookMessages(messages);
-    }
+    sendMultipleFacebookMessages(messages);
 };
 
 const isEmailValid = (email) => {
@@ -382,6 +409,12 @@ const addGptFacebook = async () => {
     }
 };
 
+const clearAllData = async () => {
+    sendMessageFacebook_signup_p.clear();
+    sendMessageFacebook_signup_v.clear();
+    sendMessageFacebook_done.clear();
+}
+
 const facebook_intervals = {
     createStyleElement: null,
     addResponseButtons: null,
@@ -420,6 +453,9 @@ browser.runtime.onMessage.addListener(async (message) => {
                 if (autoFacebookCheckbox) {
                     userDone(message)
                 }
+                break;
+            case 'clear-all-data':
+                await clearAllData();
                 break;
         }
     } catch (error) {

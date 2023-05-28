@@ -45,3 +45,7 @@ function simulateKeyPressAndRelease(targetElement, key, code, keyCode, charCode)
     });
     targetElement.dispatchEvent(keyUpEvent);
 }
+
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
