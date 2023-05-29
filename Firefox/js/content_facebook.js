@@ -1,4 +1,9 @@
-const createStyleElement = () => {
+const sendMessage = async (type, user) => {
+    await browser.runtime.sendMessage({ type: type, user: user });
+}
+
+
+const createStyleElement = async () => {
     const style = document.createElement("style");
     style.textContent = `
       .gpt-pass-button {
@@ -24,66 +29,58 @@ const createStyleElement = () => {
   
     `;
     document.head.appendChild(style);
-    clearInterval(facebook_intervals.createStyleElement);
 };
 
-function removeLables() {
+const removeLables = async () => {
     var element = document.querySelector('[aria-label="clearLabel"]');
     if (element) {
-        element.click();
-        removeLables();
+        await simulateMouseEvents(element);
+        await removeLables();
     }
 }
 
-function addLabel(txt) {
-    let xpath = "//div[contains(text(), 'Add label')]";
-    let matchingElement = document.evaluate(xpath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
-
-    if (matchingElement) {
-        let addLabelbtn = matchingElement.parentNode.parentNode;
-        if (addLabelbtn) {
-            addLabelbtn.click();
-        }
-        let inputElement = fillFacebookInput('input[placeholder="Add label"]', txt);
-        simulateKeyPressAndRelease(inputElement, key = 'Enter', code = 'Enter', keyCode = 13, charCode = 13);
-        if (addLabelbtn) {
-            addLabelbtn.click();
-        }
-    }
-}
-
-function clickMoveToDone() {
-    let xpath = "//div[contains(text(), 'Move to done')]";
-    let doneButton = document.evaluate(xpath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
-    if (doneButton) {
-        let button = doneButton.parentNode.parentNode.parentNode;
-        if (button) {
-            setTimeout(() => {
-                button.click();
-            }, 1000);
-        }
-    }
-}
-
-function fillFacebookInput(selector, value) {
+const fillFacebookInput = async (selector, value) => {
     const targetElement = document.querySelector(selector);
     if (targetElement && targetElement.value.length < 1) {
         targetElement.value = value;
         let event = new Event('input', { bubbles: true });
-        targetElement.dispatchEvent(event);
+        await targetElement.dispatchEvent(event);
         return targetElement;
     }
     return false;
 }
 
+const addLabel = async (txt) => {
+    let xpath = "//div[contains(text(), 'Add label')]";
+    let matchingElement = document.evaluate(xpath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+    if (matchingElement) {
+        let addLabelbtn = matchingElement.parentNode.parentNode;
+        await simulateMouseEvents(addLabelbtn);
+        let inputElement = await fillFacebookInput('input[placeholder="Add label"]', txt);
+        await simulateKeyPressAndRelease(inputElement, key = 'Enter', code = 'Enter', keyCode = 13, charCode = 13);
+        await simulateMouseEvents(addLabelbtn);
 
-function sendFacebookMessage(message) {
+    }
+}
+
+const clickMoveToDone = async () => {
+    let xpath = "//div[contains(text(), 'Move to done')]";
+    let doneButton = document.evaluate(xpath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+    if (doneButton) {
+        let button = doneButton.parentNode.parentNode.parentNode;
+        if (button) {
+            await sleep(500);
+            await simulateMouseEvents(button);
+        }
+    }
+}
+
+const sendFacebookMessage = async (message) => {
     try {
-        let fillInputDone = fillFacebookInput('textarea[placeholder="Reply on Instagram…"]', message)
-        const sendbutton = document.querySelector('div[aria-label="Send"][role="button"]');
-
-        if (fillInputDone && sendbutton) {
-            sendbutton.click();
+        let fillInputDone = await fillFacebookInput('textarea[placeholder="Reply on Instagram…"]', message)
+        if (fillInputDone) {
+            const sendbutton = document.querySelector('div[aria-label="Send"][role="button"]');
+            await simulateMouseEvents(sendbutton);
             return true;
         }
     } catch (err) {
@@ -93,23 +90,21 @@ function sendFacebookMessage(message) {
     return false;
 }
 
-
-function sendMultipleFacebookMessages(messages, moveToDone = true, index = 0) {
+const sendMultipleFacebookMessages = async (messages, moveToDone = true, index = 0) => {
     if (index >= messages.length && moveToDone) {
-        setTimeout(clickMoveToDone, 100);
+        await sleep(100);
+        await clickMoveToDone();
         return true;
     }
-
-    const done = sendFacebookMessage(messages[index]);
-
+    const done = await sendFacebookMessage(messages[index]);
     if (!done) {
         return false;
     }
-
-    setTimeout(() => sendMultipleFacebookMessages(messages, moveToDone, index + 1), 100);
+    await sleep(100);
+    await sendMultipleFacebookMessages(messages, moveToDone, index + 1);
 }
 
-function addButtonToNotes(css_class, text, message, label, click_done) {
+const addButtonToNotes = async (css_class, text, message, label, click_done) => {
     let xpath = "//div[contains(text(), 'Notes')]";
     let matchingElement = document.evaluate(xpath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
 
@@ -120,18 +115,16 @@ function addButtonToNotes(css_class, text, message, label, click_done) {
             let btn = document.createElement("button");
             btn.innerHTML = text;
             btn.classList.add(css_class); // add the class to the button
-            btn.addEventListener('click', function () {
-                const messageSent = sendFacebookMessage(message);
-                if (messageSent && label) {
-                    removeLables();
-                    setTimeout(() => {
-                        addLabel(label);
-                    }, 1000);
-                }
-                if (messageSent && click_done) {
-                    setTimeout(() => {
-                        clickMoveToDone();
-                    }, 2000);
+            btn.addEventListener('click', async () => {
+                const messageSent = await sendFacebookMessage(message);
+                if (messageSent) {
+                    if (label) {
+                        await removeLables();
+                        await addLabel(label);
+                    }
+                    if (click_done) {
+                        await clickMoveToDone();
+                    }
                 }
             });
             matchingElement.appendChild(btn);
@@ -139,8 +132,8 @@ function addButtonToNotes(css_class, text, message, label, click_done) {
     }
 }
 
-function addResponseButtons() {
-    addButtonToNotes(
+const addResponseButtons = async () => {
+    await addButtonToNotes(
         "euro_btn",
         "🇪🇺فاضل الرقم الاوروبي🇪🇺",
         `تمام جدا!
@@ -152,7 +145,7 @@ function addResponseButtons() {
         "num",
         true);
 
-    addButtonToNotes("wrong_password_btn",
+    await addButtonToNotes("wrong_password_btn",
         "🔴الباسورد غلط🔴",
         `الباسورد غلط ... ممكن من فضلك تبعتلي الإيميل والباسورد الصح في رسايل منفصلة عشان احط رقم اوروبي واشغلهولك!
 وممكن تتأكد بنفسك لو عملت تسجيل دخول من اللينك ده وتقدر كمان تغير الباسورد
@@ -162,7 +155,7 @@ https://chat.openai.com/auth/login`,
         false
     );
 
-    addButtonToNotes("wrong_password_btn",
+    await addButtonToNotes("wrong_password_btn",
         "🔐ايميل تغييرالباسورد🔐",
         `انا بعتلك ايميل تغيير الباسورد .. دور عندك في الرسايل
 هما بعتولك ايميل شبه الصورة الي في اللينك او سيرش علي OpenAI وغير الباسورد وابعتلي الجديد
@@ -171,28 +164,28 @@ https://imgtr.ee/images/2023/05/21/2fJ0U.png`,
         false
     );
 
-    addButtonToNotes("outlook_btn",
+    await addButtonToNotes("outlook_btn",
         "outlook",
         "ممكن من فضلك تبعتلي ايميل تاني ال Outlook@ و ال Hotmail@ فيهم مشكلة مش بنقدر نعمل بيهم حسابات",
         "--",
         true
     );
 
-    addButtonToNotes("frnd_acc_btn",
+    await addButtonToNotes("frnd_acc_btn",
         "🤎صاحب الميل يبعتلي🤎",
         "أنا اسف جدا ... ممكن من فضلك تخلي صاحب الإيميل يبعتلي عشان جايلي طلبات كتير🙏🏻",
         "done",
         true
     );
 
-    addButtonToNotes("gpt4_btn",
+    await addButtonToNotes("gpt4_btn",
         "ChatGPT-⓸⓸⓸",
         `للاسف، مش بقدر اساعد في ChatGPT-4 🙏
 ممكن تشوف الي كتبته في التويته ديه
 https://twitter.com/tarekbadrsh/status/1641394327015370754
 `);
 
-    addButtonToNotes("activate_your_account",
+    await addButtonToNotes("activate_your_account",
         "🥦🥦اكتف الإيميل بتاعك🥦🥦",
         `من فضلك هما بعتولك ايميل شبه الصورة الي في اللينك
 دوس علي الزرار الأخضر عشان تاكتف الاكونت
@@ -203,20 +196,20 @@ https://twitter.com/tarekbadrsh/status/1641394327015370754
 https://imgtr.ee/images/2023/05/18/280Kn.jpg`,
         "--",
         true);
-
     clearInterval(facebook_intervals.createStyleElement);
 }
 
 const sendMessageFacebook_signup_p = new Set();
-const facebookSendPassword = (message) => {
+const facebookSendPassword = async (message) => {
     if (sendMessageFacebook_signup_v.has(message.user.email)) {
         return;
     }
     sendMessageFacebook_signup_v.add(message.user.email);
-    removeLables();
+    await removeLables();
     const messages = [
         message.user.email,
-        message.user.password, `👆ده الباسورد
+        message.user.password,
+        `👆ده الباسورد
 معذرة علي التأخير جايلي رسايل كتير جدا!
 
 من فضلك هما بعتولك ايميل شبه الصورة الي في اللينك
@@ -227,18 +220,20 @@ const facebookSendPassword = (message) => {
     
 https://imgtr.ee/images/2023/05/18/280Kn.jpg
 `];
-    addLabel("--");
-    sendMultipleFacebookMessages(messages);
-    browser.runtime.sendMessage({ type: "status", status: "password-sent", user: message.user });
+    await addLabel("--");
+    await sendMultipleFacebookMessages(messages);
+    message.user.status = "password-sent"
+    await sendMessage("update-user", message.user);
 };
 
 const sendMessageFacebook_signup_v = new Set();
-const facebookUserAlreadyExists = (message) => {
+const facebookUserAlreadyExists = async (message) => {
     if (sendMessageFacebook_signup_v.has(message.user.email)) {
         return;
     }
     sendMessageFacebook_signup_v.add(message.user.email);
-    removeLables();
+    await removeLables();
+    await addLabel("--");
     const messages = [
         message.user.email,
         `انت عندك اكونت بالفعل ... ممكن تبعتلي الإيميل والباسورد الصح في رسايل منفصلة عشان احط رقم اوروبي واشغلهولك!
@@ -246,19 +241,19 @@ const facebookUserAlreadyExists = (message) => {
 
 https://chat.openai.com/auth/login`
     ];
-    addLabel("--");
-    sendMultipleFacebookMessages(messages, true);
-    browser.runtime.sendMessage({ type: "status", status: "user-already-exists-sent", user: message.user });
+    await sendMultipleFacebookMessages(messages, true);
+    message.user.status = "user-already-exists-sent"
+    await sendMessage(type = "update-user", message.user);
 };
 
 const sendMessageFacebook_done = new Set();
-const userDone = (message) => {
+const userDone = async (message) => {
     if (sendMessageFacebook_done.has(message.user.email)) {
         return;
     }
     sendMessageFacebook_done.add(message.user.email);
-    removeLables();
-    addLabel("done");
+    await removeLables();
+    await addLabel("done");
     const messages = [
         message.user.email,
         message.user.password,
@@ -279,7 +274,7 @@ https://twitter.com/tarekbadrsh/status/1619418114340585472
 
 - انا هبقي شاكر جدا لو تقدر تنزل استوري علي الانستجرام او تكتب تويته ان اي حد محتاج اكونت ChatGPT يبعتلي اهلا وسهلا
 انا بحاول اعمل حسابات لأكبر قدر ممكن من الناس دلوقتي🙏`];
-    sendMultipleFacebookMessages(messages);
+    await sendMultipleFacebookMessages(messages);
 };
 
 const isEmailValid = (email) => {
@@ -313,14 +308,7 @@ const findParentDiv = (element) => {
 };
 
 // Generate a random birth date
-function generateRandomBirthDate() {
-    const randomYear = Math.floor(Math.random() * (1995 - 1970 + 1)) + 1970;
-    const randomMonth = (Math.floor(Math.random() * 12) + 1).toString().padStart(2, '0');
-    const randomDay = (Math.floor(Math.random() * 25) + 1).toString().padStart(2, '0');
-    return `${randomMonth}/${randomDay}/${randomYear}`;
-}
-
-function processUserName() {
+const processUserName = async () => {
     const anchorElements = document.getElementsByTagName("a");
     let first_name = "GPT";
     let last_name = "AI";
@@ -348,26 +336,9 @@ function processUserName() {
     return null;
 }
 
-
-
-// Generate a hash for a given string
-async function generateHash(str) {
-    try {
-        const encoder = new TextEncoder();
-        const data = encoder.encode(str);
-        const digest = await crypto.subtle.digest('SHA-256', data);
-        const hashArray = Array.from(new Uint8Array(digest));
-        const hashHex = hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
-        return hashHex.slice(0, 16);
-    } catch (err) {
-        console.error(`Failed to generate hash: ${err}`);
-        return null;
-    }
-}
-
 const extractUser = async (text) => {
     const email = extractEmail(text);
-    const user_name = processUserName();
+    const user_name = await processUserName();
     let user = new User(window.location.href, user_name.instagramUrl, email, user_name.first_name, user_name.last_name);
     await user.SetPassword();
     user.status = "new_user";
@@ -382,11 +353,11 @@ const addGptPassButton = async (span) => {
 
         button.addEventListener("click", async (e) => {
             const selectedText = window.getSelection().toString();
-            const user = await extractUser(span.textContent);
+            let user = await extractUser(span.textContent);
             if (selectedText) {
                 user.password = selectedText;
             }
-            await browser.runtime.sendMessage({ type: "new_user", user: user });
+            await sendMessage("new_user", user);
         });
         span.appendChild(button);
     } catch (err) {
@@ -417,14 +388,13 @@ const clearAllData = async () => {
 }
 
 const facebook_intervals = {
-    createStyleElement: null,
-    addResponseButtons: null,
-    addGptFacebook: null
+    addGptFacebook: null,
+    addResponseButtons: null
 };
 
-
-function onFacebookLoad() {
-    facebook_intervals.createStyleElement = setInterval(createStyleElement, 500);
+const onFacebookLoad = async () => {
+    await sleep(500);
+    await createStyleElement();
     facebook_intervals.addGptFacebook = setInterval(addGptFacebook, 1000);
     facebook_intervals.addResponseButtons = setInterval(addResponseButtons, 1000);
 }
@@ -437,29 +407,26 @@ if (document.readyState === "complete") {
 }
 
 browser.runtime.onMessage.addListener(async (message) => {
-    const { autoFacebookCheckbox = true } = await browser.storage.local.get(["autoFacebookCheckbox"]);
-    try {
-        switch (message.type) {
-            case 'send-password':
-                if (autoFacebookCheckbox) {
-                    facebookSendPassword(message);
-                }
-                break;
-            case 'send-user-already-exists':
-                if (autoFacebookCheckbox) {
-                    facebookUserAlreadyExists(message);
-                }
-                break;
-            case 'send-done-to-user':
-                if (autoFacebookCheckbox) {
-                    userDone(message)
-                }
-                break;
-            case 'clear-all-data':
-                await clearAllData();
-                break;
-        }
-    } catch (error) {
-        console.error(error)
+    let result = await browser.storage.local.get("automation");
+    const automation = result.automation;
+    switch (message.type) {
+        case 'send-password':
+            if (automation) {
+                await facebookSendPassword(message);
+            }
+            break;
+        case 'send-user-already-exists':
+            if (automation) {
+                await facebookUserAlreadyExists(message);
+            }
+            break;
+        case 'send-done-to-user':
+            if (automation) {
+                await userDone(message)
+            }
+            break;
+        case 'clear-all-data':
+            await clearAllData();
+            break;
     }
 });

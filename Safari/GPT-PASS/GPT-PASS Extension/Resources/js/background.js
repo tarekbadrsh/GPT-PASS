@@ -7,13 +7,6 @@ function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-// Open extension options page
-function configureExtension() {
-    browser.runtime.openOptionsPage()
-        .then(() => console.log('Opened options page'))
-        .catch((error) => console.error('Error opening options page:', error));
-}
-
 // Save user to the list of users
 async function saveUserToList(user) {
     if (!user || !user.email) return;

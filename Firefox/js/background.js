@@ -7,24 +7,15 @@ function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-// Open extension options page
-function configureExtension() {
-    browser.runtime.openOptionsPage()
-        .then(() => console.log('Opened options page'))
-        .catch((error) => console.error('Error opening options page:', error));
-}
-
 // Save user to the list of users
 async function saveUserToList(user) {
     if (!user || !user.email) return;
     try {
         const { users = [] } = await browser.storage.local.get('users');
         const existingUserIndex = users.findIndex((u) => u.email === user.email);
-
         if (existingUserIndex !== -1) {
             users.splice(existingUserIndex, 1);
         }
-
         users.push(user);
         await browser.storage.local.set({ users });
     } catch (err) {
@@ -54,13 +45,16 @@ const clearAllData = async () => {
 
 // Listen for messages from other parts of the extension
 browser.runtime.onMessage.addListener(async (message) => {
-    console.log(message);
-    let result = await browser.storage.local.get("currentUser");
-    let currentUser = result.currentUser;
+    console.log(message)
+    let user;
+    if (message.user) {
+        user = message.user;
+    } else {
+        const result = await browser.storage.local.get("currentUser");
+        user = result.currentUser;
+    }
     let facebookWindow;
     let facebookTab;
-    let openAIWindow;
-    let openAITab;
     const windows = await browser.windows.getAll({ populate: true });
     for (const window of windows) {
         for (const tab of window.tabs) {
@@ -68,87 +62,75 @@ browser.runtime.onMessage.addListener(async (message) => {
                 facebookWindow = window;
                 facebookTab = tab;
             }
-            if (tab.url.includes("openai.com")) {
-                openAIWindow = window;
-                openAITab = tab;
-            }
         }
     }
     switch (message.type) {
         case 'log-error':
-            console.error(message.error, message.user);
+            console.error(message.error, user);
             break;
         case 'new_user':
-            const user = message.user;
-            let privateWindow = {
+            const win = await browser.windows.create({
                 url: "https://chat.openai.com/auth/login",
                 incognito: true
-            };
-            let win = await browser.windows.create(privateWindow);
+            });
             let tab = win.tabs[0];
             user.tabId = tab.id;
             await updateCurrentUser(user);
             break;
         case 'update-user':
-            const update_user = message.user;
-            await updateCurrentUser(update_user);
+            await updateCurrentUser(user);
+            switch (user.status) {
+                case 'signup-v':
+                    if (sendMessageFacebook_signup_v.has(user.email)) {
+                        return;
+                    }
+                    sendMessageFacebook_signup_v.add(user.email);
+                    await browser.tabs.sendMessage(facebookTab.id, { type: 'send-password', user: user });
+                    break;
+                case 'user-already-exists':
+                    if (sendMessageFacebook_user_exists.has(user.email)) {
+                        return;
+                    }
+                    sendMessageFacebook_user_exists.add(user.email);
+                    await browser.tabs.sendMessage(facebookTab.id, { type: 'send-user-already-exists', user: user });
+                    break;
+                case 'done':
+                    if (sendMessageFacebook_done.has(user.email)) {
+                        return;
+                    }
+                    sendMessageFacebook_done.add(user.email);
+                    await browser.tabs.sendMessage(facebookTab.id, { type: 'send-done-to-user', user: user });
+                    break;
+                default:
+                    break;
+            }
             break;
         case 'phone_number':
-            currentUser.phone_number = message.phone_number;
-            await updateCurrentUser(currentUser);
+            user.phone_number = message.phone_number;
+            user.country_code = message.country_code;
+            await updateCurrentUser(user);
             break;
         case 'smscode':
             if (smscodeSet.has(message.smscode)) {
                 await browser.storage.local.set({ smscode: "" });
                 return;
             }
-            currentUser.smscode = message.smscode;
-            await updateCurrentUser(currentUser);
             smscodeSet.add(message.smscode);
+            user.smscode = message.smscode;
+            await updateCurrentUser(user);
             break;
         case 'clear-all-data':
             await clearAllData();
             await browser.tabs.sendMessage(facebookTab.id, { type: 'clear-all-data' });
-            await browser.tabs.sendMessage(openAITab.id, { type: 'clear-all-data' });
-            break;
-        case 'status':
-            message.user.status = message.status;
-            await updateCurrentUser(message.user);
-            switch (message.status) {
-                case 'signup-v':
-                    if (sendMessageFacebook_signup_v.has(message.user.email)) {
-                        return;
-                    }
-                    sendMessageFacebook_signup_v.add(message.user.email);
-                    await browser.tabs.sendMessage(facebookTab.id, { type: 'send-password', user: message.user });
-                    break;
-                case 'user-already-exists':
-                    if (sendMessageFacebook_user_exists.has(message.user.email)) {
-                        return;
-                    }
-                    sendMessageFacebook_user_exists.add(message.user.email);
-                    await browser.tabs.sendMessage(facebookTab.id, { type: 'send-user-already-exists', user: message.user });
-                    break;
-                case 'done':
-                    if (sendMessageFacebook_done.has(message.user.email)) {
-                        return;
-                    }
-                    sendMessageFacebook_done.add(message.user.email);
-                    await browser.tabs.sendMessage(facebookTab.id, { type: 'send-done-to-user', user: message.user });
-                    break;
-                default:
-                    break;
-            }
+            // await browser.tabs.sendMessage(smsTab.id, { type: 'clear-all-data' });
             break;
         case 'closeCurrentTab':
-            const cur_user = message.user;
             await browser.windows.update(facebookWindow.id, { focused: true });
             await browser.tabs.update(facebookTab.id, { active: true });
-
             const windows = await browser.windows.getAll({ populate: true });
             for (const window of windows) {
                 for (const tab of window.tabs) {
-                    if (tab.id == cur_user.tabId) {
+                    if (tab.id == user.tabId) {
                         await sleep(2000);
                         await browser.tabs.remove(tab.id);
                     }

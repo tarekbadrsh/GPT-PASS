@@ -76,14 +76,14 @@ async function setCheckboxStateFromLocalStorage(id) {
     }
 }
 
-function addCheckboxListener(id) {
+const addCheckboxListener = (id) => {
     const checkbox = document.getElementById(id);
     checkbox.addEventListener("change", async function (event) {
-        browser.storage.local.set({ [id]: event.target.checked });
+        await browser.storage.local.set({ [id]: event.target.checked });
     });
 }
 
-['autoFillCheckbox', 'autoSmsCheckbox', 'autoClickCheckbox', 'autoCloseTabCheckbox', 'autoFacebookCheckbox'].forEach(id => {
+['automation'].forEach(id => {
     setCheckboxStateFromLocalStorage(id);
     addCheckboxListener(id);
 });

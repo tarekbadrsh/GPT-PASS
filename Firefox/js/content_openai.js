@@ -1,27 +1,7 @@
-let autoClickOpenAIButton = false;
 let user = null;
 
-const sendMessage = async (type, userstatus, error) => {
-    if (!userstatus) {
-        userstatus = user.status;
-    }
-    await browser.runtime.sendMessage({ type: type, error: error, status: userstatus, user: user });
-}
-
-const simulateMouseEvents = async (targetElement) => {
-    const mouseMoveEvent = new MouseEvent('mousemove', { bubbles: true, cancelable: true, clientX: targetElement.getBoundingClientRect().x, clientY: targetElement.getBoundingClientRect().y });
-    document.dispatchEvent(mouseMoveEvent);
-    const mouseOverEvent = new MouseEvent('mouseover', { bubbles: true, cancelable: true });
-    targetElement.dispatchEvent(mouseOverEvent);
-    const mouseDownEvent = new MouseEvent('mousedown', { bubbles: true, cancelable: true });
-    targetElement.dispatchEvent(mouseDownEvent);
-    const mouseUpEvent = new MouseEvent('mouseup', { bubbles: true, cancelable: true });
-    targetElement.dispatchEvent(mouseUpEvent);
-
-    // Simulate click after a small delay to mimic human interaction 
-    const clickEvent = new MouseEvent('click', { bubbles: true, cancelable: true });
-    await sleep(100);
-    targetElement.dispatchEvent(clickEvent);
+const sendMessage = async (type, error) => {
+    await browser.runtime.sendMessage({ type: type, user: user, error: error });
 }
 
 const clickOnButtons = async (selector, text) => {
@@ -75,7 +55,8 @@ const openAIAddEventListener = async () => {
     let loginButton = Array.from(document.getElementsByClassName('btn relative btn-primary')).find(button => button.textContent === "Log in");
     if (loginButton) {
         loginButton.addEventListener('click', async () => {
-            await sendMessage(type = "status", userstatus = "login");
+            user.status = "login"
+            await sendMessage(type = "update-user");
         });
     }
 
@@ -83,7 +64,8 @@ const openAIAddEventListener = async () => {
     let signupButton = Array.from(document.getElementsByClassName('btn relative btn-primary')).find(button => button.textContent === "Sign up");
     if (signupButton) {
         signupButton.addEventListener('click', async () => {
-            await sendMessage(type = "status", userstatus = "signup");
+            user.status = "signup"
+            await sendMessage(type = "update-user");
 
         });
     }
@@ -112,14 +94,12 @@ const createYourAccount = async () => {
     if (!done) {
         return false;
     }
-    if (!autoClickOpenAIButton) {
-        return true;
-    }
     done = await clickOnButton('button[type="submit"]');
     if (!done) {
         return false;
     }
-    await sendMessage(type = "status", userstatus = "signup-e");
+    user.status = "signup-e";
+    await sendMessage(type = "update-user");
     return true;
 }
 
@@ -131,14 +111,12 @@ const createYourAccountPassword = async () => {
     if (!done) {
         return false;
     }
-    if (!autoClickOpenAIButton) {
-        return true;
-    }
     done = await clickOnButton('button[type="submit"]');
     if (!done) {
         return false;
     }
-    await sendMessage(type = "status", userstatus = "signup-p");
+    user.status = "signup-p"
+    await sendMessage(type = "update-user");
     return true;
 }
 
@@ -146,15 +124,13 @@ const verifyYourEmail = async () => {
     if (!document.body.textContent.includes("Verify your email")) {
         return true;
     }
-    if (!autoClickOpenAIButton) {
-        return true;
-    }
     let done = false;
     done = await clickOnButtons('.onb-resend-email-btn');
     if (!done) {
         return false;
     }
-    await sendMessage(type = "status", userstatus = "signup-v");
+    user.status = "signup-v"
+    await sendMessage(type = "update-user");
     return true;
 }
 
@@ -166,14 +142,12 @@ const loginYourAccount = async () => {
     if (!done) {
         return false;
     }
-    if (!autoClickOpenAIButton) {
-        return true;
-    }
     done = await clickOnButton('button[type="submit"]');
     if (!done) {
         return false;
     }
-    await sendMessage(type = "status", userstatus = "login-e");
+    user.status = "login-e"
+    await sendMessage(type = "update-user");
     return true;
 }
 
@@ -185,23 +159,23 @@ const loginYourAccountPassword = async () => {
     if (!done) {
         return false;
     }
-    if (!autoClickOpenAIButton) {
-        return true;
-    }
     done = await clickOnButton('button[type="submit"]');
     if (!done) {
         return false;
     }
     let errorElement = document.querySelector('[class*="error"], [data-error-code*="blocked"]');
     if (!errorElement) {
-        await sendMessage(type = "status", userstatus = "login-p");
+        user.status = "login-p"
+        await sendMessage(type = "update-user");
         return true;
     }
     if (document.body.textContent.includes("The user already exists")) {
-        await sendMessage(type = "status", userstatus = "user-already-exists");
+        user.status = "user-already-exists"
+        await sendMessage(type = "update-user");
         return false;
     } else if (document.body.textContent.includes("Wrong email or password")) {
-        await sendMessage(type = "status", userstatus = "wrong-password");
+        user.status = "wrong-password"
+        await sendMessage(type = "update-user");
         return false;
     }
     return true;
@@ -226,14 +200,12 @@ const tellUsAboutYou = async () => {
     if (!done) {
         return false;
     }
-    if (!autoClickOpenAIButton) {
-        return true;
-    }
     done = await clickOnButton('button[type="submit"]');
     if (!done) {
         return false;
     }
-    await sendMessage(type = "status", userstatus = "login-n");
+    user.status = "login-n"
+    await sendMessage(type = "update-user");
     return true;
 }
 
@@ -255,21 +227,26 @@ const verifyYourPhoneNumber = async () => {
     selectPhoneCountry.add(user.email);
     await simulateMouseEvents(dropdownCountry);
     await sleep(500);
-    const romania = document.getElementById("react-select-2-option-181");
-    await simulateMouseEvents(romania);
+    let countryhtml;
+    if (user.country_code == 8) { // kenya 
+        countryhtml = "react-select-2-option-115"
+    } else if (user.country_code == 32) { // Romania
+        countryhtml = "react-select-2-option-181"
+    }
+
+    const country = document.getElementById(countryhtml);
+    await simulateMouseEvents(country);
     await sleep(500);
     let done = await fillInput('.text-input', user.phone_number);
     if (!done) {
         return false;
     }
-    if (!autoClickOpenAIButton) {
-        return true;
-    }
     done = await clickOnButton('button[type="submit"]');
     if (!done) {
         return false;
     }
-    await sendMessage(type = "status", userstatus = "phone-nubmer-added");
+    user.status = "phone-nubmer-added"
+    await sendMessage(type = "update-user");
     return true;
 }
 
@@ -284,7 +261,8 @@ const enterCode = async () => {
     if (!done) {
         return false;
     }
-    await sendMessage(type = "status", userstatus = "done");
+    user.status = "done"
+    await sendMessage(type = "update-user");
 }
 
 const openAIWelcomeMessage = async () => {
@@ -292,63 +270,67 @@ const openAIWelcomeMessage = async () => {
     await clickOnButtons('.btn.relative.btn-neutral.ml-auto');
     const done = await clickOnButtons('.btn.relative.btn-primary.ml-auto');
     if (done) {
+        clearInterval(openai_intervals.handleOpenAI);
         const textarea = document.querySelector(`textarea.m-0.w-full.resize-none.border-0.bg-transparent.p-0.pr-7.focus\\:ring-0.focus-visible\\:ring-0.dark\\:bg-transparent.pl-2.md\\:pl-0`);
         textarea.value = `Hi ChatGPT my name is ${user.first_name}`;
-        simulateKeyPressAndRelease(textarea, key = 'Enter', code = 'Enter', keyCode = 13, charCode = 13);
-        clearInterval(openai_intervals.handleOpenAI);
+        await simulateKeyPressAndRelease(textarea, key = 'Enter', code = 'Enter', keyCode = 13, charCode = 13);
         await sendMessage(type = "closeCurrentTab");
     }
 }
 
 const handleOpenAI = async () => {
+    let result = await browser.storage.local.get("automation");
+    const automation = result.automation;
+    if (!automation) {
+        return;
+    }
     openAIAddEventListener();
     try {
         let errorElement = document.querySelector('[class*="error"], [data-error-code*="blocked"]');
-        const { autoFillCheckbox = true, autoClickCheckbox = true, autoCloseTabCheckbox = true, currentUser = undefined } = await browser.storage.local.get(["autoFillCheckbox", "autoClickCheckbox", "autoCloseTabCheckbox", "currentUser"]);
-        user = currentUser;
-        autoClickOpenAIButton = autoClickCheckbox;
+        let result = await browser.storage.local.get("currentUser");
+        user = result.currentUser;
         if (errorElement) {
             if (document.body.textContent.includes("The user already exists")) {
                 user.status = "user-already-exists";
-                await sendMessage(type = "status", userstatus = "user-already-exists");
+                await sendMessage(type = "update-user");
                 await sendMessage(type = "closeCurrentTab");
             }
             return;
         }
 
-        if (!user && !autoFillCheckbox) {
+        if (!user) {
             return;
         }
         switch (user.status) {
             case "signup":
                 if (!createYourAccount()) {
-                    await sendMessage(type = "log-error", userstatus = null, error = "Could not create account");
+                    await sendMessage(type = "log-error", error = "Could not create account");
                 }
                 break;
             case "signup-e":
                 if (!createYourAccountPassword()) {
-                    await sendMessage(type = "log-error", userstatus = null, error = "signup-e: Could not enter Your Password");
+                    await sendMessage(type = "log-error", error = "signup-e: Could not enter Your Password");
                 }
                 break;
             case "signup-p":
                 if (!verifyYourEmail()) {
-                    await sendMessage(type = "log-error", userstatus = null, error = "Could not Verify Your Email");
+                    await sendMessage(type = "log-error", error = "Could not Verify Your Email");
                 }
                 break;
             case "password-sent":
-                if (autoCloseTabCheckbox) {
+                if (automation) {
                     await sendMessage(type = "closeCurrentTab");
                 }
                 break;
             //----
             case "login":
                 if (!loginYourAccount()) {
-                    await sendMessage(type = "log-error", userstatus = null, error = "Could not create account");
+                    await sendMessage(type = "log-error", error = "Could not create account");
                 }
                 break;
             case "login-e":
                 if (!loginYourAccountPassword()) {
-                    await sendMessage(type = "log-error", userstatus = null, error = "login-e: Could not enter Your Password");
+                    await sendMessage(type = "log-error", error = "login-e: Could not enter Your Password");
                 }
                 break;
             case "login-p":
@@ -358,17 +340,17 @@ const handleOpenAI = async () => {
                 break;
             case "login-n":
                 if (!verifyYourPhoneNumber()) {
-                    await sendMessage(type = "log-error", userstatus = null, error = "Could not verify user phone number");
+                    await sendMessage(type = "log-error", error = "Could not verify user phone number");
                 }
                 break;
             case "phone-nubmer-added":
                 if (!enterCode()) {
-                    await sendMessage(type = "log-error", userstatus = null, error = "Could not Enter code");
+                    await sendMessage(type = "log-error", error = "Could not Enter code");
                 }
                 break;
             case "done":
                 if (!openAIWelcomeMessage()) {
-                    await sendMessage(type = "log-error", userstatus = null, error = "Could not openAI Welcome Message");
+                    await sendMessage(type = "log-error", error = "Could not openAI Welcome Message");
                 }
                 break;
             //----
@@ -399,7 +381,6 @@ if (document.readyState === "complete") {
 }
 
 browser.runtime.onMessage.addListener(async (message) => {
-    console.log("Hello from OpenAI");
     try {
         switch (message.type) {
             case 'clear-all-data':

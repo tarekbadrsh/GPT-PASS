@@ -162,12 +162,6 @@ const isSixDigitNumber = (value) => {
 };
 
 async function handleSmsActivate() {
-    const { autoSmsCheckbox = true } = await browser.storage.local.get("autoSmsCheckbox");
-
-    if (!autoSmsCheckbox) {
-        return;
-    }
-
     let phoneElement = document.querySelector(".activate-grid-item__numberq");
     let phone_number = ""
     if (!phoneElement) {
@@ -176,7 +170,18 @@ async function handleSmsActivate() {
     }
     phone_number = phoneElement.innerText.replace(/\D/g, "");
     if (phone_number) {
-        browser.runtime.sendMessage({ type: "phone_number", phone_number: phone_number });
+        let imgElements = document.querySelectorAll('img.country_img');
+        let country_code;
+        imgElements.forEach(img => {
+            let src = img.getAttribute('src');
+            let number = src.match(/(\d+)\.svg$/);
+            if (number) {
+                country_code = number[1];
+            }
+        });
+
+
+        browser.runtime.sendMessage({ type: "phone_number", phone_number: phone_number, country_code: country_code });
     }
     const smscodeElement = document.querySelector(".underline-orange.cursor-pointer");
     if (!smscodeElement || !isSixDigitNumber(smscodeElement.textContent)) {
