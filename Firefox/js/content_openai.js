@@ -1,6 +1,6 @@
 let user = null;
 
-const sendMessage = async (type, error) => {
+const sendMessagefromOpenAI = async (type, error) => {
     await browser.runtime.sendMessage({ type: type, user: user, error: error });
 }
 
@@ -50,26 +50,20 @@ const fillInput = async (selector, value) => {
     return false;
 }
 
-const openAIAddEventListener = async () => {
-    // If Login button found, add the event listener
-    let loginButton = Array.from(document.getElementsByClassName('btn relative btn-primary')).find(button => button.textContent === "Log in");
-    if (loginButton) {
-        loginButton.addEventListener('click', async () => {
-            user.status = "login"
-            await sendMessage(type = "update-user");
-        });
+const openAIAddEventListener = () => {
+    const allBtns = document.getElementsByClassName('btn relative btn-primary');
+    for (let i = 0; i < allBtns.length; i++) {
+        const btn = allBtns[i];
+        if (btn.textContent.trim() == "Log in") {
+            btn.addEventListener('click', async () => {
+                await browser.runtime.sendMessage({ type: "update-user-status", "status": "login" });
+            });
+        } else if (btn.textContent.trim() == "Sign up") {
+            btn.addEventListener('click', async () => {
+                await browser.runtime.sendMessage({ type: "update-user-status", "status": "signup" });
+            });
+        }
     }
-
-    // If Sign Up button found, add the event listener
-    let signupButton = Array.from(document.getElementsByClassName('btn relative btn-primary')).find(button => button.textContent === "Sign up");
-    if (signupButton) {
-        signupButton.addEventListener('click', async () => {
-            user.status = "signup"
-            await sendMessage(type = "update-user");
-
-        });
-    }
-
     const passTxt = document.querySelector('input[name="password"]');
     if (passTxt) {
         passTxt.addEventListener("change", async () => {
@@ -77,7 +71,7 @@ const openAIAddEventListener = async () => {
                 return;
             }
             user.password = passTxt.value;
-            await sendMessage(type = "update-user");
+            await sendMessagefromOpenAI(type = "update-user");
         });
     }
 }
@@ -90,7 +84,7 @@ const createYourAccount = async () => {
     if (spanElement && spanElement.textContent.trim() !== "") {
         return true;
     }
-    let done = fillInput('input[name="email"]', user.email);
+    let done = await fillInput('input[name="email"]', user.email);
     if (!done) {
         return false;
     }
@@ -99,7 +93,7 @@ const createYourAccount = async () => {
         return false;
     }
     user.status = "signup-e";
-    await sendMessage(type = "update-user");
+    await sendMessagefromOpenAI(type = "update-user");
     return true;
 }
 
@@ -116,7 +110,7 @@ const createYourAccountPassword = async () => {
         return false;
     }
     user.status = "signup-p"
-    await sendMessage(type = "update-user");
+    await sendMessagefromOpenAI(type = "update-user");
     return true;
 }
 
@@ -130,7 +124,7 @@ const verifyYourEmail = async () => {
         return false;
     }
     user.status = "signup-v"
-    await sendMessage(type = "update-user");
+    await sendMessagefromOpenAI(type = "update-user");
     return true;
 }
 
@@ -147,7 +141,7 @@ const loginYourAccount = async () => {
         return false;
     }
     user.status = "login-e"
-    await sendMessage(type = "update-user");
+    await sendMessagefromOpenAI(type = "update-user");
     return true;
 }
 
@@ -166,16 +160,16 @@ const loginYourAccountPassword = async () => {
     let errorElement = document.querySelector('[class*="error"], [data-error-code*="blocked"]');
     if (!errorElement) {
         user.status = "login-p"
-        await sendMessage(type = "update-user");
+        await sendMessagefromOpenAI(type = "update-user");
         return true;
     }
     if (document.body.textContent.includes("The user already exists")) {
         user.status = "user-already-exists"
-        await sendMessage(type = "update-user");
+        await sendMessagefromOpenAI(type = "update-user");
         return false;
     } else if (document.body.textContent.includes("Wrong email or password")) {
         user.status = "wrong-password"
-        await sendMessage(type = "update-user");
+        await sendMessagefromOpenAI(type = "update-user");
         return false;
     }
     return true;
@@ -205,7 +199,7 @@ const tellUsAboutYou = async () => {
         return false;
     }
     user.status = "login-n"
-    await sendMessage(type = "update-user");
+    await sendMessagefromOpenAI(type = "update-user");
     return true;
 }
 
@@ -226,14 +220,13 @@ const verifyYourPhoneNumber = async () => {
     }
     selectPhoneCountry.add(user.email);
     await simulateMouseEvents(dropdownCountry);
-    await sleep(500);
     let countryhtml;
     if (user.country_code == 8) { // kenya 
         countryhtml = "react-select-2-option-115"
     } else if (user.country_code == 32) { // Romania
         countryhtml = "react-select-2-option-181"
     }
-
+    await sleep(500);
     const country = document.getElementById(countryhtml);
     await simulateMouseEvents(country);
     await sleep(500);
@@ -241,12 +234,13 @@ const verifyYourPhoneNumber = async () => {
     if (!done) {
         return false;
     }
+    await sleep(500);
     done = await clickOnButton('button[type="submit"]');
     if (!done) {
         return false;
     }
     user.status = "phone-nubmer-added"
-    await sendMessage(type = "update-user");
+    await sendMessagefromOpenAI(type = "update-user");
     return true;
 }
 
@@ -262,19 +256,23 @@ const enterCode = async () => {
         return false;
     }
     user.status = "done"
-    await sendMessage(type = "update-user");
+    await sendMessagefromOpenAI(type = "update-user");
 }
 
 const openAIWelcomeMessage = async () => {
     await clickOnButtons('.btn.relative.btn-neutral.ml-auto');
     await clickOnButtons('.btn.relative.btn-neutral.ml-auto');
-    const done = await clickOnButtons('.btn.relative.btn-primary.ml-auto');
+    let done = await clickOnButtons('.btn.relative.btn-primary.ml-auto');
     if (done) {
         clearInterval(openai_intervals.handleOpenAI);
-        const textarea = document.querySelector(`textarea.m-0.w-full.resize-none.border-0.bg-transparent.p-0.pr-7.focus\\:ring-0.focus-visible\\:ring-0.dark\\:bg-transparent.pl-2.md\\:pl-0`);
-        textarea.value = `Hi ChatGPT my name is ${user.first_name}`;
-        await simulateKeyPressAndRelease(textarea, key = 'Enter', code = 'Enter', keyCode = 13, charCode = 13);
-        await sendMessage(type = "closeCurrentTab");
+        done = await fillInput('#prompt-textarea', `Hi ChatGPT my name is ${user.first_name}`);
+        if (!done) {
+            return false;
+        }
+        const textarea = document.getElementById('prompt-textarea').nextElementSibling;
+        const button = textarea.nextElementSibling;
+        await simulateMouseEvents(button);
+        await sendMessagefromOpenAI(type = "closeCurrentTab");
     }
 }
 
@@ -284,7 +282,6 @@ const handleOpenAI = async () => {
     if (!automation) {
         return;
     }
-    openAIAddEventListener();
     try {
         let errorElement = document.querySelector('[class*="error"], [data-error-code*="blocked"]');
         let result = await browser.storage.local.get("currentUser");
@@ -292,65 +289,61 @@ const handleOpenAI = async () => {
         if (errorElement) {
             if (document.body.textContent.includes("The user already exists")) {
                 user.status = "user-already-exists";
-                await sendMessage(type = "update-user");
-                await sendMessage(type = "closeCurrentTab");
+                await sendMessagefromOpenAI(type = "update-user");
+                await sendMessagefromOpenAI(type = "closeCurrentTab");
             }
-            return;
-        }
-
-        if (!user) {
             return;
         }
         switch (user.status) {
             case "signup":
                 if (!createYourAccount()) {
-                    await sendMessage(type = "log-error", error = "Could not create account");
+                    await sendMessagefromOpenAI(type = "log-error", error = "Could not create account");
                 }
                 break;
             case "signup-e":
                 if (!createYourAccountPassword()) {
-                    await sendMessage(type = "log-error", error = "signup-e: Could not enter Your Password");
+                    await sendMessagefromOpenAI(type = "log-error", error = "signup-e: Could not enter Your Password");
                 }
                 break;
             case "signup-p":
                 if (!verifyYourEmail()) {
-                    await sendMessage(type = "log-error", error = "Could not Verify Your Email");
+                    await sendMessagefromOpenAI(type = "log-error", error = "Could not Verify Your Email");
                 }
                 break;
             case "password-sent":
                 if (automation) {
-                    await sendMessage(type = "closeCurrentTab");
+                    await sendMessagefromOpenAI(type = "closeCurrentTab");
                 }
                 break;
             //----
             case "login":
                 if (!loginYourAccount()) {
-                    await sendMessage(type = "log-error", error = "Could not create account");
+                    await sendMessagefromOpenAI(type = "log-error", error = "Could not create account");
                 }
                 break;
             case "login-e":
                 if (!loginYourAccountPassword()) {
-                    await sendMessage(type = "log-error", error = "login-e: Could not enter Your Password");
+                    await sendMessagefromOpenAI(type = "log-error", error = "login-e: Could not enter Your Password");
                 }
                 break;
             case "login-p":
                 if (!tellUsAboutYou()) {
-                    await sendMessage(type = "log-error", error = "Could not Tell us about you");
+                    await sendMessagefromOpenAI(type = "log-error", error = "Could not Tell us about you");
                 }
                 break;
             case "login-n":
                 if (!verifyYourPhoneNumber()) {
-                    await sendMessage(type = "log-error", error = "Could not verify user phone number");
+                    await sendMessagefromOpenAI(type = "log-error", error = "Could not verify user phone number");
                 }
                 break;
             case "phone-nubmer-added":
                 if (!enterCode()) {
-                    await sendMessage(type = "log-error", error = "Could not Enter code");
+                    await sendMessagefromOpenAI(type = "log-error", error = "Could not Enter code");
                 }
                 break;
             case "done":
                 if (!openAIWelcomeMessage()) {
-                    await sendMessage(type = "log-error", error = "Could not openAI Welcome Message");
+                    await sendMessagefromOpenAI(type = "log-error", error = "Could not openAI Welcome Message");
                 }
                 break;
             //----
@@ -370,7 +363,8 @@ const openai_intervals = {
     handleOpenAI: null
 };
 
-function onOpenAILoad() {
+const onOpenAILoad = async () => {
+    openAIAddEventListener();
     openai_intervals.handleOpenAI = setInterval(handleOpenAI, 500);
 }
 

@@ -77,6 +77,10 @@ browser.runtime.onMessage.addListener(async (message) => {
             user.tabId = tab.id;
             await updateCurrentUser(user);
             break;
+        case 'update-user-status':
+            user.status = message.status;
+            await updateCurrentUser(user);
+            break;
         case 'update-user':
             await updateCurrentUser(user);
             switch (user.status) {
@@ -112,7 +116,6 @@ browser.runtime.onMessage.addListener(async (message) => {
             break;
         case 'smscode':
             if (smscodeSet.has(message.smscode)) {
-                await browser.storage.local.set({ smscode: "" });
                 return;
             }
             smscodeSet.add(message.smscode);
@@ -122,7 +125,6 @@ browser.runtime.onMessage.addListener(async (message) => {
         case 'clear-all-data':
             await clearAllData();
             await browser.tabs.sendMessage(facebookTab.id, { type: 'clear-all-data' });
-            // await browser.tabs.sendMessage(smsTab.id, { type: 'clear-all-data' });
             break;
         case 'closeCurrentTab':
             await browser.windows.update(facebookWindow.id, { focused: true });
@@ -131,7 +133,7 @@ browser.runtime.onMessage.addListener(async (message) => {
             for (const window of windows) {
                 for (const tab of window.tabs) {
                     if (tab.id == user.tabId) {
-                        await sleep(2000);
+                        await sleep(5000);
                         await browser.tabs.remove(tab.id);
                     }
                 }

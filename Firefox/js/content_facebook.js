@@ -1,7 +1,6 @@
-const sendMessage = async (type, user) => {
+const sendMessagefromFacebook = async (type, user) => {
     await browser.runtime.sendMessage({ type: type, user: user });
 }
-
 
 const createStyleElement = async () => {
     const style = document.createElement("style");
@@ -113,7 +112,7 @@ const addButtonToNotes = async (css_class, text, message, label, click_done) => 
         let existingButton = matchingElement.querySelector(`button.${css_class}`);
         if (!existingButton) {
             let btn = document.createElement("button");
-            btn.innerHTML = text;
+            btn.textContent = text;
             btn.classList.add(css_class); // add the class to the button
             btn.addEventListener('click', async () => {
                 const messageSent = await sendFacebookMessage(message);
@@ -223,7 +222,7 @@ https://imgtr.ee/images/2023/05/18/280Kn.jpg
     await addLabel("--");
     await sendMultipleFacebookMessages(messages);
     message.user.status = "password-sent"
-    await sendMessage("update-user", message.user);
+    await sendMessagefromFacebook("update-user", message.user);
 };
 
 const sendMessageFacebook_signup_v = new Set();
@@ -243,7 +242,7 @@ https://chat.openai.com/auth/login`
     ];
     await sendMultipleFacebookMessages(messages, true);
     message.user.status = "user-already-exists-sent"
-    await sendMessage(type = "update-user", message.user);
+    await sendMessagefromFacebook(type = "update-user", message.user);
 };
 
 const sendMessageFacebook_done = new Set();
@@ -357,7 +356,7 @@ const addGptPassButton = async (span) => {
             if (selectedText) {
                 user.password = selectedText;
             }
-            await sendMessage("new_user", user);
+            await sendMessagefromFacebook("new_user", user);
         });
         span.appendChild(button);
     } catch (err) {

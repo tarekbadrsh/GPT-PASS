@@ -47,8 +47,6 @@ class Number {
 */
 //--- sms api 
 async function handleUserNumbers(user) {
-    const { numbers = [] } = await browser.storage.local.get('numbers');
-
     // Check if the user is already assigned to a number
     const assignedNumber = numbers.find(number => number.users.some(u => u.email === user.email));
 
@@ -76,7 +74,6 @@ async function handleUserNumbers(user) {
                 assignedNumber.users[userIndex] = assignedUser;
 
                 // Update local storage for numbers
-                await browser.storage.local.set({ numbers });
             }
         }
     } else {
@@ -92,7 +89,6 @@ async function handleUserNumbers(user) {
             suitableNumber.users.push(user);
 
             // Update local storage for numbers
-            await browser.storage.local.set({ numbers });
         } else {
             // Request a new number
             const result = await requestNewNumber();
@@ -108,7 +104,6 @@ async function handleUserNumbers(user) {
 
             // Add the new number to the numbers list and update local storage
             numbers.push(newNumber);
-            await browser.storage.local.set({ numbers });
         }
     }
     updateCurrentUser(user);
@@ -161,11 +156,10 @@ const isSixDigitNumber = (value) => {
     return regex.test(value);
 };
 
-async function handleSmsActivate() {
+const handleSmsActivate = async () => {
     let phoneElement = document.querySelector(".activate-grid-item__numberq");
     let phone_number = ""
     if (!phoneElement) {
-        await browser.storage.local.set({ phone_number });
         return;
     }
     phone_number = phoneElement.innerText.replace(/\D/g, "");
@@ -179,15 +173,13 @@ async function handleSmsActivate() {
                 country_code = number[1];
             }
         });
-
-
-        browser.runtime.sendMessage({ type: "phone_number", phone_number: phone_number, country_code: country_code });
+        await browser.runtime.sendMessage({ type: "phone_number", phone_number: phone_number, country_code: country_code });
     }
     const smscodeElement = document.querySelector(".underline-orange.cursor-pointer");
     if (!smscodeElement || !isSixDigitNumber(smscodeElement.textContent)) {
         return;
     }
-    browser.runtime.sendMessage({ type: "smscode", smscode: smscodeElement.textContent });
+    await browser.runtime.sendMessage({ type: "smscode", smscode: smscodeElement.textContent });
 };
 
 
