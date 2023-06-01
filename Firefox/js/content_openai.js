@@ -126,6 +126,7 @@ const verifyYourEmail = async () => {
     }
     user.status = "signup-v"
     await sendMessagefromOpenAI(type = "update-user");
+    await sendMessagefromOpenAI(type = "closeCurrentTab");
     return true;
 }
 
@@ -235,7 +236,7 @@ const verifyYourPhoneNumber = async () => {
     if (!done) {
         return false;
     }
-    await sleep(500);
+    await sleep(1000);
     done = await clickOnButton('button[type="submit"]');
     if (!done) {
         return false;
@@ -258,6 +259,7 @@ const enterCode = async () => {
     }
     user.status = "done"
     await sendMessagefromOpenAI(type = "update-user");
+    return true;
 }
 
 const openAIWelcomeMessage = async () => {
@@ -270,10 +272,11 @@ const openAIWelcomeMessage = async () => {
         if (!done) {
             return false;
         }
-        const textarea = document.getElementById('prompt-textarea').nextElementSibling;
+        const textarea = document.getElementById('prompt-textarea');
         const button = textarea.nextElementSibling;
         await simulateMouseEvents(button);
         await sendMessagefromOpenAI(type = "closeCurrentTab");
+        return true;
     }
 }
 
@@ -309,11 +312,6 @@ const handleOpenAI = async () => {
             case "signup-p":
                 if (!verifyYourEmail()) {
                     await sendMessagefromOpenAI(type = "log-error", error = "Could not Verify Your Email");
-                }
-                break;
-            case "password-sent":
-                if (automation) {
-                    await sendMessagefromOpenAI(type = "closeCurrentTab");
                 }
                 break;
             //----
