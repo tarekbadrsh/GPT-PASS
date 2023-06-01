@@ -4,8 +4,8 @@
 
 const generateRandomBirthDate = () => {
     const randomYear = Math.floor(Math.random() * (1995 - 1970 + 1)) + 1970;
-    const randomMonth = (Math.floor(Math.random() * 12) + 1).toString().padStart(2, '0');
-    const randomDay = (Math.floor(Math.random() * 25) + 1).toString().padStart(2, '0');
+    const randomMonth = (Math.floor(Math.random() * 11) + 1).toString().padStart(2, '0');
+    const randomDay = (Math.floor(Math.random() * 11) + 1).toString().padStart(2, '0');
     return `${randomMonth}/${randomDay}/${randomYear}`;
 }
 

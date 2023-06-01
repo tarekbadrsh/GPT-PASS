@@ -40,6 +40,7 @@ const clickOnButton = async (selector, text) => {
 const fillInput = async (selector, value) => {
     const targetElement = document.querySelector(selector);
     if (targetElement && targetElement.value.length < 1) {
+        await simulateMouseEvents(targetElement);
         targetElement.value = value;
         await sleep(100);
         let event = new Event('input', { bubbles: true });
@@ -190,7 +191,7 @@ const tellUsAboutYou = async () => {
     if (!done) {
         return false;
     }
-    done = await fillInput('input[placeholder="MM/DD/YYYY"]', user.birth_date);
+    done = await fillInput('input[placeholder="Birthday"]', user.birth_date);
     if (!done) {
         return false;
     }
