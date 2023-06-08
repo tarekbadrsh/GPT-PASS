@@ -191,6 +191,9 @@ const sms_intervals = {
 
 function onSmsLoad() {
     sms_intervals.handleSmsActivate = setInterval(handleSmsActivate, 500);
+    setInterval(function () {
+        location.reload();
+    }, 10000); // 10000 milliseconds = 10 seconds
 }
 
 

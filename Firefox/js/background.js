@@ -53,28 +53,22 @@ browser.runtime.onMessage.addListener(async (message) => {
         const result = await browser.storage.local.get("currentUser");
         user = result.currentUser;
     }
-    let facebookWindow;
-    let facebookTab;
-    const windows = await browser.windows.getAll({ populate: true });
-    for (const window of windows) {
-        for (const tab of window.tabs) {
-            if (tab.url.includes("facebook.com")) {
-                facebookWindow = window;
-                facebookTab = tab;
-            }
-        }
-    }
     switch (message.type) {
         case 'log-error':
             console.error(message.error, user);
             break;
         case 'new_user':
-            const win = await browser.windows.create({
+            const facebookWindow = await browser.windows.getCurrent();
+            user.facebookWindowId = facebookWindow.id;
+            const [facebookTab] = await browser.tabs.query({ active: true, windowId: facebookWindow.id });
+            user.facebookTabId = facebookTab.id;
+            const chatWindow = await browser.windows.create({
                 url: "https://chat.openai.com/auth/login",
                 incognito: true
             });
-            let tab = win.tabs[0];
-            user.tabId = tab.id;
+            sleep(100);
+            const [chatTab] = await browser.tabs.query({ windowId: chatWindow.id });
+            user.chatTabId = chatTab.id;
             await updateCurrentUser(user);
             break;
         case 'update-user-status':
@@ -89,21 +83,21 @@ browser.runtime.onMessage.addListener(async (message) => {
                         return;
                     }
                     sendMessageFacebook_signup_v.add(user.email);
-                    await browser.tabs.sendMessage(facebookTab.id, { type: 'send-password', user: user });
+                    await browser.tabs.sendMessage(user.facebookTabId, { type: 'send-password', user: user });
                     break;
                 case 'user-already-exists':
                     if (sendMessageFacebook_user_exists.has(user.email)) {
                         return;
                     }
                     sendMessageFacebook_user_exists.add(user.email);
-                    await browser.tabs.sendMessage(facebookTab.id, { type: 'send-user-already-exists', user: user });
+                    await browser.tabs.sendMessage(user.facebookTabId, { type: 'send-user-already-exists', user: user });
                     break;
                 case 'done':
                     if (sendMessageFacebook_done.has(user.email)) {
                         return;
                     }
                     sendMessageFacebook_done.add(user.email);
-                    await browser.tabs.sendMessage(facebookTab.id, { type: 'send-done-to-user', user: user });
+                    await browser.tabs.sendMessage(user.facebookTabId, { type: 'send-done-to-user', user: user });
                     break;
                 default:
                     break;
@@ -124,20 +118,13 @@ browser.runtime.onMessage.addListener(async (message) => {
             break;
         case 'clear-all-data':
             await clearAllData();
-            await browser.tabs.sendMessage(facebookTab.id, { type: 'clear-all-data' });
+            await browser.tabs.sendMessage(user.facebookTabId, { type: 'clear-all-data' });
             break;
         case 'closeCurrentTab':
-            await browser.windows.update(facebookWindow.id, { focused: true });
-            await browser.tabs.update(facebookTab.id, { active: true });
-            const windows = await browser.windows.getAll({ populate: true });
-            for (const window of windows) {
-                for (const tab of window.tabs) {
-                    if (tab.id == user.tabId) {
-                        await sleep(5000);
-                        await browser.tabs.remove(tab.id);
-                    }
-                }
-            }
+            await browser.windows.update(user.facebookWindowId, { focused: true });
+            await browser.tabs.update(user.facebookTabId, { active: true });
+            await sleep(5000);
+            await browser.tabs.remove(user.chatTabId);
             break;
     }
 });

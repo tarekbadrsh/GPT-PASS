@@ -27,7 +27,9 @@ const generateHash = async (str) => {
 class User {
     constructor(facebookUrl, instagramUrl, email, first_name, last_name) {
         this.status = "";
-        this.tabId = "";
+        this.chatTabId = "";
+        this.facebookWindowId = "";
+        this.facebookTabId = "";
         this.facebookUrl = facebookUrl;
         this.instagramUrl = instagramUrl;
         this.email = email;
