@@ -5,28 +5,26 @@ const sendMessagefromFacebook = async (type, user) => {
 const createStyleElement = async () => {
     const style = document.createElement("style");
     style.textContent = `
-      .gpt-pass-button {
-        background-color: red;
+      .gpt-login-button {
+        background-color: white;
         border: none;
-        border-radius: 50%;
+        border-radius: 12%;
+        color: rgb(10, 120, 190);
+        cursor: pointer;
+        font-size: 16px;
+        margin-left: 5px;
+      }
+
+      .gpt-signup-button {
+        background-color: rgb(10, 120, 190);
+        border: none;
+        border-radius: 12%;
         color: white;
         cursor: pointer;
-        font-size: 20px;
-        height: 20px;
+        font-size: 16px;
         margin-left: 5px;
-        padding: 0;
-        width: 20px;
       }
-
-      .gpt-pass-button button:active {
-        background-color: green;
-      }
-
-      .gpt-pass-button button:focus {
-        outline: none;
-      }
-  
-    `;
+`;
     document.head.appendChild(style);
 };
 
@@ -340,25 +338,41 @@ const extractUser = async (text) => {
     const user_name = await processUserName();
     let user = new User(window.location.href, user_name.instagramUrl, email, user_name.first_name, user_name.last_name);
     await user.SetPassword();
-    user.status = "new_user";
     return user;
 };
 
 const addGptPassButton = async (span) => {
     try {
         span.classList.add("gpt-pass-spen");
-        const button = document.createElement("button");
-        button.classList.add("gpt-pass-button");
 
-        button.addEventListener("click", async (e) => {
+        const loginButton = document.createElement("button");
+        loginButton.classList.add("gpt-login-button");
+        loginButton.textContent = "login";
+        loginButton.addEventListener("click", async (e) => {
             const selectedText = window.getSelection().toString();
             let user = await extractUser(span.textContent);
             if (selectedText) {
                 user.password = selectedText;
             }
+            user.status = "to-login";
             await sendMessagefromFacebook("new_user", user);
         });
-        span.appendChild(button);
+
+        const signupButton = document.createElement("button");
+        signupButton.classList.add("gpt-signup-button");
+        signupButton.textContent = "signup";
+        signupButton.addEventListener("click", async (e) => {
+            const selectedText = window.getSelection().toString();
+            let user = await extractUser(span.textContent);
+            if (selectedText) {
+                user.password = selectedText;
+            }
+            user.status = "to-signup";
+            await sendMessagefromFacebook("new_user", user);
+        });
+
+        span.parentNode.appendChild(loginButton);
+        span.parentNode.appendChild(signupButton);
     } catch (err) {
         console.error(`Error sending user: ${err}`);
     }

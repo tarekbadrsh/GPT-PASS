@@ -52,19 +52,6 @@ const fillInput = async (selector, value) => {
 }
 
 const openAIAddEventListener = () => {
-    const allBtns = document.getElementsByClassName('btn relative btn-primary');
-    for (let i = 0; i < allBtns.length; i++) {
-        const btn = allBtns[i];
-        if (btn.textContent.trim() == "Log in") {
-            btn.addEventListener('click', async () => {
-                await browser.runtime.sendMessage({ type: "update-user-status", "status": "login" });
-            });
-        } else if (btn.textContent.trim() == "Sign up") {
-            btn.addEventListener('click', async () => {
-                await browser.runtime.sendMessage({ type: "update-user-status", "status": "signup" });
-            });
-        }
-    }
     const passTxt = document.querySelector('input[name="password"]');
     if (passTxt) {
         passTxt.addEventListener("change", async () => {
@@ -75,6 +62,19 @@ const openAIAddEventListener = () => {
             await sendMessagefromOpenAI(type = "update-user");
         });
     }
+}
+
+const toCreateYourAccount = async () => {
+    if (!document.body.textContent.includes("Welcome to ChatGPT")) {
+        return true;
+    }
+    let done = await clickOnButton('.btn.relative.btn-primary:nth-of-type(2)');
+    if (!done) {
+        return false;
+    }
+    user.status = "signup"
+    await sendMessagefromOpenAI(type = "update-user");
+    return true;
 }
 
 const createYourAccount = async () => {
@@ -119,14 +119,26 @@ const verifyYourEmail = async () => {
     if (!document.body.textContent.includes("Verify your email")) {
         return true;
     }
-    let done = false;
-    done = await clickOnButtons('.onb-resend-email-btn');
+    let done = await clickOnButtons('.onb-resend-email-btn:nth-of-type(1)');
     if (!done) {
         return false;
     }
     user.status = "signup-v"
     await sendMessagefromOpenAI(type = "update-user");
     await sendMessagefromOpenAI(type = "closeCurrentTab");
+    return true;
+}
+
+const toLoginYourAccount = async () => {
+    if (!document.body.textContent.includes("Welcome to ChatGPT")) {
+        return true;
+    }
+    let done = await clickOnButton('.btn.relative.btn-primary:nth-of-type(1)');
+    if (!done) {
+        return false;
+    }
+    user.status = "login"
+    await sendMessagefromOpenAI(type = "update-user");
     return true;
 }
 
@@ -263,9 +275,9 @@ const enterCode = async () => {
 }
 
 const openAIWelcomeMessage = async () => {
-    await clickOnButtons('.btn.relative.btn-neutral.ml-auto');
-    await clickOnButtons('.btn.relative.btn-neutral.ml-auto');
-    let done = await clickOnButtons('.btn.relative.btn-primary.ml-auto');
+    await clickOnButton('.btn.relative.btn-neutral.ml-auto:nth-of-type(1)');
+    await clickOnButton('.btn.relative.btn-neutral.ml-auto');
+    let done = await clickOnButton('.btn.relative.btn-primary.ml-auto');
     if (done) {
         clearInterval(openai_intervals.handleOpenAI);
         done = await fillInput('#prompt-textarea', `Hi ChatGPT my name is ${user.first_name}`);
@@ -299,6 +311,11 @@ const handleOpenAI = async () => {
             return;
         }
         switch (user.status) {
+            case "to-signup":
+                if (!toCreateYourAccount()) {
+                    await sendMessagefromOpenAI(type = "log-error", error = "Could not signup");
+                }
+                break;
             case "signup":
                 if (!createYourAccount()) {
                     await sendMessagefromOpenAI(type = "log-error", error = "Could not create account");
@@ -314,10 +331,15 @@ const handleOpenAI = async () => {
                     await sendMessagefromOpenAI(type = "log-error", error = "Could not Verify Your Email");
                 }
                 break;
-            //----
+            //---- 
+            case "to-login":
+                if (!toLoginYourAccount()) {
+                    await sendMessagefromOpenAI(type = "log-error", error = "Could not login");
+                }
+                break;
             case "login":
                 if (!loginYourAccount()) {
-                    await sendMessagefromOpenAI(type = "log-error", error = "Could not create account");
+                    await sendMessagefromOpenAI(type = "log-error", error = "Could not login Your Account");
                 }
                 break;
             case "login-e":
