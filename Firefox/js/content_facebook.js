@@ -113,15 +113,17 @@ const addButtonToNotes = async (css_class, text, message, label, click_done) => 
             btn.textContent = text;
             btn.classList.add(css_class); // add the class to the button
             btn.addEventListener('click', async () => {
-                const messageSent = await sendFacebookMessage(message);
-                if (messageSent) {
-                    if (label) {
-                        await removeLables();
-                        await addLabel(label);
-                    }
-                    if (click_done) {
-                        await clickMoveToDone();
-                    }
+                if (message) {
+                    await sendFacebookMessage(message);
+                    sleep(200);
+                }
+                if (label) {
+                    await removeLables();
+                    await addLabel(label);
+                    sleep(100);
+                }
+                if (click_done) {
+                    await clickMoveToDone();
                 }
             });
             matchingElement.appendChild(btn);
@@ -161,13 +163,6 @@ https://imgtr.ee/images/2023/05/21/2fJ0U.png`,
         false
     );
 
-    await addButtonToNotes("outlook_btn",
-        "outlook",
-        "ممكن من فضلك تبعتلي ايميل تاني ال Outlook@ و ال Hotmail@ فيهم مشكلة مش بنقدر نعمل بيهم حسابات",
-        "--",
-        true
-    );
-
     await addButtonToNotes("frnd_acc_btn",
         "🤎صاحب الميل يبعتلي🤎",
         "أنا اسف جدا ... ممكن من فضلك تخلي صاحب الإيميل يبعتلي عشان جايلي طلبات كتير🙏🏻",
@@ -192,6 +187,37 @@ https://twitter.com/tarekbadrsh/status/1641394327015370754
     
 https://imgtr.ee/images/2023/05/18/280Kn.jpg`,
         "--",
+        true);
+
+    await addButtonToNotes("welcome",
+        "👋👋اهلا وسهلا👋👋",
+        `👋 اهلا وسهلا!  
+ومعذرة علي التأخير انا جايلي رسايل كتير جدا
+من فضلك ابعت الايميل الخاص بيك (ايميل واحد فقط)
+*فقط للتأكيد* لو عندك اكونت ChatGPT بالفعل وواقف علي رقم الموبايل الأوروبي
+فممكن من فضلك تبعتلي الميل والباسورد في رسايل منفصلة عشان احط رقم اوروبي واشغلهولك
+وممكن استأذنك تطول بالك علينا عشان فيه ناس كتير فممكن نتأخر في الرد كام اسبوع
+—
+🤖 Auto message 🤖
+
+https://www.youtube.com/c/tarekBadrsh
+Tarek Badr طارق بدر 
+Gothenburg, Sweden`,
+        "--",
+        true);
+
+    await addButtonToNotes("youHaveAccount",
+        "🤷‍♂️🤷‍♂️🤷‍♂️انت عندك اكونت🤷‍♂️🤷‍♂️🤷‍♂️",
+        `انت عندك اكونت بالفعل وشغال تمام
+- انت هتحتاج تغير الباسورد ... بص علي التويته ديه عشان تعرف ازاي 🔐
+https://twitter.com/tarekbadrsh/status/1619418114340585472`,
+        "done",
+        true);
+
+    await addButtonToNotes("urgent",
+        "🚨🚨urgent🚨🚨",
+        null,
+        "urgent 🚨",
         true);
     clearInterval(facebook_intervals.createStyleElement);
 }
