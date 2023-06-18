@@ -157,6 +157,10 @@ const isSixDigitNumber = (value) => {
 };
 
 const handleSmsActivate = async () => {
+    let result = await browser.storage.local.get("automation");
+    if (!result.automation) {
+        return;
+    }
     let phoneElement = document.querySelector(".activate-grid-item__numberq");
     let phone_number = ""
     if (!phoneElement) {
@@ -189,11 +193,14 @@ const sms_intervals = {
 };
 
 
-function onSmsLoad() {
+const onSmsLoad = async () => {
     sms_intervals.handleSmsActivate = setInterval(handleSmsActivate, 500);
-    setInterval(function () {
-        location.reload();
-    }, 5000); // 1000 milliseconds = 1 second
+    setInterval(async function () {
+        let result = await browser.storage.local.get("automation");
+        if (result.automation) {
+            location.reload();
+        }
+    }, 10000); // 1000 milliseconds = 1 second
 }
 
 

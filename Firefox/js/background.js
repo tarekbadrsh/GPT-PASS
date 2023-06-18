@@ -123,7 +123,7 @@ browser.runtime.onMessage.addListener(async (message) => {
         case 'closeCurrentTab':
             await browser.windows.update(user.facebookWindowId, { focused: true });
             await browser.tabs.update(user.facebookTabId, { active: true });
-            await sleep(5000);
+            await sleep(message.duration);
             await browser.tabs.remove(user.chatTabId);
             break;
     }

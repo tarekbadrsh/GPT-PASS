@@ -125,7 +125,7 @@ const verifyYourEmail = async () => {
     }
     user.status = "signup-v"
     await sendMessagefromOpenAI(type = "update-user");
-    await sendMessagefromOpenAI(type = "closeCurrentTab");
+    await sendMessagefromOpenAI(type = "closeCurrentTab", duration = 3000);
     return true;
 }
 
@@ -287,15 +287,14 @@ const openAIWelcomeMessage = async () => {
         const textarea = document.getElementById('prompt-textarea');
         const button = textarea.nextElementSibling;
         await simulateMouseEvents(button);
-        await sendMessagefromOpenAI(type = "closeCurrentTab");
+        await sendMessagefromOpenAI(type = "closeCurrentTab", duration = 7000);
         return true;
     }
 }
 
 const handleOpenAI = async () => {
     let result = await browser.storage.local.get("automation");
-    const automation = result.automation;
-    if (!automation) {
+    if (!result.automation) {
         return;
     }
     try {
@@ -306,7 +305,7 @@ const handleOpenAI = async () => {
             if (document.body.textContent.includes("The user already exists")) {
                 user.status = "user-already-exists";
                 await sendMessagefromOpenAI(type = "update-user");
-                await sendMessagefromOpenAI(type = "closeCurrentTab");
+                await sendMessagefromOpenAI(type = "closeCurrentTab", duration = 3000);
             }
             return;
         }
