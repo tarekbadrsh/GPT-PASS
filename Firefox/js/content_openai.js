@@ -287,7 +287,7 @@ const openAIWelcomeMessage = async () => {
         const textarea = document.getElementById('prompt-textarea');
         const button = textarea.nextElementSibling;
         await simulateMouseEvents(button);
-        await sendMessagefromOpenAI(type = "closeCurrentTab", duration = 7000);
+        await sendMessagefromOpenAI(type = "closeCurrentTab", duration = 12000);
         return true;
     }
 }
