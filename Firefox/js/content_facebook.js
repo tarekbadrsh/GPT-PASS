@@ -24,6 +24,21 @@ const createStyleElement = async () => {
         font-size: 16px;
         margin-left: 5px;
       }
+
+      .gpt-facebook-button {
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        padding: 5px 10px;
+        font-size: 14px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin: 5px;
+        display: block;
+        width: max-content;
+    }
+
 `;
     document.head.appendChild(style);
 };
@@ -101,7 +116,7 @@ const sendMultipleFacebookMessages = async (messages, moveToDone = true, index =
     await sendMultipleFacebookMessages(messages, moveToDone, index + 1);
 }
 
-const addButtonToNotes = async (css_class, text, message, label, click_done) => {
+const addButtonToNotes = async (css_class, text, message, label, click_done, backgroundColor) => {
     let xpath = "//div[contains(text(), 'Notes')]";
     let matchingElement = document.evaluate(xpath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
 
@@ -111,7 +126,10 @@ const addButtonToNotes = async (css_class, text, message, label, click_done) => 
         if (!existingButton) {
             let btn = document.createElement("button");
             btn.textContent = text;
-            btn.classList.add(css_class); // add the class to the button
+            btn.classList.add(css_class);
+            btn.classList.add("gpt-facebook-button");
+            btn.style.backgroundColor = backgroundColor;
+
             btn.addEventListener('click', async () => {
                 if (message) {
                     await sendFacebookMessage(message);
@@ -142,7 +160,9 @@ const addResponseButtons = async () => {
 ---
 ممكن من فضلك تطول بالك عليا فيه رسايل كتير 🙌`,
         "num",
-        true);
+        true,
+        "#0B378C"
+    );
 
     await addButtonToNotes("wrong_password_btn",
         "🔴الباسورد غلط🔴",
@@ -151,7 +171,8 @@ const addResponseButtons = async () => {
 
 https://chat.openai.com/auth/login`,
         "--",
-        false
+        false,
+        "#CC1616"
     );
 
     await addButtonToNotes("wrong_password_btn",
@@ -167,7 +188,8 @@ https://imgtr.ee/images/2023/05/21/2fJ0U.png`,
         "🤎صاحب الميل يبعتلي🤎",
         "أنا اسف جدا ... ممكن من فضلك تخلي صاحب الإيميل يبعتلي عشان جايلي طلبات كتير🙏🏻",
         "done",
-        true
+        true,
+        "#6C4426"
     );
 
     await addButtonToNotes("gpt4_btn",
@@ -175,7 +197,10 @@ https://imgtr.ee/images/2023/05/21/2fJ0U.png`,
         `للاسف، مش بقدر اساعد في ChatGPT-4 🙏
 ممكن تشوف الي كتبته في التويته ديه
 https://twitter.com/tarekbadrsh/status/1641394327015370754
-`);
+`,
+        false,
+        false,
+        "#1DA1F2");
 
     await addButtonToNotes("activate_your_account",
         "🥦🥦اكتف الإيميل بتاعك🥦🥦",
@@ -187,7 +212,8 @@ https://twitter.com/tarekbadrsh/status/1641394327015370754
     
 https://imgtr.ee/images/2023/05/18/280Kn.jpg`,
         "--",
-        true);
+        true,
+        "#43662D");
 
     await addButtonToNotes("welcome",
         "👋👋اهلا وسهلا👋👋",
@@ -204,7 +230,8 @@ https://www.youtube.com/c/tarekBadrsh
 Tarek Badr طارق بدر 
 Gothenburg, Sweden`,
         "--",
-        true);
+        true,
+        "#ff0142");
 
     await addButtonToNotes("youHaveAccount",
         "🤷‍♂️🤷‍♂️🤷‍♂️انت عندك اكونت🤷‍♂️🤷‍♂️🤷‍♂️",
@@ -213,13 +240,23 @@ Gothenburg, Sweden`,
 - انت هتحتاج تغير الباسورد ... بص علي التويته ديه عشان تعرف ازاي 🔐
 https://twitter.com/tarekbadrsh/status/1619418114340585472`,
         "done",
-        true);
+        true,
+        "#164875");
 
     await addButtonToNotes("urgent",
         "🚨🚨urgent🚨🚨",
         null,
         "urgent 🚨",
-        true);
+        true,
+        "#EB5131");
+
+    await addButtonToNotes("done",
+        "✅✅done✅✅",
+        null,
+        "done",
+        true,
+        "#00B300");
+
     clearInterval(facebook_intervals.createStyleElement);
 }
 
@@ -285,15 +322,14 @@ const userDone = async (message) => {
         message.user.password,
         "https://chat.openai.com/chat",
         `- انا شغلت ليك الاكونت🤟🎉🎊
+*من فضلك اكد عليا انه اشتغل ومتتكسفش تبعتلي لو فيه مشكلة او مش شغال*
 
 - ديه فيدوهات عن الشات في قناة اليوتوب 🎥 
-
-ازاي بعمل حسابات للناس بسرعه!؟
-https://youtu.be/JKbIstFXB1Y
-
 ازاي تستعمله | 🤖ChatGPT
 https://youtu.be/OKCMfCdLqXA
 
+ازاي بعمل حسابات للناس بسرعه!؟
+https://youtu.be/JKbIstFXB1Y
 
 - انت هتحتاج تغير الباسورد ... بص علي التويته ديه عشان تعرف ازاي 🔐
 https://twitter.com/tarekbadrsh/status/1619418114340585472

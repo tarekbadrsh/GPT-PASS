@@ -96,12 +96,7 @@ button:hover {
 .button-clear-all:hover {
   background-color: #0c7fb0;
 }
-
-.checkbox-container {
-  display: flex;
-  align-items: center;
-  margin-bottom: 10px;
-}
+ 
 
 input[type="checkbox"] {
   margin-right: 5px;
@@ -119,12 +114,6 @@ input[type="checkbox"] {
 
 input[type="checkbox"]:checked {
   background-color: #1da1f2;
-}
-
-label[for="auto-fill-checkbox"] {
-  font-size: 14px;
-  display: inline-block;
-  margin-left: 5px;
 }
 
 #clear-all-button {

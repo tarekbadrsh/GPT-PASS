@@ -1,7 +1,7 @@
 let user = null;
 
-const sendMessagefromOpenAI = async (type, error) => {
-    await browser.runtime.sendMessage({ type: type, user: user, error: error });
+const sendMessagefromOpenAI = async (type, error, duration) => {
+    await browser.runtime.sendMessage({ type: type, user: user, error: error, duration: duration });
 }
 
 const clickOnButtons = async (selector, text) => {
@@ -125,7 +125,7 @@ const verifyYourEmail = async () => {
     }
     user.status = "signup-v"
     await sendMessagefromOpenAI(type = "update-user");
-    await sendMessagefromOpenAI(type = "closeCurrentTab", duration = 3000);
+    await sendMessagefromOpenAI(type = "closeCurrentTab", null, duration = 1000);
     return true;
 }
 
@@ -287,7 +287,7 @@ const openAIWelcomeMessage = async () => {
         const textarea = document.getElementById('prompt-textarea');
         const button = textarea.nextElementSibling;
         await simulateMouseEvents(button);
-        await sendMessagefromOpenAI(type = "closeCurrentTab", duration = 12000);
+        await sendMessagefromOpenAI(type = "closeCurrentTab", null, duration = 5000);
         return true;
     }
 }
@@ -305,7 +305,7 @@ const handleOpenAI = async () => {
             if (document.body.textContent.includes("The user already exists")) {
                 user.status = "user-already-exists";
                 await sendMessagefromOpenAI(type = "update-user");
-                await sendMessagefromOpenAI(type = "closeCurrentTab", duration = 3000);
+                await sendMessagefromOpenAI(type = "closeCurrentTab", null, duration = 1000);
             }
             return;
         }
