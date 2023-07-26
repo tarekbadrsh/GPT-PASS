@@ -102,7 +102,7 @@ const sendFacebookMessage = async (message) => {
     return false;
 }
 
-const sendMultipleFacebookMessages = async (messages, moveToDone = true, index = 0) => {
+const sendMultipleFacebookMessages = async (messages, moveToDone, index = 0) => {
     if (index >= messages.length && moveToDone) {
         await sleep(300);
         await clickMoveToDone();
@@ -160,7 +160,7 @@ const addResponseButtons = async () => {
 ---
 ممكن من فضلك تطول بالك عليا فيه رسايل كتير 🙌`,
         "num",
-        true,
+        false,
         "#0B378C");
 
     await addButtonToNotes("wrong_password_btn",
@@ -175,7 +175,7 @@ https://chat.openai.com/auth/login`,
 
     await addButtonToNotes("frnd_acc_btn",
         "🤎صاحب الميل يبعتلي🤎",
-        "أنا اسف جدا ... ممكن من فضلك تخلي صاحب الإيميل يبعتلي عشان جايلي طلبات كتير🙏🏻",
+        "أنا اسف جدا ... ممكن من فضلك تخلي صاحب الإيميل يبعتلي عشان جايلي رسايل كتير🙏🏻",
         "done",
         true,
         "#6C4426");
@@ -218,7 +218,7 @@ https://drive.google.com/file/d/1SoEQy4cr8k8tLG0_Hx5CHJHSws0HD1xX/view?usp=shari
 
 https://drive.google.com/file/d/1lHyQE0KxGfR_2zlWBK1JuXG41ArgYRk3/view`,
         "--",
-        true,
+        false,
         "#43662D");
 
     await addButtonToNotes("activate_your_account",
@@ -231,13 +231,12 @@ https://drive.google.com/file/d/1lHyQE0KxGfR_2zlWBK1JuXG41ArgYRk3/view`,
 
 https://drive.google.com/file/d/1lHyQE0KxGfR_2zlWBK1JuXG41ArgYRk3/view`,
         "--",
-        true,
+        false,
         "#43662D");
 
     await addButtonToNotes("welcome",
         "👋👋اهلا وسهلا👋👋",
-        `👋 اهلا وسهلا!  
-معذرة لو اتأخرت في الرد انا جايلي رسايل كتير جدا!
+        `👋 اهلا وسهلا!
 من فضلك ابعت الايميل الخاص بيك (ايميل واحد فقط)
 *فقط للتأكيد* لو عندك اكونت ChatGPT بالفعل وواقف علي رقم الموبايل الأوروبي
 فممكن من فضلك تبعتلي الميل والباسورد في رسايل منفصلة عشان احط رقم اوروبي واشغلهولك
@@ -249,12 +248,12 @@ https://www.youtube.com/c/tarekBadrsh
 Tarek Badr طارق بدر 
 Gothenburg, Sweden`,
         "--",
-        true,
+        false,
         "#ff0142");
 
     await addButtonToNotes("youHaveAccount",
-        "🤷‍♂️🤷‍♂️🤷‍♂️انت عندك اكونت🤷‍♂️🤷‍♂️🤷‍♂️",
-        `معذرة لو اتأخرت في الرد انا جايلي رسايل كتير جدا!
+        "!!!انت عندك اكونت!!!",
+        `👋 اهلا وسهلا!
 انت عندك اكونت بالفعل وشغال تمام
 - انت هتحتاج تغير الباسورد ... بص علي التويته ديه عشان تعرف ازاي 🔐
 https://twitter.com/tarekbadrsh/status/1619418114340585472`,
@@ -266,7 +265,7 @@ https://twitter.com/tarekbadrsh/status/1619418114340585472`,
         "🚨🚨urgent🚨🚨",
         null,
         "urgent 🚨",
-        true,
+        false,
         "#EB5131");
 
     clearInterval(facebook_intervals.createStyleElement);
@@ -283,7 +282,6 @@ const facebookSendPassword = async (message) => {
         message.user.email,
         message.user.password,
         `👆ده الباسورد
-معذرة لو اتأخرت في الرد انا جايلي رسايل كتير جدا!
 من فضلك هما بعتولك ايميل شبه الصورة الي في اللينك
 دوس علي الزرار الأخضر عشان تاكتف الاكونت
 
@@ -293,7 +291,7 @@ const facebookSendPassword = async (message) => {
 https://drive.google.com/file/d/1lHyQE0KxGfR_2zlWBK1JuXG41ArgYRk3/view
 `];
     await addLabel("--");
-    await sendMultipleFacebookMessages(messages);
+    await sendMultipleFacebookMessages(messages, false);
     message.user.status = "password-sent"
     await sendMessagefromFacebook("update-user", message.user);
 };
@@ -308,7 +306,7 @@ const facebookUserAlreadyExists = async (message) => {
     await addLabel("--");
     const messages = [
         message.user.email,
-        `معذرة لو اتأخرت في الرد انا جايلي رسايل كتير جدا!
+        `👋 اهلا وسهلا!
 انت عندك اكونت بالفعل ...
 لو محتاج تفعله برقم اوروبي
 ممكن تبعتلي الإيميل والباسورد الصح في رسايل منفصلة عشان احط رقم اوروبي واشغلهولك!
@@ -316,7 +314,7 @@ const facebookUserAlreadyExists = async (message) => {
 
 https://chat.openai.com/auth/login`
     ];
-    await sendMultipleFacebookMessages(messages, true);
+    await sendMultipleFacebookMessages(messages, false);
     message.user.status = "user-already-exists-sent"
     await sendMessagefromFacebook(type = "update-user", message.user);
 };
@@ -345,7 +343,7 @@ https://youtu.be/OKCMfCdLqXA
 - انا هبقي شاكر جدا لو تقدر تنزل استوري او تويته ان اي حد محتاج اكونت يبعتلي اهلا وسهلا
 انا بحاول اعمل حسابات لأكبر قدر ممكن من الناس دلوقتي🙏`
     ];
-    await sendMultipleFacebookMessages(messages);
+    await sendMultipleFacebookMessages(messages, true);
 };
 
 const isEmailValid = (email) => {
