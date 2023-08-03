@@ -102,7 +102,7 @@ const sendFacebookMessage = async (message) => {
     return false;
 }
 
-const sendMultipleFacebookMessages = async (messages, moveToDone, index = 0) => {
+const sendMultipleFacebookMessages = async (messages, moveToDone = true, index = 0) => {
     if (index >= messages.length && moveToDone) {
         await sleep(300);
         await clickMoveToDone();
@@ -157,8 +157,10 @@ const addResponseButtons = async () => {
 
 كده لسه الاكونت مشتغلش
 فاضل ان انا احط رقم موبايل اوروبي واشغله
----
-ممكن من فضلك تطول بالك عليا فيه رسايل كتير 🙌`,
+
+—
+🤖 Auto message 🤖
+`,
         "num",
         false,
         "#0B378C");
@@ -168,14 +170,22 @@ const addResponseButtons = async () => {
         `الباسورد غلط ... ممكن من فضلك تبعتلي الإيميل والباسورد الصح في رسايل منفصلة عشان احط رقم اوروبي واشغلهولك!
 وممكن تتأكد بنفسك لو عملت تسجيل دخول من اللينك ده وتقدر كمان تغير الباسورد
 
-https://chat.openai.com/auth/login`,
+https://chat.openai.com/auth/login
+
+—
+🤖 Auto message 🤖
+`,
         "--",
         false,
         "#CC1616");
 
     await addButtonToNotes("frnd_acc_btn",
         "🤎صاحب الميل يبعتلي🤎",
-        "أنا اسف جدا ... ممكن من فضلك تخلي صاحب الإيميل يبعتلي عشان جايلي رسايل كتير🙏🏻",
+        `أنا اسف جدا ... ممكن من فضلك تخلي صاحب الإيميل يبعتلي عشان جايلي رسايل كتير🙏🏻
+
+—
+🤖 Auto message 🤖
+`,
         "done",
         true,
         "#6C4426");
@@ -185,6 +195,9 @@ https://chat.openai.com/auth/login`,
         `للاسف، مش بقدر اساعد في ChatGPT-4 🙏
 ممكن تشوف الي كتبته في التويته ديه
 https://twitter.com/tarekbadrsh/status/1641394327015370754
+
+—
+🤖 Auto message 🤖
 `,
         false,
         false,
@@ -203,7 +216,11 @@ https://twitter.com/tarekbadrsh/status/1641394327015370754
         `انا بعتلك ايميل تغيير الباسورد دور عندك في الرسايل
 هما بعتولك ايميل شبه الصورة الي في اللينك او سيرش علي OpenAI وغير الباسورد وابعتلي الجديد
 
-https://drive.google.com/file/d/1SoEQy4cr8k8tLG0_Hx5CHJHSws0HD1xX/view?usp=sharing`,
+https://drive.google.com/file/d/1SoEQy4cr8k8tLG0_Hx5CHJHSws0HD1xX/view
+
+—
+🤖 Auto message 🤖
+`,
         "--",
         false,
         "#8b2ef5");
@@ -216,7 +233,11 @@ https://drive.google.com/file/d/1SoEQy4cr8k8tLG0_Hx5CHJHSws0HD1xX/view?usp=shari
 انت مش محتاج VPN بس علي الاغلب هيقولك غير متوفر في بلدك
 خلص وبعدها ابعتلي عشان احط نمرة اوروبي واشغل الاكونت
 
-https://drive.google.com/file/d/1lHyQE0KxGfR_2zlWBK1JuXG41ArgYRk3/view`,
+https://drive.google.com/file/d/1lHyQE0KxGfR_2zlWBK1JuXG41ArgYRk3/view
+
+—
+🤖 Auto message 🤖
+`,
         "--",
         false,
         "#43662D");
@@ -229,7 +250,11 @@ https://drive.google.com/file/d/1lHyQE0KxGfR_2zlWBK1JuXG41ArgYRk3/view`,
 انت مش محتاج VPN بس علي الاغلب هيقولك غير متوفر في بلدك
 خلص وبعدها ابعتلي عشان احط نمرة اوروبي واشغل الاكونت
 
-https://drive.google.com/file/d/1lHyQE0KxGfR_2zlWBK1JuXG41ArgYRk3/view`,
+https://drive.google.com/file/d/1lHyQE0KxGfR_2zlWBK1JuXG41ArgYRk3/view
+
+—
+🤖 Auto message 🤖
+`,
         "--",
         false,
         "#43662D");
@@ -256,7 +281,11 @@ Gothenburg, Sweden`,
         `👋 اهلا وسهلا!
 انت عندك اكونت بالفعل وشغال تمام
 - انت هتحتاج تغير الباسورد ... بص علي التويته ديه عشان تعرف ازاي 🔐
-https://twitter.com/tarekbadrsh/status/1619418114340585472`,
+https://twitter.com/tarekbadrsh/status/1619418114340585472
+
+—
+🤖 Auto message 🤖
+`,
         "done",
         true,
         "#164875");
@@ -289,9 +318,12 @@ const facebookSendPassword = async (message) => {
 خلص وبعدها ابعتلي عشان احط نمرة اوروبي واشغل الاكونت
     
 https://drive.google.com/file/d/1lHyQE0KxGfR_2zlWBK1JuXG41ArgYRk3/view
+
+—
+🤖 Auto message 🤖
 `];
     await addLabel("--");
-    await sendMultipleFacebookMessages(messages, false);
+    await sendMultipleFacebookMessages(messages);
     message.user.status = "password-sent"
     await sendMessagefromFacebook("update-user", message.user);
 };
@@ -312,9 +344,13 @@ const facebookUserAlreadyExists = async (message) => {
 ممكن تبعتلي الإيميل والباسورد الصح في رسايل منفصلة عشان احط رقم اوروبي واشغلهولك!
 وممكن تتأكد بنفسك لو عملت تسجيل دخول من اللينك ده وتقدر كمان تغير الباسورد
 
-https://chat.openai.com/auth/login`
+https://chat.openai.com/auth/login
+
+—
+🤖 Auto message 🤖
+`
     ];
-    await sendMultipleFacebookMessages(messages, false);
+    await sendMultipleFacebookMessages(messages);
     message.user.status = "user-already-exists-sent"
     await sendMessagefromFacebook(type = "update-user", message.user);
 };
@@ -343,7 +379,7 @@ https://youtu.be/OKCMfCdLqXA
 - انا هبقي شاكر جدا لو تقدر تنزل استوري او تويته ان اي حد محتاج اكونت يبعتلي اهلا وسهلا
 انا بحاول اعمل حسابات لأكبر قدر ممكن من الناس دلوقتي🙏`
     ];
-    await sendMultipleFacebookMessages(messages, true);
+    await sendMultipleFacebookMessages(messages);
 };
 
 const isEmailValid = (email) => {

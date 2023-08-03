@@ -65,10 +65,13 @@ const openAIAddEventListener = () => {
 }
 
 const toCreateYourAccount = async () => {
-    if (!document.body.textContent.includes("Welcome to ChatGPT")) {
+    if (!window.location.href.includes("chat.openai.com/auth/login")) {
         return true;
     }
     let done = await clickOnButton('.btn.relative.btn-primary:nth-of-type(2)');
+    if (!done) {
+        done = await clickOnButton('.grid > button:nth-of-type(2)');
+    }
     if (!done) {
         return false;
     }
@@ -130,10 +133,13 @@ const verifyYourEmail = async () => {
 }
 
 const toLoginYourAccount = async () => {
-    if (!document.body.textContent.includes("Welcome to ChatGPT")) {
+    if (!window.location.href.includes("chat.openai.com/auth/login")) {
         return true;
     }
     let done = await clickOnButton('.btn.relative.btn-primary:nth-of-type(1)');
+    if (!done) {
+        done = await clickOnButton('.grid > button:nth-of-type(1)');
+    }
     if (!done) {
         return false;
     }
