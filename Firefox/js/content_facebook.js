@@ -102,19 +102,22 @@ const sendFacebookMessage = async (message) => {
     return false;
 }
 
-const sendMultipleFacebookMessages = async (messages, moveToDone = true, index = 0) => {
-    if (index >= messages.length && moveToDone) {
+const sendMultipleFacebookMessages = async (messages, moveToDone) => {
+    for (let index = 0; index < messages.length; index++) {
+        const done = await sendFacebookMessage(messages[index]);
+        if (!done) {
+            return false;
+        }
+        await sleep(100);
+    }
+
+    if (moveToDone) {
         await sleep(300);
         await clickMoveToDone();
-        return true;
     }
-    const done = await sendFacebookMessage(messages[index]);
-    if (!done) {
-        return false;
-    }
-    await sleep(100);
-    await sendMultipleFacebookMessages(messages, moveToDone, index + 1);
-}
+
+    return true;
+};
 
 const addButtonToNotes = async (css_class, text, message, label, click_done, backgroundColor) => {
     let xpath = "//div[contains(text(), 'Notes')]";
@@ -323,7 +326,7 @@ https://drive.google.com/file/d/1lHyQE0KxGfR_2zlWBK1JuXG41ArgYRk3/view
 🤖 Auto message 🤖
 `];
     await addLabel("--");
-    await sendMultipleFacebookMessages(messages);
+    await sendMultipleFacebookMessages(messages, false);
     message.user.status = "password-sent"
     await sendMessagefromFacebook("update-user", message.user);
 };
@@ -350,7 +353,7 @@ https://chat.openai.com/auth/login
 🤖 Auto message 🤖
 `
     ];
-    await sendMultipleFacebookMessages(messages);
+    await sendMultipleFacebookMessages(messages, false);
     message.user.status = "user-already-exists-sent"
     await sendMessagefromFacebook(type = "update-user", message.user);
 };
@@ -379,7 +382,7 @@ https://youtu.be/OKCMfCdLqXA
 - انا هبقي شاكر جدا لو تقدر تنزل استوري او تويته ان اي حد محتاج اكونت يبعتلي اهلا وسهلا
 انا بحاول اعمل حسابات لأكبر قدر ممكن من الناس دلوقتي🙏`
     ];
-    await sendMultipleFacebookMessages(messages);
+    await sendMultipleFacebookMessages(messages, true);
 };
 
 const isEmailValid = (email) => {
