@@ -281,9 +281,10 @@ const enterCode = async () => {
 }
 
 const openAIWelcomeMessage = async () => {
-    await clickOnButton('.btn.relative.btn-neutral.ml-auto:nth-of-type(1)');
-    await clickOnButton('.btn.relative.btn-neutral.ml-auto');
-    let done = await clickOnButton('.btn.relative.btn-primary.ml-auto');
+    let done = await clickOnButtons('.btn.relative.btn-primary', "Okay, let’s go");
+    if (!done) {
+        return false;
+    }
     if (done) {
         clearInterval(openai_intervals.handleOpenAI);
         done = await fillInput('#prompt-textarea', `Hi ChatGPT my name is ${user.first_name}`);
