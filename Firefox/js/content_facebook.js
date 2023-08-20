@@ -153,20 +153,6 @@ const addButtonToNotes = async (css_class, text, message, label, click_done, bac
 }
 
 const addResponseButtons = async () => {
-    await addButtonToNotes(
-        "euro_btn",
-        "🇪🇺فاضل الرقم الاوروبي🇪🇺",
-        `تمام جدا!
-
-كده لسه الاكونت مشتغلش
-فاضل ان انا احط رقم موبايل اوروبي واشغله
-
-—
-🤖 Auto message 🤖
-`,
-        "num",
-        false,
-        "#0B378C");
 
     await addButtonToNotes("wrong_password_btn",
         "🔴الباسورد غلط🔴",
@@ -299,6 +285,19 @@ https://twitter.com/tarekbadrsh/status/1619418114340585472
         "urgent 🚨",
         false,
         "#EB5131");
+    await addButtonToNotes(
+        "euro_btn",
+        "🇪🇺فاضل الرقم الاوروبي🇪🇺",
+        `تمام جدا!
+كده لسه الاكونت مشتغلش
+فاضل ان انا احط رقم موبايل اوروبي واشغله
+
+—
+🤖 Auto message 🤖
+    `,
+        "num",
+        false,
+        "#0B378C");
 
     clearInterval(facebook_intervals.createStyleElement);
 }
@@ -314,6 +313,7 @@ const facebookSendPassword = async (message) => {
         message.user.email,
         message.user.password,
         `👆ده الباسورد
+كده لسه الاكونت مشتغلش
 من فضلك هما بعتولك ايميل شبه الصورة الي في اللينك
 دوس علي الزرار الأخضر عشان تاكتف الاكونت
 

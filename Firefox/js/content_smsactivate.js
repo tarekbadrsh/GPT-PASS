@@ -197,7 +197,8 @@ const onSmsLoad = async () => {
     sms_intervals.handleSmsActivate = setInterval(handleSmsActivate, 500);
     setInterval(async function () {
         let result = await browser.storage.local.get("automation");
-        if (result.automation) {
+        let phoneElement = document.querySelector(".activate-grid-item__numberq");
+        if (result.automation && phoneElement) {
             location.reload();
         }
     }, 10000); // 1000 milliseconds = 1 second

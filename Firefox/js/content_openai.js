@@ -241,14 +241,24 @@ const verifyYourPhoneNumber = async () => {
     selectPhoneCountry.add(user.email);
     await simulateMouseEvents(dropdownCountry);
     let countryhtml;
-    if (user.country_code == 8) { // kenya 
-        countryhtml = "react-select-2-option-115"
-    } else if (user.country_code == 32) { // Romania
-        countryhtml = "react-select-2-option-181"
+    let whatsapp_opt_in = false;
+    if (user.country_code == 6) {
+        countryhtml = "react-select-2-option-103" // indonesia
+        whatsapp_opt_in = true;
+    } else if (user.country_code == 8) {
+        countryhtml = "react-select-2-option-115" // kenya 
+    } else if (user.country_code == 16) {
+        countryhtml = "react-select-2-option-236" // United Kingdom
+    } else if (user.country_code == 32) {
+        countryhtml = "react-select-2-option-181" // Romania
     }
     await sleep(500);
     const country = document.getElementById(countryhtml);
     await simulateMouseEvents(country);
+    await sleep(500);
+    if (whatsapp_opt_in) {
+        await clickOnButton('#whatsapp-opt-in-radio-no');
+    }
     await sleep(500);
     let done = await fillInput('.text-input', user.phone_number);
     if (!done) {
