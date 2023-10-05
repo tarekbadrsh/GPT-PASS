@@ -154,6 +154,14 @@ const addButtonToNotes = async (css_class, text, message, label, click_done, bac
 
 const addResponseButtons = async () => {
 
+    await addButtonToNotes("hr2error",
+    "⏰مشكلة الساعتين في الموقع⏰",
+    `معذرة ... فيه مشكلة في الموقع لو عدي اكتر من ساعتين علي تأكيد الايميل من غير رقم الاكونت بيحتاج يتعمل من الاول
+فممكن من فضلك تأكد علي الإيميل تاني وانا قاعد بشتغل دلوقتي هعملهولك`,
+    false,
+    false,
+    "#0B378C");
+
     await addButtonToNotes("wrong_password_btn",
         "🔴الباسورد غلط🔴",
         `الباسورد غلط ... ممكن من فضلك تبعتلي الإيميل والباسورد الصح في رسايل منفصلة عشان احط رقم اوروبي واشغلهولك!
@@ -162,8 +170,7 @@ const addResponseButtons = async () => {
 https://chat.openai.com/auth/login
 
 —
-🤖 Auto message 🤖
-`,
+🤖 Auto message 🤖`,
         "--",
         false,
         "#CC1616");
@@ -173,10 +180,9 @@ https://chat.openai.com/auth/login
         `أنا اسف جدا ... ممكن من فضلك تخلي صاحب الإيميل يبعتلي عشان جايلي رسايل كتير🙏🏻
 
 —
-🤖 Auto message 🤖
-`,
-        "done",
-        true,
+🤖 Auto message 🤖`,
+        false,
+        false,
         "#6C4426");
 
     await addButtonToNotes("gpt4_btn",
@@ -186,8 +192,7 @@ https://chat.openai.com/auth/login
 https://twitter.com/tarekbadrsh/status/1641394327015370754
 
 —
-🤖 Auto message 🤖
-`,
+🤖 Auto message 🤖`,
         false,
         false,
         "#1DA1F2");
@@ -208,8 +213,7 @@ https://twitter.com/tarekbadrsh/status/1641394327015370754
 https://drive.google.com/file/d/1SoEQy4cr8k8tLG0_Hx5CHJHSws0HD1xX/view
 
 —
-🤖 Auto message 🤖
-`,
+🤖 Auto message 🤖`,
         "--",
         false,
         "#8b2ef5");
@@ -225,25 +229,7 @@ https://drive.google.com/file/d/1SoEQy4cr8k8tLG0_Hx5CHJHSws0HD1xX/view
 https://drive.google.com/file/d/1lHyQE0KxGfR_2zlWBK1JuXG41ArgYRk3/view
 
 —
-🤖 Auto message 🤖
-`,
-        "--",
-        false,
-        "#43662D");
-
-    await addButtonToNotes("activate_your_account",
-        "🥦🥦اكتف الإيميل بتاعك🥦🥦",
-        `من فضلك هما بعتولك ايميل شبه الصورة الي في اللينك
-دوس علي الزرار الأخضر عشان تاكتف الاكونت
-
-انت مش محتاج VPN بس علي الاغلب هيقولك غير متوفر في بلدك
-خلص وبعدها ابعتلي عشان احط نمرة اوروبي واشغل الاكونت
-
-https://drive.google.com/file/d/1lHyQE0KxGfR_2zlWBK1JuXG41ArgYRk3/view
-
-—
-🤖 Auto message 🤖
-`,
+🤖 Auto message 🤖`,
         "--",
         false,
         "#43662D");
@@ -256,11 +242,7 @@ https://drive.google.com/file/d/1lHyQE0KxGfR_2zlWBK1JuXG41ArgYRk3/view
 فممكن من فضلك تبعتلي الميل والباسورد في رسايل منفصلة عشان احط رقم اوروبي واشغلهولك
 وممكن استأذنك تطول بالك علينا عشان فيه ناس كتير فممكن نتأخر في الرد كام اسبوع
 —
-🤖 Auto message 🤖
-
-https://www.youtube.com/c/tarekBadrsh
-Tarek Badr طارق بدر 
-Gothenburg, Sweden`,
+🤖 Auto message 🤖`,
         "--",
         false,
         "#ff0142");
@@ -273,8 +255,7 @@ Gothenburg, Sweden`,
 https://twitter.com/tarekbadrsh/status/1619418114340585472
 
 —
-🤖 Auto message 🤖
-`,
+🤖 Auto message 🤖`,
         "done",
         true,
         "#164875");
@@ -285,19 +266,7 @@ https://twitter.com/tarekbadrsh/status/1619418114340585472
         "urgent 🚨",
         false,
         "#EB5131");
-    await addButtonToNotes(
-        "euro_btn",
-        "🇪🇺فاضل الرقم الاوروبي🇪🇺",
-        `تمام جدا!
-كده لسه الاكونت مشتغلش
-فاضل ان انا احط رقم موبايل اوروبي واشغله
 
-—
-🤖 Auto message 🤖
-    `,
-        "num",
-        false,
-        "#0B378C");
 
     clearInterval(facebook_intervals.createStyleElement);
 }
@@ -369,7 +338,7 @@ const userDone = async (message) => {
     const messages = [
         message.user.email,
         message.user.password,
-        "https://chat.openai.com/chat",
+        "https://chat.openai.com",
         `- انا شغلت ليك الاكونت🤟🎉🎊
 *من فضلك اكد عليا انه اشتغل ومتتكسفش تبعتلي لو فيه مشكلة او مش شغال*
 

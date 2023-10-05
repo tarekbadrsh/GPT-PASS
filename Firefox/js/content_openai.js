@@ -122,13 +122,13 @@ const verifyYourEmail = async () => {
     if (!document.body.textContent.includes("Verify your email")) {
         return true;
     }
-    let done = await clickOnButtons('.onb-resend-email-btn:nth-of-type(1)');
-    if (!done) {
-        return false;
-    }
+    // let done = await clickOnButtons('.onb-resend-email-btn:nth-of-type(1)');
+    // if (!done) {
+    //     return false;
+    // }
     user.status = "signup-v"
     await sendMessagefromOpenAI(type = "update-user");
-    await sendMessagefromOpenAI(type = "closeCurrentTab", null, duration = 1000);
+    await sendMessagefromOpenAI(type = "closeCurrentTab", null, duration = 5000);
     return true;
 }
 
@@ -243,8 +243,8 @@ const verifyYourPhoneNumber = async () => {
     let countryhtml;
     let whatsapp_opt_in = false;
     if (user.country_code == 6) {
-        countryhtml = "react-select-2-option-103" // indonesia
         whatsapp_opt_in = true;
+        countryhtml = "react-select-2-option-103" // indonesia
     } else if (user.country_code == 8) {
         countryhtml = "react-select-2-option-115" // kenya 
     } else if (user.country_code == 16) {
