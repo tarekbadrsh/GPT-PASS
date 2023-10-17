@@ -45,7 +45,6 @@ const clearAllData = async () => {
 
 // Listen for messages from other parts of the extension
 browser.runtime.onMessage.addListener(async (message) => {
-    console.log(message)
     let user;
     if (message.user) {
         user = message.user;
@@ -104,16 +103,15 @@ browser.runtime.onMessage.addListener(async (message) => {
             }
             break;
         case 'phone_number':
-            user.phone_number = message.phone_number;
-            user.country_code = message.country_code;
-            await updateCurrentUser(user);
-            break;
-        case 'smscode':
-            if (smscodeSet.has(message.smscode)) {
-                return;
+            user.phone_number = message.phone_number.phoneNumber;
+            user.country_code = message.phone_number.countryCode;
+            if(Object.values(message.phone_number.smsCodes)[0]){
+                const sms = Object.keys(message.phone_number.smsCodes)[0];
+                if (!smscodeSet.has(sms)) {
+                    smscodeSet.add(sms)
+                    user.smscode = sms
+                 }
             }
-            smscodeSet.add(message.smscode);
-            user.smscode = message.smscode;
             await updateCurrentUser(user);
             break;
         case 'clear-all-data':

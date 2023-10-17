@@ -2,27 +2,6 @@
  * Optimized content.js for an extension
  */
 
-const generateRandomBirthDate = () => {
-    const randomYear = Math.floor(Math.random() * (1995 - 1970 + 1)) + 1970;
-    const randomMonth = (Math.floor(Math.random() * 11) + 1).toString().padStart(2, '0');
-    const randomDay = (Math.floor(Math.random() * 11) + 1).toString().padStart(2, '0');
-    return `${randomMonth}/${randomDay}/${randomYear}`;
-}
-
-// Generate a hash for a given string 
-const generateHash = async (str) => {
-    try {
-        const encoder = new TextEncoder();
-        const data = encoder.encode(str);
-        const digest = await crypto.subtle.digest('SHA-256', data);
-        const hashArray = Array.from(new Uint8Array(digest));
-        const hashHex = hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
-        return hashHex.slice(0, 16);
-    } catch (err) {
-        console.error(`Failed to generate hash: ${err}`);
-        return null;
-    }
-}
 
 class User {
     constructor(facebookUrl, instagramUrl, email, first_name, last_name) {
@@ -48,6 +27,28 @@ class User {
 
     setBirthDate() {
         this.birth_date = generateRandomBirthDate();
+    }
+}
+
+const generateRandomBirthDate = () => {
+    const randomYear = Math.floor(Math.random() * (1995 - 1970 + 1)) + 1970;
+    const randomMonth = (Math.floor(Math.random() * 11) + 1).toString().padStart(2, '0');
+    const randomDay = (Math.floor(Math.random() * 11) + 1).toString().padStart(2, '0');
+    return `${randomMonth}/${randomDay}/${randomYear}`;
+}
+
+// Generate a hash for a given string 
+const generateHash = async (str) => {
+    try {
+        const encoder = new TextEncoder();
+        const data = encoder.encode(str);
+        const digest = await crypto.subtle.digest('SHA-256', data);
+        const hashArray = Array.from(new Uint8Array(digest));
+        const hashHex = hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
+        return hashHex.slice(0, 16);
+    } catch (err) {
+        console.error(`Failed to generate hash: ${err}`);
+        return null;
     }
 }
 

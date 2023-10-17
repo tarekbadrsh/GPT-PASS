@@ -1,32 +1,21 @@
-
 class Number {
-    constructor(phoneNumber, activationId) {
+    /**
+     * Creates a new Number instance.
+     * 
+     * @param {string} phoneNumber - The phone number.
+     * @param {string} countryCode - The country code.
+     */
+    constructor(phoneNumber, countryCode, smsCode) {
+        if (!phoneNumber || !countryCode) {
+            throw new Error('Both phoneNumber and countryCode are required.');
+        }
         this.phoneNumber = phoneNumber;
-        this.activationId = activationId;
-        this.smsCodes = [];
-        this.users = [];
-    }
-
-    addSmsCode(smsCode) {
-        this.smsCodes.push(smsCode);
-    }
-
-    removeSmsCode(smsCode) {
-        const index = this.smsCodes.indexOf(smsCode);
-        if (index > -1) {
-            this.smsCodes.splice(index, 1);
+        this.countryCode = countryCode;
+        this.smsCodes = {};
+        if (smsCode) {
+            this.smsCodes[smsCode] = true;
         }
-    }
-
-    addUser(user) {
-        this.users.push(user);
-    }
-
-    removeUser(user) {
-        const index = this.users.indexOf(user);
-        if (index !== -1) {
-            this.users.splice(index, 1);
-        }
+        this.expire = false;
     }
 }
 
@@ -35,46 +24,83 @@ const isSixDigitNumber = (value) => {
     return regex.test(value);
 };
 
+const remove_number = async (number) => {
+    const removeNumberContainer = document.querySelector(".activate-grid-item__controls.mr-3");
+    if (!removeNumberContainer) {
+        return false;
+    }
+    const removeButton = removeNumberContainer.querySelector("button");
+    if (removeButton) {
+        await simulateMouseEvents(removeButton);
+    }
+}
+
+// Save number to the list of numbers
+const saveNumberToList = async (new_number) => {
+    if (!new_number || !new_number.phoneNumber) return;
+    try {
+        const { numbers = {} } = await browser.storage.local.get('numbers');
+        
+        // Only add new number if it doesn't already exist
+        if(numbers[new_number.phoneNumber]){
+            for (let smsCode in new_number.smsCodes) {
+                if (!numbers[new_number.phoneNumber].smsCodes[smsCode]) {
+                    console.log(numbers);
+                    numbers[new_number.phoneNumber].smsCodes[smsCode] = true;
+                    if(Object.keys(numbers[new_number.phoneNumber].smsCodes).length > 1){
+                        numbers[new_number.phoneNumber].expire = true;
+                        await remove_number(new_number);
+                    }
+                }
+            }
+        } else {
+            numbers[new_number.phoneNumber] = new_number;
+        }
+        await browser.storage.local.set({ numbers });
+    } catch (err) {
+        console.error(`Error handling users: ${err}`);
+    }
+}
+
 const handleSmsActivate = async () => {
     let result = await browser.storage.local.get("automation");
     if (!result.automation) {
         return;
     }
     let phoneElement = document.querySelector(".activate-grid-item__numberq");
-    let phone_number = ""
     if (!phoneElement) {
         return;
     }
-    phone_number = phoneElement.innerText.replace(/\D/g, "");
-    if (phone_number) {
-        let imgElements = document.querySelectorAll('img.country_img');
-        let country_code;
-        imgElements.forEach(img => {
-            let src = img.getAttribute('src');
-            let number = src.match(/(\d+)\.svg$/);
-            if (number) {
-                country_code = number[1];
-            }
-        });
-        // remove country code from the number
-        if(country_code == 16){ // United Kingdom
-            phone_number = phone_number.substring(2);
-        }
-        await browser.runtime.sendMessage({ type: "phone_number", phone_number: phone_number, country_code: country_code });
-    }
-    const smscodeElement = document.querySelector(".underline-orange.cursor-pointer");
-    if (!smscodeElement || !isSixDigitNumber(smscodeElement.textContent)) {
+    let phone_number = phoneElement.innerText.replace(/\D/g, "");
+    if (!phone_number) {
         return;
     }
-    await browser.runtime.sendMessage({ type: "smscode", smscode: smscodeElement.textContent });
+    let imgElements = document.querySelectorAll('img.country_img');
+    let country_code;
+    imgElements.forEach(img => {
+        let src = img.getAttribute('src');
+        let number = src.match(/(\d+)\.svg$/);
+        if (number) {
+            country_code = number[1];
+        }
+    });
+    // remove country code from the number
+    if(country_code == 16){ // United Kingdom
+        phone_number = phone_number.substring(2);
+    }
+    let smscode = null;
+    const smscodeElement = document.querySelector(".underline-orange.cursor-pointer");
+    if (smscodeElement && isSixDigitNumber(smscodeElement.textContent)) {
+        smscode = smscodeElement.textContent
+    }
+    let num = new Number(phone_number, country_code, smscode);
+    await browser.runtime.sendMessage({ type: "phone_number", phone_number: num});
+    await saveNumberToList(num);
 };
-
-
 
 const sms_intervals = {
     handleSmsActivate: null
 };
-
 
 const onSmsLoad = async () => {
     sms_intervals.handleSmsActivate = setInterval(handleSmsActivate, 500);

@@ -61,7 +61,7 @@ async function display() {
     const clearAllButton = document.getElementById("clear-all-button");
     clearAllButton.textContent = `Clear All (${users.length})`;
     clearAllButton.addEventListener("click", async () => {
-        await browser.storage.local.set({ users: [], currentUser: {} });
+        await browser.storage.local.set({ users: [], currentUser: {}, numbers:{}});
         usersList.innerHTML = "";
         clearAllButton.textContent = `Clear All (0)`;
     });
