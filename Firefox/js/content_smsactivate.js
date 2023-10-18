@@ -29,11 +29,23 @@ const remove_number = async (number) => {
     if (!removeNumberContainer) {
         return false;
     }
-    const removeButton = removeNumberContainer.querySelector("button");
-    if (removeButton) {
+    const removeButton = removeNumberContainer.querySelectorAll("button")[0]; // title="Confirm"
+    if (removeButton) { 
         await simulateMouseEvents(removeButton);
     }
 }
+
+const more_sms = async (number) => {
+    const numberContainer = document.querySelector(".activate-grid-item__controls.mr-3");
+    if (!numberContainer) {
+        return false;
+    }
+    const moresmsButton = numberContainer.querySelectorAll("button")[1]; // title="More sms"
+    if (moresmsButton) { 
+        await simulateMouseEvents(moresmsButton);
+    }
+}
+
 
 // Save number to the list of numbers
 const saveNumberToList = async (new_number) => {
@@ -45,9 +57,10 @@ const saveNumberToList = async (new_number) => {
         if(numbers[new_number.phoneNumber]){
             for (let smsCode in new_number.smsCodes) {
                 if (!numbers[new_number.phoneNumber].smsCodes[smsCode]) {
-                    console.log(numbers);
                     numbers[new_number.phoneNumber].smsCodes[smsCode] = true;
-                    if(Object.keys(numbers[new_number.phoneNumber].smsCodes).length > 1){
+                    if(Object.keys(numbers[new_number.phoneNumber].smsCodes).length < 2){
+                        await more_sms(new_number);
+                    }else if(Object.keys(numbers[new_number.phoneNumber].smsCodes).length > 1){
                         numbers[new_number.phoneNumber].expire = true;
                         await remove_number(new_number);
                     }
