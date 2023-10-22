@@ -44,7 +44,7 @@ const clearAllData = async () => {
 
 
 // Listen for messages from other parts of the extension
-browser.runtime.onMessage.addListener(async (message) => {
+browser.runtime.onMessage.addListener(async (message, sender) => {
     let user;
     if (message.user) {
         user = message.user;
@@ -91,6 +91,13 @@ browser.runtime.onMessage.addListener(async (message) => {
                     sendMessageFacebook_user_exists.add(user.email);
                     await browser.tabs.sendMessage(user.facebookTabId, { type: 'send-user-already-exists', user: user });
                     break;
+                case 'login-n':
+                    const smsTab = await browser.storage.local.get("smsTabId");
+                    if(!smsTab.smsTabId){
+                        return;
+                    }
+                    await browser.tabs.sendMessage(smsTab.smsTabId, { type: 'get-new-phone-number'});
+                    break;
                 case 'done':
                     if (sendMessageFacebook_done.has(user.email)) {
                         return;
@@ -101,6 +108,10 @@ browser.runtime.onMessage.addListener(async (message) => {
                 default:
                     break;
             }
+            break;
+        case 'new-sms-tab':
+            const smsTabId = sender.tab.id;
+            browser.storage.local.set({ "smsTabId": smsTabId });
             break;
         case 'phone_number':
             user.phone_number = message.phone_number.phoneNumber;

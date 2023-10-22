@@ -83,7 +83,7 @@ const addCheckboxListener = (id) => {
     });
 }
 
-['automation'].forEach(id => {
+['automation', 'clickdone'].forEach(id => {
     setCheckboxStateFromLocalStorage(id);
     addCheckboxListener(id);
 });

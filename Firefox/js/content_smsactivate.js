@@ -76,7 +76,7 @@ const saveNumberToList = async (new_number) => {
 }
 
 const handleSmsActivate = async () => {
-    let result = await browser.storage.local.get("automation");
+    const result = await browser.storage.local.get("automation");
     if (!result.automation) {
         return;
     }
@@ -97,10 +97,6 @@ const handleSmsActivate = async () => {
             country_code = number[1];
         }
     });
-    // remove country code from the number
-    if(country_code == 16){ // United Kingdom
-        phone_number = phone_number.substring(2);
-    }
     let smscode = null;
     const smscodeElement = document.querySelector(".underline-orange.cursor-pointer");
     if (smscodeElement && isSixDigitNumber(smscodeElement.textContent)) {
@@ -118,12 +114,13 @@ const sms_intervals = {
 const onSmsLoad = async () => {
     sms_intervals.handleSmsActivate = setInterval(handleSmsActivate, 500);
     setInterval(async function () {
-        let result = await browser.storage.local.get("automation");
+        const result = await browser.storage.local.get("automation");
         let phoneElement = document.querySelector(".activate-grid-item__numberq");
         if (result.automation && phoneElement) {
             location.reload();
         }
     }, 10000); // 1000 milliseconds = 1 second
+    await browser.runtime.sendMessage({ type: "new-sms-tab"});
 }
 
 
@@ -132,3 +129,19 @@ if (document.readyState === "complete") {
 } else {
     window.addEventListener("load", onSmsLoad);
 }
+
+browser.runtime.onMessage.addListener(async (message) => {
+    try {
+        switch (message.type) {
+            case 'get-new-phone-number':
+                let phoneElement = document.querySelector(".activate-grid-item__numberq");
+                if (phoneElement) {
+                    return;
+                }
+                console.log("I will get a new phone number");
+                break;
+        }
+    } catch (error) {
+        console.error(error)
+    }
+});

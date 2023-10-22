@@ -172,9 +172,12 @@ const addResponseButtons = async () => {
         false,
         "#6C4426");
 
-    await addButtonToNotes("wrong_password_btn",
-        "🔴الباسورد غلط🔴",
-        `الباسورد غلط ... ممكن من فضلك تبعتلي الإيميل والباسورد الصح في رسايل منفصلة عشان احط رقم اوروبي واشغلهولك!
+        await addButtonToNotes("youHaveAccount",
+        "!!!انت عندك اكونت!!!",
+        `👋 اهلا وسهلا!
+انت عندك اكونت بالفعل ...
+لو محتاج تفعله برقم اوروبي
+ممكن تبعتلي الإيميل والباسورد الصح في رسايل منفصلة عشان احط رقم اوروبي واشغلهولك!
 وممكن تتأكد بنفسك لو عملت تسجيل دخول من اللينك ده وتقدر كمان تغير الباسورد
 
 https://chat.openai.com/auth/login
@@ -183,7 +186,14 @@ https://chat.openai.com/auth/login
 🤖 Auto message 🤖`,
         "--",
         false,
-        "#CC1616");
+        "#164875");
+
+    await addButtonToNotes("done",
+        "✅✅done✅✅",
+        null,
+        "done",
+        true,
+        "#00B300");
 
     await addButtonToNotes("gpt4_btn",
         "ChatGPT-⓸⓸⓸",
@@ -197,12 +207,19 @@ https://www.youtube.com/watch?v=tKMTUvxJJW8
         false,
         "#1DA1F2");
 
-    await addButtonToNotes("done",
-        "✅✅done✅✅",
-        null,
-        "done",
-        true,
-        "#00B300");
+    await addButtonToNotes("wrong_password_btn",
+        "🔴الباسورد غلط🔴",
+        `الباسورد غلط ... ممكن من فضلك تبعتلي الإيميل والباسورد الصح في رسايل منفصلة عشان احط رقم اوروبي واشغلهولك!
+وممكن تتأكد بنفسك لو عملت تسجيل دخول من اللينك ده وتقدر كمان تغير الباسورد
+
+https://chat.openai.com/auth/login
+
+—
+🤖 Auto message 🤖`,
+        "--",
+        false,
+        "#CC1616");
+
 
 
     await addButtonToNotes("change_password_btn",
@@ -243,19 +260,6 @@ https://www.youtube.com/watch?v=tKMTUvxJJW8
         false,
         "#ff0142");
 
-    await addButtonToNotes("youHaveAccount",
-        "!!!انت عندك اكونت!!!",
-        `👋 اهلا وسهلا!
-انت عندك اكونت بالفعل وشغال تمام
-- انت هتحتاج تغير الباسورد ... بص علي التويته ديه عشان تعرف ازاي 🔐
-https://twitter.com/tarekbadrsh/status/1619418114340585472
-
-—
-🤖 Auto message 🤖`,
-        "done",
-        true,
-        "#164875");
-
     await addButtonToNotes("urgent",
         "🚨🚨urgent🚨🚨",
         null,
@@ -285,11 +289,14 @@ const facebookSendPassword = async (message) => {
 انت مش محتاج VPN بس علي الاغلب هيقولك غير متوفر في بلدك
 لازم تفعله دلوقتي وابعتلي عشان احط نمرة اوروبي واشغل الاكونت
 
+*لو عدي ساعتين هنضطر نعمله من الاول*
 —
 🤖 Auto message 🤖
 `];
     await addLabel("--");
-    await sendMultipleFacebookMessages(messages, false);
+    let result = await browser.storage.local.get("clickdone");
+    const clickdone = result.clickdone; 
+    await sendMultipleFacebookMessages(messages, clickdone);
     message.user.status = "password-sent"
     await sendMessagefromFacebook("update-user", message.user);
 };

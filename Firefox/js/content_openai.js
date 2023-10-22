@@ -241,7 +241,9 @@ const verifyYourPhoneNumber = async () => {
     selectPhoneCountry.add(user.email);
     await simulateMouseEvents(dropdownCountry);
     let countryhtml;
+    let phone_number = user.phone_number;
     let whatsapp_opt_in = false;
+    let remove_country_code = null;
     if (user.country_code == 6) {
         whatsapp_opt_in = true;
         countryhtml = "react-select-2-option-103" // indonesia
@@ -249,9 +251,15 @@ const verifyYourPhoneNumber = async () => {
         countryhtml = "react-select-2-option-115" // kenya 
     } else if (user.country_code == 16) {
         countryhtml = "react-select-2-option-236" // United Kingdom
+        remove_country_code = 2
     } else if (user.country_code == 32) {
         countryhtml = "react-select-2-option-181" // Romania
+    } else if (user.country_code == 117) {
+        countryhtml = "react-select-2-option-177" // Portugal
+    }else if (user.country_code == 48) {
+        countryhtml = "react-select-2-option-155" // Netherlands
     }
+    
     await sleep(500);
     const country = document.getElementById(countryhtml);
     await simulateMouseEvents(country);
@@ -259,8 +267,11 @@ const verifyYourPhoneNumber = async () => {
     if (whatsapp_opt_in) {
         await clickOnButton('#whatsapp-opt-in-radio-no');
     }
+    if (remove_country_code) {
+        phone_number = user.phone_number.substring(remove_country_code);
+    }
     await sleep(500);
-    let done = await fillInput('.text-input', user.phone_number);
+    let done = await fillInput('.text-input', phone_number);
     if (!done) {
         return false;
     }
@@ -292,21 +303,16 @@ const enterCode = async () => {
 
 const openAIWelcomeMessage = async () => {
     let done = await clickOnButtons('.btn.relative.btn-primary', "Okay, let’s go");
+    done = await fillInput('#prompt-textarea', `Hi ChatGPT my name is ${user.first_name}`);
+    const textarea = document.getElementById('prompt-textarea');
+    const button = textarea.nextElementSibling;
+    await simulateMouseEvents(button);
     if (!done) {
         return false;
     }
-    if (done) {
-        clearInterval(openai_intervals.handleOpenAI);
-        done = await fillInput('#prompt-textarea', `Hi ChatGPT my name is ${user.first_name}`);
-        if (!done) {
-            return false;
-        }
-        const textarea = document.getElementById('prompt-textarea');
-        const button = textarea.nextElementSibling;
-        await simulateMouseEvents(button);
-        await sendMessagefromOpenAI(type = "closeCurrentTab", null, duration = 5000);
-        return true;
-    }
+    await sendMessagefromOpenAI(type = "closeCurrentTab", null, duration = 7000);
+    clearInterval(openai_intervals.handleOpenAI);
+    return true;
 }
 
 const handleOpenAI = async () => {
@@ -322,7 +328,7 @@ const handleOpenAI = async () => {
             if (document.body.textContent.includes("The user already exists")) {
                 user.status = "user-already-exists";
                 await sendMessagefromOpenAI(type = "update-user");
-                await sendMessagefromOpenAI(type = "closeCurrentTab", null, duration = 1000);
+                // await sendMessagefromOpenAI(type = "closeCurrentTab", null, duration = 1000);
             }
             return;
         }
